@@ -19,7 +19,7 @@ process SAMPLESHEET_CHECK {
 
     script: // This script is bundled with the pipeline, in nf-core/processclusterperspecies/bin/
     """
-    check_samplesheet.py \\
+    check_samplesheet_clusters.py \\
         $samplesheet \\
         samplesheet.valid.csv
 
