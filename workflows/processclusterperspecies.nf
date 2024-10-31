@@ -52,6 +52,7 @@ include { FASTQC                      } from '../modules/nf-core/fastqc/main'
 include { MULTIQC                     } from '../modules/nf-core/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoftwareversions/main'
 include { SNIPPY_RUN                  } from '../modules/nf-core/snippy/run/main'
+include { SNIPPY_CORE                 } from '../modules/nf-core/snippy/core/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -74,28 +75,50 @@ workflow PROCESSCLUSTERPERSPECIES {
     )
     ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
 
-    INPUT_CHECK.out.input_files.view()
+    //INPUT_CHECK.out.input_files.view()
 
     //
     // MODULE: Run Snippy for each sample with the provided reference
     //
+
     SNIPPY_RUN(
         INPUT_CHECK.out.input_files
     )
 
-    //}
+
+    //
+    // MODULE: Identify core SNPS
+    //
+
+    //Group VCFs by species and by cluster
+    SNIPPY_RUN.out.vcf
+    .map { meta, vcf -> tuple([[species:meta.species, cluster_id:meta.cluster_id], vcf]) }
+    .groupTuple(by: [0])
+    .set { ch_collected_vcfs }
+    //Group the aligned_fa's by species and by cluster
+    SNIPPY_RUN.out.aligned_fa
+    .map {meta, aligned_fa -> tuple([[species:meta.species, cluster_id:meta.cluster_id], aligned_fa])}
+    .groupTuple(by:[0])
+    .set{ch_collected_aligned_fa}
+    //Join the VCF and aligned_fa channels for snippy core
+    ch_collected_vcfs.join(ch_collected_aligned_fa).set{ch_vcf_and_aligned_fa}
+    //ch_snippy_core_input.view()
+    //Get the unique reference per species per cluster
+    INPUT_CHECK.out.input_files
+    .map { meta, input_files, gff, reference -> tuple([[species: meta.species, cluster_id: meta.cluster_id], reference]) }
+    .distinct { it[1] }  // Use distinct to keep only unique reference values
+    .set{ch_ref_per_species_per_cluster}
+    //Join the reference with the vcf and aligned fa
+    ch_vcf_and_aligned_fa.join(ch_ref_per_species_per_cluster).set{ch_snippy_core_input}
+    //ch_snippy_core_input.view()
+
+    //RUN SNIPPY CORE
+    SNIPPY_CORE(
+        ch_snippy_core_input
+    )
+
     //INPUT_CHECK.out.species_channel.view()
 
-    //iterate over the possible species from samplesheet
-    // for (species in INPUT_CHECK.out.species_channel) {
-    //     println "Species :${species}"
-    //     //only perform operation on the channel for the current species being analyzed
-    //     //perform operation on INPUT_CHECK.out.input_files //species value in ch is 6th
-    //     INPUT_CHECK.out.input_files
-    //         .filter {row -> row[5] == species}
-    //         .subscribe { filtered_entry ->
-    //             println "Filtered entry for species ${species} : ${filtered_entry}"}
-    // }
     //
     // MODULE: Run FastQC
     //

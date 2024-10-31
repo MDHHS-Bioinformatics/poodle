@@ -8,8 +8,8 @@ process SNIPPY_RUN {
         'biocontainers/snippy:4.6.0--hdfd78af_2' }"
 
     input:
-    tuple val(meta), path(reads)
-    path reference
+    tuple val(meta), path(input_files), path(gff), path(reference)
+    
 
     output:
     tuple val(meta), path("${prefix}/${prefix}.tab")              , emit: tab
@@ -37,7 +37,24 @@ process SNIPPY_RUN {
     script:
     def args = task.ext.args ?: ''
     prefix = task.ext.prefix ?: "${meta.id}"
-    def read_inputs = meta.single_end ? "--se ${reads[0]}" : "--R1 ${reads[0]} --R2 ${reads[1]}"
+    cluster_id = task.ext.prefix ?: "${meta.cluster_id}"
+    species = task.ext.prefix ?: "${meta.species}"
+    // Determine which input to use: prioritize reads, fallback to assembly if no reads
+    def input_command
+    if (meta.has_reads) {
+        // If reads are available, use them
+        if (meta.single_end) {
+            input_command = "--se ${input_files[0]}"  // Single-end reads
+        } else {
+            input_command = "--R1 ${input_files[0]} --R2 ${input_files[1]}"  // Paired-end reads
+        }
+    } else if (meta.has_assembly) {
+        // If no reads, fallback to the assembly
+        input_command = "--contigs ${input_files[0]}"  // Assembly (contigs)
+    } else {
+        exit 1, "ERROR: Sample ${meta.id} does not have valid reads or assembly!"
+    }
+
     """
     snippy \\
         $args \\
@@ -46,7 +63,7 @@ process SNIPPY_RUN {
         --outdir $prefix \\
         --reference $reference \\
         --prefix $prefix \\
-        $read_inputs
+        $input_command
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
