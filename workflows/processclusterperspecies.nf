@@ -51,6 +51,7 @@ include { INPUT_CHECK } from '../subworkflows/local/input_check'
 include { FASTQC                      } from '../modules/nf-core/fastqc/main'
 include { MULTIQC                     } from '../modules/nf-core/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoftwareversions/main'
+include { SNIPPY_RUN                  } from '../modules/nf-core/snippy/run/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -74,6 +75,27 @@ workflow PROCESSCLUSTERPERSPECIES {
     ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
 
     INPUT_CHECK.out.input_files.view()
+
+    //
+    // MODULE: Run Snippy for each sample with the provided reference
+    //
+    SNIPPY_RUN(
+        INPUT_CHECK.out.input_files
+    )
+
+    //}
+    //INPUT_CHECK.out.species_channel.view()
+
+    //iterate over the possible species from samplesheet
+    // for (species in INPUT_CHECK.out.species_channel) {
+    //     println "Species :${species}"
+    //     //only perform operation on the channel for the current species being analyzed
+    //     //perform operation on INPUT_CHECK.out.input_files //species value in ch is 6th
+    //     INPUT_CHECK.out.input_files
+    //         .filter {row -> row[5] == species}
+    //         .subscribe { filtered_entry ->
+    //             println "Filtered entry for species ${species} : ${filtered_entry}"}
+    // }
     //
     // MODULE: Run FastQC
     //

@@ -34,8 +34,8 @@ def create_fastq_channel(LinkedHashMap row) {
     meta.single_end  = row.single_end ? row.single_end.toBoolean() : false
     meta.has_reads   = row.fastq_1 && row.fastq_1 != ""  // Check if reads are available
     meta.has_assembly = row.assembly && row.assembly != ""  // Check if an assembly is available
-    // meta.cluster_id = row.cluster_id
-    // meta.species = row.species
+    meta.cluster_id = row.cluster_id
+    meta.species = row.species
 
     // Validate and add file paths
     def input_meta = []
@@ -47,13 +47,13 @@ def create_fastq_channel(LinkedHashMap row) {
         }
         if (meta.single_end) {
             // Single-end case
-            input_meta = [ meta, [ file(row.fastq_1) ], file(row.gff),file(row.reference),row.cluster_id, row.species  ]
+            input_meta = [ meta, [ file(row.fastq_1) ], file(row.gff),file(row.reference) ]
         } else {
             if (!file(row.fastq_2).exists()) {
                 exit 1, "ERROR: Please check input samplesheet -> Read 2 FastQ file does not exist!\n${row.fastq_2}"
             }
             // Paired-end case
-            input_meta = [ meta, [ file(row.fastq_1), file(row.fastq_2) ], file(row.gff),file(row.reference),row.cluster_id, row.species ]
+            input_meta = [ meta, [ file(row.fastq_1), file(row.fastq_2) ], file(row.gff),file(row.reference) ]
         }
     } else if (meta.has_assembly) {
         // If no reads but assembly is available, use the assembly
@@ -61,7 +61,7 @@ def create_fastq_channel(LinkedHashMap row) {
             exit 1, "ERROR: Please check input samplesheet -> Assembly file does not exist!\n${row.assembly}"
         }
         // Add the assembly path to the meta map
-        input_meta = [ meta, [ file(row.assembly) ], file(row.gff),file(row.reference),row.cluster_id, row.species  ]
+        input_meta = [ meta, [ file(row.assembly) ], file(row.gff),file(row.reference)  ]
         //meta.assembly = row.assembly
     } else {
         exit 1, "ERROR: Sample ${row.sample} does not have valid reads or assembly!"

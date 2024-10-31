@@ -8,7 +8,6 @@ import argparse
 import csv
 import logging
 import sys
-import pandas as pd
 from collections import Counter
 from pathlib import Path
 
@@ -178,6 +177,16 @@ class RowChecker:
                 f"The assembly file has an unrecognized extension: {filename}\n"
                 f"It should be one of: {', '.join(self.VALID_ASSEMBLY_FORMATS)}"
             )
+    def check_if_nan(self,row):
+        """Check if the row contains any NA values
+        Only FastQ or Assembly columns are allowed to have these if either are missing
+        """
+        #possible variations
+        nans = ['NaN','Nan','nan','NA','Na']
+        if row in nans:
+            return True
+        else:
+            return False
 
     def validate_unique_samples(self):
         """
@@ -276,7 +285,7 @@ def check_samplesheet(file_in, file_out):
             except AssertionError as error:
                 logger.critical(f"{str(error)} On line {i + 2}.")
                 sys.exit(1)
-        checker.validate_unique_samples()
+        #checker.validate_unique_samples()
         # checker.validate_unique_samples()
     header = list(reader.fieldnames)
     header.insert(1, "single_end")
