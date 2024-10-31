@@ -8,3 +8,6 @@ testing*
 *.pyc
 python_notebooks/
 logs/
+*.fasta
+*.sh
+*.csv
