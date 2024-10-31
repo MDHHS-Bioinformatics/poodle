@@ -34,6 +34,9 @@ ch_multiqc_custom_methods_description = params.multiqc_methods_description ? fil
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
+include { CLEAN_TREE                  } from '../modules/local/cleantree'
+
+
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
@@ -54,6 +57,7 @@ include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoft
 include { SNIPPY_RUN                  } from '../modules/nf-core/snippy/run/main'
 include { SNIPPY_CORE                 } from '../modules/nf-core/snippy/core/main'
 include { SNPDISTS as SNPDISTS_SNIPPY } from '../modules/nf-core/snpdists/main'
+include { IQTREE                      } from '../modules/nf-core/iqtree/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -124,8 +128,18 @@ workflow PROCESSCLUSTERPERSPECIES {
     SNPDISTS_SNIPPY(
         SNIPPY_CORE.out.aln
     )
-    //INPUT_CHECK.out.species_channel.view()
 
+    //
+    // MODULE: Create core-snp phylogeny
+    //
+    IQTREE(SNIPPY_CORE.out.aln)
+    ch_versions = ch_versions.mix(IQTREE.out.versions)
+
+    //
+    // MODULE: Remove referencec and root at midpoint
+    //
+    CLEAN_TREE(IQTREE.out.phylogeny)
+    ch_versions = ch_versions.mix(CLEAN_TREE.out.versions)
     //
     // MODULE: Run FastQC
     //
