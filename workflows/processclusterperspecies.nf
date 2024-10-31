@@ -53,6 +53,7 @@ include { MULTIQC                     } from '../modules/nf-core/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoftwareversions/main'
 include { SNIPPY_RUN                  } from '../modules/nf-core/snippy/run/main'
 include { SNIPPY_CORE                 } from '../modules/nf-core/snippy/core/main'
+include { SNPDISTS as SNPDISTS_SNIPPY } from '../modules/nf-core/snpdists/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -117,6 +118,12 @@ workflow PROCESSCLUSTERPERSPECIES {
         ch_snippy_core_input
     )
 
+    //
+    // MODULE: Core SNP Distances
+    //
+    SNPDISTS_SNIPPY(
+        SNIPPY_CORE.out.aln
+    )
     //INPUT_CHECK.out.species_channel.view()
 
     //
