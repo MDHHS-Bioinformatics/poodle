@@ -35,6 +35,7 @@ ch_multiqc_custom_methods_description = params.multiqc_methods_description ? fil
 */
 
 include { CLEAN_TREE                  } from '../modules/local/cleantree'
+include { GENEDISTS                   } from '../modules/local/genedists'
 
 
 //
@@ -60,6 +61,8 @@ include { SNPDISTS as SNPDISTS_SNIPPY  } from '../modules/nf-core/snpdists/main'
 include { SNPDISTS as SNPDISTS_GUBBINS } from '../modules/nf-core/snpdists/main'
 include { IQTREE                       } from '../modules/nf-core/iqtree/main'
 include { GUBBINS                      } from '../modules/nf-core/gubbins/main'
+include { PANAROO_RUN                  } from '../modules/nf-core/panaroo/run/main'
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     RUN MAIN WORKFLOW
@@ -157,7 +160,25 @@ workflow PROCESSCLUSTERPERSPECIES {
     // MODULE: Gene-prescene abscence with panroo
     //
 
+    //Collect GFF files by species and cluster
+    INPUT_CHECK.out.input_files
+    .map{meta, input_files, gff, reference -> tuple([[species:meta.species,cluster_id:meta.cluster_id],gff])}
+    .groupTuple(by:[0])
+    .set{ch_collected_gffs}
+    ch_collected_gffs.view()
+    //
+    PANAROO_RUN(
+        ch_collected_gffs
+    )
+    ch_versions = ch_versions.mix(PANAROO_RUN.out.versions)
 
+    //
+    // MODULE: GENEDISTS prescence-abscence distances
+    //
+    GENEDISTS(
+        PANAROO_RUN.out.rtab
+    )
+    ch_versions = ch_versions.mix(GENEDISTS.out.versions)
     //
     // MODULE: Run FastQC
     //
