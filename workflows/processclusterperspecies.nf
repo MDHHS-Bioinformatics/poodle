@@ -51,14 +51,15 @@ include { INPUT_CHECK } from '../subworkflows/local/input_check'
 //
 // MODULE: Installed directly from nf-core/modules
 //
-include { FASTQC                      } from '../modules/nf-core/fastqc/main'
-include { MULTIQC                     } from '../modules/nf-core/multiqc/main'
-include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoftwareversions/main'
-include { SNIPPY_RUN                  } from '../modules/nf-core/snippy/run/main'
-include { SNIPPY_CORE                 } from '../modules/nf-core/snippy/core/main'
-include { SNPDISTS as SNPDISTS_SNIPPY } from '../modules/nf-core/snpdists/main'
-include { IQTREE                      } from '../modules/nf-core/iqtree/main'
-
+include { FASTQC                       } from '../modules/nf-core/fastqc/main'
+include { MULTIQC                      } from '../modules/nf-core/multiqc/main'
+include { CUSTOM_DUMPSOFTWAREVERSIONS  } from '../modules/nf-core/custom/dumpsoftwareversions/main'
+include { SNIPPY_RUN                   } from '../modules/nf-core/snippy/run/main'
+include { SNIPPY_CORE                  } from '../modules/nf-core/snippy/core/main'
+include { SNPDISTS as SNPDISTS_SNIPPY  } from '../modules/nf-core/snpdists/main'
+include { SNPDISTS as SNPDISTS_GUBBINS } from '../modules/nf-core/snpdists/main'
+include { IQTREE                       } from '../modules/nf-core/iqtree/main'
+include { GUBBINS                      } from '../modules/nf-core/gubbins/main'
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     RUN MAIN WORKFLOW
@@ -140,6 +141,23 @@ workflow PROCESSCLUSTERPERSPECIES {
     //
     CLEAN_TREE(IQTREE.out.phylogeny)
     ch_versions = ch_versions.mix(CLEAN_TREE.out.versions)
+
+    //
+    // MODULE: Gubbins
+    //
+    if (params.gubbins) {
+        GUBBINS(SNIPPY_CORE.out.clean_full_aln)
+        ch_versions = ch_versions.mix(GUBBINS.out.versions)
+
+        SNPDISTS_GUBBINS(GUBBINS.out.fasta)
+        ch_versions = ch_versions.mix(SNPDISTS_GUBBINS.out.versions)
+    }
+
+    //
+    // MODULE: Gene-prescene abscence with panroo
+    //
+
+
     //
     // MODULE: Run FastQC
     //
