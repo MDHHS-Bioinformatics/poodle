@@ -34,9 +34,10 @@ ch_multiqc_custom_methods_description = params.multiqc_methods_description ? fil
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
+include { RENAME_REFERENCE            } from '../modules/local/renamereference.nf'
+include { RENAME_INPUTS               } from '../modules/local/renameinputs.nf'
 include { CLEAN_TREE                  } from '../modules/local/cleantree'
 include { GENEDISTS                   } from '../modules/local/genedists'
-
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
@@ -62,6 +63,7 @@ include { SNPDISTS as SNPDISTS_GUBBINS } from '../modules/nf-core/snpdists/main'
 include { IQTREE                       } from '../modules/nf-core/iqtree/main'
 include { GUBBINS                      } from '../modules/nf-core/gubbins/main'
 include { PANAROO_RUN                  } from '../modules/nf-core/panaroo/run/main'
+include { MASHTREE                     } from '../modules/nf-core/mashtree/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -89,11 +91,13 @@ workflow PROCESSCLUSTERPERSPECIES {
     //
     // MODULE: Run Snippy for each sample with the provided reference
     //
+    //INPUT_CHECK.out.final_input_files.view()
+
 
     SNIPPY_RUN(
-        INPUT_CHECK.out.input_files
+        INPUT_CHECK.out.final_input_files
     )
-
+    ch_versions = ch_versions.mix(SNIPPY_RUN.out.versions.first())
 
     //
     // MODULE: Identify core SNPS
@@ -113,7 +117,7 @@ workflow PROCESSCLUSTERPERSPECIES {
     ch_collected_vcfs.join(ch_collected_aligned_fa).set{ch_vcf_and_aligned_fa}
     //ch_snippy_core_input.view()
     //Get the unique reference per species per cluster
-    INPUT_CHECK.out.input_files
+    INPUT_CHECK.out.final_input_files
     .map { meta, input_files, gff, reference -> tuple([[species: meta.species, cluster_id: meta.cluster_id], reference]) }
     .distinct { it[1] }  // Use distinct to keep only unique reference values
     .set{ch_ref_per_species_per_cluster}
@@ -125,6 +129,7 @@ workflow PROCESSCLUSTERPERSPECIES {
     SNIPPY_CORE(
         ch_snippy_core_input
     )
+    ch_versions = ch_versions.mix(SNIPPY_CORE.out.versions.first())
 
     //
     // MODULE: Core SNP Distances
@@ -132,6 +137,7 @@ workflow PROCESSCLUSTERPERSPECIES {
     SNPDISTS_SNIPPY(
         SNIPPY_CORE.out.aln
     )
+    ch_versions = ch_versions.mix(SNPDISTS_SNIPPY.out.versions.first())
 
     //
     // MODULE: Create core-snp phylogeny
@@ -161,11 +167,11 @@ workflow PROCESSCLUSTERPERSPECIES {
     //
 
     //Collect GFF files by species and cluster
-    INPUT_CHECK.out.input_files
+    INPUT_CHECK.out.final_input_files
     .map{meta, input_files, gff, reference -> tuple([[species:meta.species,cluster_id:meta.cluster_id],gff])}
     .groupTuple(by:[0])
     .set{ch_collected_gffs}
-    ch_collected_gffs.view()
+    //ch_collected_gffs.view()
     //
     PANAROO_RUN(
         ch_collected_gffs
@@ -179,7 +185,38 @@ workflow PROCESSCLUSTERPERSPECIES {
         PANAROO_RUN.out.rtab
     )
     ch_versions = ch_versions.mix(GENEDISTS.out.versions)
+
     //
+    //MODULE: Get software versions
+    //
+    CUSTOM_DUMPSOFTWAREVERSIONS(
+        ch_versions.unique().collectFile(name:'collated_versions.yml')
+    )
+
+
+    //
+    // MODULE: MashTree
+    //
+    if (params.mashtree){
+        //Get only assemblies from the input and place in a channel per species and cluster
+        INPUT_CHECK.out.final_input_files
+        .filter{meta, assembly, gff, reference -> meta.has_assembly == true}
+        .map{ meta, assembly, gff, reference -> tuple([[species:meta.species, cluster_id:meta.cluster_id], assembly[0]]) } //we need to do assembly [0] since its a tuple, shouldo only have the one file if assembly
+        .groupTuple(by: [0])
+        .set{ ch_assemblies }
+
+        //Run Mashtree
+        MASHTREE(
+            ch_assemblies
+
+        )
+        ch_versions = ch_versions.mix(MASHTREE.out.versions)
+    }
+    //Group VCFs by species and by cluster
+    // SNIPPY_RUN.out.vcf
+    // .map { meta, vcf -> tuple([[species:meta.species, cluster_id:meta.cluster_id], vcf]) }
+    // .groupTuple(by: [0])
+    // .set { ch_collected_vcfs }
     // MODULE: Run FastQC
     //
     // FASTQC (
@@ -200,19 +237,21 @@ workflow PROCESSCLUSTERPERSPECIES {
     methods_description    = WorkflowProcessclusterperspecies.methodsDescriptionText(workflow, ch_multiqc_custom_methods_description)
     ch_methods_description = Channel.value(methods_description)
 
-    // ch_multiqc_files = Channel.empty()
-    // ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
-    // ch_multiqc_files = ch_multiqc_files.mix(ch_methods_description.collectFile(name: 'methods_description_mqc.yaml'))
-    // ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
-    // ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]}.ifEmpty([]))
+    ch_multiqc_files = Channel.empty()
+    ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
+    ch_multiqc_files = ch_multiqc_files.mix(ch_methods_description.collectFile(name: 'methods_description_mqc.yaml'))
+    ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
+    ch_multiqc_files = ch_multiqc_files.mix(SNIPPY_RUN.out.txt.collect{it[1]}.ifEmpty([]))
+    //ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]}.ifEmpty([]))
 
-    // MULTIQC (
-    //     ch_multiqc_files.collect(),
-    //     ch_multiqc_config.toList(),
-    //     ch_multiqc_custom_config.toList(),
-    //     ch_multiqc_logo.toList()
-    // )
-    // multiqc_report = MULTIQC.out.report.toList()
+    MULTIQC (
+        ch_multiqc_files.collect(),
+        ch_multiqc_config.toList(),
+        ch_multiqc_custom_config.toList(),
+        ch_multiqc_logo.toList()
+
+    )
+    multiqc_report = MULTIQC.out.report.toList()
 }
 
 /*
