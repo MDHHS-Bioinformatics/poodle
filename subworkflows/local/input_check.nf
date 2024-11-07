@@ -70,7 +70,7 @@ workflow INPUT_CHECK {
         final_input_files = final_input_files.mix(new_input_files)
 
     }
-    final_input_files.view()
+    //final_input_files.view()
     emit:
     final_input_files                                  // channel: [ val(meta), [reads/assemblies], gff, reference]
     //input_files                                     // channel: [ val(meta), [ reads ] ]
