@@ -3,7 +3,7 @@
 //
 
 //Modules
-include { SNIPPY_CORE                   } from '../../modules/nf-core/snippy/core/main'
+//include { SNIPPY_CORE                   } from '../../modules/nf-core/snippy/core/main'
 include { SNIPPY_RUN                    } from '../../modules/nf-core/snippy/run/main'
 
 
@@ -102,11 +102,34 @@ workflow SNIPPY_CLUSTERS {
     //Add the results from previous samples that already have a vcf
     ch_snippy_vcfs = ch_snippy_vcfs.mix(
         previous_vcf.vcf_match
-        .map{meta, files, gff, ref, vcf_info -> tuple(meta, files, gff, ref, vcf_info[1])}
+        .map{meta, files, gff, ref, vcf_info -> tuple(meta, vcf_info[1])}
     )
     //Add the results from the Snippy run
     ch_snippy_vcfs = ch_snippy_vcfs.mix(SNIPPY_RUN.out.vcf)
     ch_snippy_vcfs.view()
+
+    //Group VCFs by species and by cluster
+    // ch_snippy_vcfs
+    // .map { meta, vcf -> tuple([[species:meta.species, cluster_id:meta.cluster_id], vcf]) }
+    // .groupTuple(by: [0])
+    // .set { ch_collected_vcfs }
+    // ch_collected_vcfs.view()
+    //Group the aligned_fa's by species and by cluster
+    // SNIPPY_RUN.out.aligned_fa
+    // .map {meta, aligned_fa -> tuple([[species:meta.species, cluster_id:meta.cluster_id], aligned_fa])}
+    // .groupTuple(by:[0])
+    // .set{ch_collected_aligned_fa}
+    // //Join the VCF and aligned_fa channels for snippy core
+    // ch_collected_vcfs.join(ch_collected_aligned_fa).set{ch_vcf_and_aligned_fa}
+    // //ch_snippy_core_input.view()
+    // //Get the unique reference per species per cluster
+    // INPUT_CHECK.out.final_input_files
+    // .map { meta, input_files, gff, reference -> tuple([[species: meta.species, cluster_id: meta.cluster_id], reference]) }
+    // .distinct { it[1] }  // Use distinct to keep only unique reference values
+    // .set{ch_ref_per_species_per_cluster}
+    // //Join the reference with the vcf and aligned fa
+    // ch_vcf_and_aligned_fa.join(ch_ref_per_species_per_cluster).set{ch_snippy_core_input}
+    //ch_snippy_core_input.view()
 
 
     emit:
