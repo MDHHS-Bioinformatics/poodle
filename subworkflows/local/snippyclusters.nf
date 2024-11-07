@@ -3,9 +3,9 @@
 //
 
 //Modules
-//include { SNIPPY_CORE                   } from '../../modules/nf-core/snippy/core/main'
+include { SNIPPY_CORE                   } from '../../modules/nf-core/snippy/core/main'
 include { SNIPPY_RUN                    } from '../../modules/nf-core/snippy/run/main'
-
+include { REFERENCE_EVALUATION          } from '../../modules/local/referenceevaluation.nf'
 
 
 /*
@@ -49,6 +49,14 @@ def read_vcf_for_ref(species, cluster_id, sample_id, ref) {
     def reference_match = (reference_in_vcf == ref_filename)
 
     return [reference_match, snippy_vcf_path] //[reference_in_vcf, reference_match, ref_filename]
+}
+
+//Function to read in aligned.fa from a previously run sample
+def read_aligned_fa(species,cluster_id,sample_id) {
+    //Create the path to the Snippy aligned.fa
+    def snippy_aligned_fa_path = file("${params.outdir}/${species}/${cluster_id}/snippy_run/${sample_id}/${sample_id}.aligned.fa")
+
+    return snippy_aligned_fa_path
 }
 
 workflow SNIPPY_CLUSTERS {
@@ -106,14 +114,56 @@ workflow SNIPPY_CLUSTERS {
     )
     //Add the results from the Snippy run
     ch_snippy_vcfs = ch_snippy_vcfs.mix(SNIPPY_RUN.out.vcf)
-    ch_snippy_vcfs.view()
-
     //Group VCFs by species and by cluster
-    // ch_snippy_vcfs
-    // .map { meta, vcf -> tuple([[species:meta.species, cluster_id:meta.cluster_id], vcf]) }
-    // .groupTuple(by: [0])
-    // .set { ch_collected_vcfs }
-    // ch_collected_vcfs.view()
+    ch_snippy_vcfs
+        .map { meta, vcf -> tuple([[species:meta.species, cluster_id:meta.cluster_id], vcf]) }
+        .groupTuple(by: [0])
+        .set { ch_collected_vcfs }
+
+    //Initialize empty channel to story aligned fa results
+    ch_snippy_aligned_fas = Channel.empty()
+    //Get the algined.fa from previously ran Samples
+    previous_vcf.vcf_match
+        .map{meta, files, gff, ref, vcf_info ->
+        tuple(meta, read_aligned_fa(meta.species, meta.cluster_id, meta.id))}
+        .set{previous_aliged_fa}
+    //Add previous aligned fas to channel
+    ch_snippy_aligned_fas = ch_snippy_aligned_fas.mix(previous_aliged_fa)
+    //Add new snippy results
+    ch_snippy_aligned_fas = ch_snippy_aligned_fas.mix(SNIPPY_RUN.out.aligned_fa)
+    //Group Aligned fas by species and by cluster
+    ch_snippy_aligned_fas
+        .map { meta, aligned_fa -> tuple([[species:meta.species, cluster_id:meta.cluster_id], aligned_fa])}
+        .groupTuple(by: [0])
+        .set {ch_collected_aligned_fa}
+
+    //Get the unique reference per species per cluster
+    ch_input_files
+    .map{ meta, input_files, gff, reference -> tuple([[species:meta.species, cluster_id:meta.cluster_id], reference])}
+    .distinct{ file(it[1]).name } // Use distinct to keep only unique reference values
+    .set{ ch_ref_per_species_per_cluster }
+
+    //Join the vcfs with aligned fa channel
+    ch_collected_vcfs.join(ch_collected_aligned_fa)
+        .set{ch_vcf_and_aligned_fa}
+    //join the vcfs/aligned fa with the reference channel
+    ch_vcf_and_aligned_fa.join(ch_ref_per_species_per_cluster)
+        .set{ch_snippy_core_input}
+    ch_snippy_core_input.view()
+
+    //
+    // MODULE: Identify core SNPS
+    //
+    SNIPPY_CORE(
+        ch_snippy_core_input
+    )
+
+    //
+    //MODULE: Evaluate reference
+    //
+    REFERENCE_EVALUATION(
+        SNIPPY_CORE.out.txt
+    )
     //Group the aligned_fa's by species and by cluster
     // SNIPPY_RUN.out.aligned_fa
     // .map {meta, aligned_fa -> tuple([[species:meta.species, cluster_id:meta.cluster_id], aligned_fa])}

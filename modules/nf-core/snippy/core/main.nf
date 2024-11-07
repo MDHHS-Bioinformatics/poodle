@@ -9,6 +9,8 @@ process SNIPPY_CORE {
 
     input:
     tuple val(meta), path(vcf), path(aligned_fa), path(reference)
+    //tuple val(meta), path(vcf), path(reference)
+
 
     output:
     tuple val(meta), path("${prefix}.aln")     , emit: aln

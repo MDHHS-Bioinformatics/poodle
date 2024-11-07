@@ -108,7 +108,7 @@ workflow PROCESSCLUSTERPERSPECIES {
     // MODULE: Identify core SNPS
     //
 
-    //Group VCFs by species and by cluster
+    // Group VCFs by species and by cluster
     // SNIPPY_RUN.out.vcf
     // .map { meta, vcf -> tuple([[species:meta.species, cluster_id:meta.cluster_id], vcf]) }
     // .groupTuple(by: [0])
@@ -128,7 +128,7 @@ workflow PROCESSCLUSTERPERSPECIES {
     // .set{ch_ref_per_species_per_cluster}
     // //Join the reference with the vcf and aligned fa
     // ch_vcf_and_aligned_fa.join(ch_ref_per_species_per_cluster).set{ch_snippy_core_input}
-    // //ch_snippy_core_input.view()
+    //ch_snippy_core_input.view()
 
     // //RUN SNIPPY CORE
     // SNIPPY_CORE(
