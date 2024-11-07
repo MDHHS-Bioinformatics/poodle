@@ -91,7 +91,7 @@ workflow PROCESSCLUSTERPERSPECIES {
     SNIPPY_CLUSTERS(
         INPUT_CHECK.out.final_input_files
     )
-
+    ch_versions = SNIPPY_CLUSTERS.out.versions
 
     //
     // MODULE: Run Snippy for each sample with the provided reference

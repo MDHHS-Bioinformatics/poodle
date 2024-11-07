@@ -104,6 +104,7 @@ workflow SNIPPY_CLUSTERS {
     SNIPPY_RUN(
         ch_snippy_to_run
     )
+    ch_versions = ch_versions.mix(SNIPPY_RUN.out.versions.first())
 
     //Initialize channel to store VCF results
     ch_snippy_vcfs = Channel.empty()
@@ -157,6 +158,7 @@ workflow SNIPPY_CLUSTERS {
     SNIPPY_CORE(
         ch_snippy_core_input
     )
+    ch_versions = ch_versions.mix(SNIPPY_CORE.out.versions.first())
 
     //
     //MODULE: Evaluate reference
@@ -164,22 +166,6 @@ workflow SNIPPY_CLUSTERS {
     REFERENCE_EVALUATION(
         SNIPPY_CORE.out.txt
     )
-    //Group the aligned_fa's by species and by cluster
-    // SNIPPY_RUN.out.aligned_fa
-    // .map {meta, aligned_fa -> tuple([[species:meta.species, cluster_id:meta.cluster_id], aligned_fa])}
-    // .groupTuple(by:[0])
-    // .set{ch_collected_aligned_fa}
-    // //Join the VCF and aligned_fa channels for snippy core
-    // ch_collected_vcfs.join(ch_collected_aligned_fa).set{ch_vcf_and_aligned_fa}
-    // //ch_snippy_core_input.view()
-    // //Get the unique reference per species per cluster
-    // INPUT_CHECK.out.final_input_files
-    // .map { meta, input_files, gff, reference -> tuple([[species: meta.species, cluster_id: meta.cluster_id], reference]) }
-    // .distinct { it[1] }  // Use distinct to keep only unique reference values
-    // .set{ch_ref_per_species_per_cluster}
-    // //Join the reference with the vcf and aligned fa
-    // ch_vcf_and_aligned_fa.join(ch_ref_per_species_per_cluster).set{ch_snippy_core_input}
-    //ch_snippy_core_input.view()
 
 
     emit:
