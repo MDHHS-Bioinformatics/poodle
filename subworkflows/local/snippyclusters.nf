@@ -150,7 +150,6 @@ workflow SNIPPY_CLUSTERS {
     //join the vcfs/aligned fa with the reference channel
     ch_vcf_and_aligned_fa.join(ch_ref_per_species_per_cluster)
         .set{ch_snippy_core_input}
-    ch_snippy_core_input.view()
 
     //
     // MODULE: Identify core SNPS
@@ -169,6 +168,9 @@ workflow SNIPPY_CLUSTERS {
 
 
     emit:
-    versions = ch_versions                     // channel: [ versions.yml ]
+    versions        = ch_versions                     // channel: [ versions.yml ]
+    aln             = SNIPPY_CORE.out.aln             // channel: [ val(meta), aln]
+    clean_full_aln  = SNIPPY_CORE.out.clean_full_aln  // channel: [ val(meta), clean_full_aln]
+    snippy_txt      = SNIPPY_RUN.out.txt              // channel: [ val(meta), txt]
 }
 
