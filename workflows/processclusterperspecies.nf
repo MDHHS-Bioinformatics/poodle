@@ -9,9 +9,8 @@ def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
 // Validate input parameters
 WorkflowProcessclusterperspecies.initialise(params, log)
 
-// TODO nf-core: Add all file path parameters for the pipeline to the list below
 // Check input path parameters to see if they exist
-def checkPathParamList = [ params.input, params.multiqc_config, params.fasta ]
+def checkPathParamList = [ params.input, params.multiqc_config, params.gubbins, params.mashtree, params.rename_files, params.previous_results,params.save_snippy_run, params.outdir ]
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
 
 // Check mandatory parameters
@@ -38,13 +37,12 @@ include { RENAME_REFERENCE            } from '../modules/local/renamereference.n
 include { RENAME_INPUTS               } from '../modules/local/renameinputs.nf'
 include { CLEAN_TREE                  } from '../modules/local/cleantree'
 include { GENEDISTS                   } from '../modules/local/genedists'
-//include { CHECKSNIPPY                 } from '../modules/local/checksnippy.nf'
-include { SNIPPY_CLUSTERS             } from '../subworkflows/local/snippyclusters.nf'
 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
-include { INPUT_CHECK } from '../subworkflows/local/input_check'
+include { INPUT_CHECK                 } from '../subworkflows/local/input_check'
+include { SNIPPY_CLUSTERS             } from '../subworkflows/local/snippyclusters.nf'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -55,7 +53,6 @@ include { INPUT_CHECK } from '../subworkflows/local/input_check'
 //
 // MODULE: Installed directly from nf-core/modules
 //
-include { FASTQC                       } from '../modules/nf-core/fastqc/main'
 include { MULTIQC                      } from '../modules/nf-core/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS  } from '../modules/nf-core/custom/dumpsoftwareversions/main'
 include { SNIPPY_RUN                   } from '../modules/nf-core/snippy/run/main'
@@ -102,13 +99,13 @@ workflow PROCESSCLUSTERPERSPECIES {
     ch_versions = ch_versions.mix(SNPDISTS_SNIPPY.out.versions.first())
 
     //
-    // MODULE: Create core-snp phylogeny
+    // MODULE: Create core-SNP phylogeny
     //
     IQTREE(SNIPPY_CLUSTERS.out.aln)
     ch_versions = ch_versions.mix(IQTREE.out.versions)
 
     //
-    // MODULE: Remove referencec and root at midpoint
+    // MODULE: Remove reference and root at midpoint
     //
     CLEAN_TREE(IQTREE.out.phylogeny)
     ch_versions = ch_versions.mix(CLEAN_TREE.out.versions)
@@ -125,15 +122,13 @@ workflow PROCESSCLUSTERPERSPECIES {
     }
 
     //
-    // MODULE: Gene-prescene abscence with panroo
+    // MODULE: Gene-prescene abscence with Panaroo
     //
-
     //Collect GFF files by species and cluster
     INPUT_CHECK.out.final_input_files
     .map{meta, input_files, gff, reference -> tuple([[species:meta.species,cluster_id:meta.cluster_id],gff])}
     .groupTuple(by:[0])
     .set{ch_collected_gffs}
-    //ch_collected_gffs.view()
     //
     PANAROO_RUN(
         ch_collected_gffs
@@ -149,35 +144,29 @@ workflow PROCESSCLUSTERPERSPECIES {
     ch_versions = ch_versions.mix(GENEDISTS.out.versions)
 
     //
-    //MODULE: Get software versions
-    //
-    CUSTOM_DUMPSOFTWAREVERSIONS(
-        ch_versions.unique().collectFile(name:'collated_versions.yml')
-    )
-
-
-    //
     // MODULE: MashTree
     //
     if (params.mashtree){
-        //Get only assemblies from the input and place in a channel per species and cluster
+        // Get only assemblies from the input and place in a channel per species and cluster
         INPUT_CHECK.out.final_input_files
         .filter{meta, assembly, gff, reference -> meta.has_assembly == true}
-        .map{ meta, assembly, gff, reference -> tuple([[species:meta.species, cluster_id:meta.cluster_id], assembly[0]]) } //we need to do assembly [0] since its a tuple, shouldo only have the one file if assembly
+        .map{ meta, assembly, gff, reference -> tuple([[species:meta.species, cluster_id:meta.cluster_id], assembly[0]]) } //we need to do assembly [0] since its a tuple, should only have the one file if assembly
         .groupTuple(by: [0])
         .set{ ch_assemblies }
 
         //Run Mashtree
         MASHTREE(
             ch_assemblies
-
         )
         ch_versions = ch_versions.mix(MASHTREE.out.versions)
     }
 
-    // CUSTOM_DUMPSOFTWAREVERSIONS (
-    //     ch_versions.unique().collectFile(name: 'collated_versions.yml')
-    // )
+    //
+    //MODULE: Get software versions
+    //
+    CUSTOM_DUMPSOFTWAREVERSIONS(
+        ch_versions.unique().collectFile(name:'collated_versions.yml')
+    )
 
     //
     // MODULE: MultiQC
