@@ -5,7 +5,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v1.0dev - [date]
 
-Initial release of nf-core/processclusterperspecies, created with the [nf-core](https://nf-co.re/) template.
+Initial release of process-cluster-per-species, created with the [nf-core](https://nf-co.re/) template.
 
 ### `Added`
 
