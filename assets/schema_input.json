@@ -28,9 +28,9 @@
                 "errorMessage": "GFF file must have extension '.gff' or '.gff3' and cannot contain spaces"
             },
             "assembly": {
-                "type": "string",
-                "pattern": "^\\S+\\.(fa|fna|fasta)(\\.gz)?$",
-                "errorMessage": "Assembly FASTA file must have extension '.fasta', '.fna', or '.fa', optionally compressed as '.gz', and cannot contain spaces"
+                "type": ["string", "null"],
+                "pattern": "^(NA|\\s*|\\S+\\.(fa|fna|fasta)(\\.gz)?)$",
+                "errorMessage": "Assembly FASTA file must be 'NA', empty, or have extension '.fasta', '.fna', or '.fa', optionally compressed as '.gz', and cannot contain spaces"
             },
             "cluster_id": {
                 "type": "string",
@@ -48,7 +48,7 @@
                 "errorMessage": "Reference FASTA file must have extension '.fasta', '.fna', or '.fa', optionally compressed as '.gz', and cannot contain spaces"
             }
         },
-        "required": ["sample", "gff", "assembly", "cluster_id", "species", "reference"],
+        "required": ["sample", "gff", "cluster_id", "species", "reference"],
         "additionalProperties": false
     }
 }
