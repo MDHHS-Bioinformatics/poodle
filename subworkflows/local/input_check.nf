@@ -31,15 +31,15 @@ workflow INPUT_CHECK {
     .set{ch_assemblies}
     //Store samples that don't have an assembly to recombined into the main channel later
     input_files
-    .filter{meta, file, gff, reference -> meta.has_assembly == false}
-    .map{meta, files,gff, reference -> tuple(meta, files, gff, reference)}
+    .filter{meta, files, gff, reference -> meta.has_assembly == false}
+    .map{meta, files, gff, reference -> tuple(meta, files, gff, reference)}
     .set{ch_non_assemblies}
     //Rename the reference files
     RENAME_REFERENCE(ch_assemblies)
     //Recreate the full channel with all the information we need
     ch_joined_assemblies = RENAME_REFERENCE.out.renamed_files.join(input_files)
     ch_joined_assemblies
-    .map{ meta, new_reference, files, gff, old_reference -> tuple(meta,files,gff,new_reference) }
+    .map{ meta, new_reference, files, gff, old_reference -> tuple(meta, files, gff, new_reference) }
     .set{renamed_input_files}
     //Mix the values of the non assemblies channel and the assemblies channel
     new_input_files = Channel.empty()
