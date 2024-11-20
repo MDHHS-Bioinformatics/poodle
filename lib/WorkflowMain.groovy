@@ -1,5 +1,5 @@
 //
-// This file holds several functions specific to the main.nf workflow in the nf-core/processclusterperspecies pipeline
+// This file holds several functions specific to the main.nf workflow in the MI-Bioinformatics/process-bact-cluster-per-species pipeline
 //
 
 class WorkflowMain {
