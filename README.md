@@ -49,7 +49,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 
 4. Start running your own analysis!
 
-Prepare a manifest CSV file with paths to the trimmed FASTQ files, GFFs and assemblies:
+Prepare a manifest CSV file with paths to the trimmed FASTQ files, GFFs, assemblies, cluster_id, and species:
 
 | sample    | fastq_1                    | fastq_2                    | gff                  | assembly                       | reference                   | cluster_id | species      |
 |-----------|----------------------------|----------------------------|----------------------|--------------------------------|-----------------------------|------------|--------------|
@@ -62,7 +62,7 @@ Prepare a manifest CSV file with paths to the trimmed FASTQ files, GFFs and asse
 
 
    ```bash
-   nextflow run process-bact-clusters/main.nf --input manifest.csv --outdir <OUTDIR> --reference <REFERENCE.fasta> --cluster_id <CLUSTER> --gubbins --mashtree -profile <docker/singularity/podman/shifter/charliecloud/conda/institute>
+   nextflow run process-bact-clusters/main.nf --input manifest.csv --outdir <OUTDIR> --gubbins --mashtree -profile <docker/singularity/podman/shifter/charliecloud/conda/institute>
    ```
 
 ## Credits
