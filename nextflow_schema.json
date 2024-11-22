@@ -1,8 +1,8 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema",
-    "$id": "https://raw.githubusercontent.com/nf-core/processclusterperspecies/master/nextflow_schema.json",
-    "title": "nf-core/processclusterperspecies pipeline parameters",
-    "description": "Process cluster per species ",
+    "$id": "https://github.com/MI-Bioinformatics/process-bact-cluster-per-species/blob/master/nextflow_schema.json",
+    "title": "MI-Bioinformatics/process-bact-cluster-per-species",
+    "description": "Bacterial cluster analysis",
     "type": "object",
     "definitions": {
         "input_output_options": {
@@ -18,8 +18,8 @@
                     "mimetype": "text/csv",
                     "pattern": "^\\S+\\.csv$",
                     "schema": "assets/schema_input.json",
-                    "description": "Path to comma-separated file containing information about the samples in the experiment.",
-                    "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row. See [usage docs](https://nf-co.re/processclusterperspecies/usage#samplesheet-input).",
+                    "description": "Path to comma-separated file containing information about the samples and reference in the analysis.",
+                    "help_text": "You will need to create a design file with information about the samples in your analysis before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 8 columns, and a header row. See [usage docs](https://github.com/MI-Bioinformatics/process-bact-cluster-per-species/blob/master/docs/usage.md#samplesheet-input).",
                     "fa_icon": "fas fa-file-csv"
                 },
                 "outdir": {
@@ -27,6 +27,36 @@
                     "format": "directory-path",
                     "description": "The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure.",
                     "fa_icon": "fas fa-folder-open"
+                },
+                "gubbins": {
+                    "type": "boolean",
+                    "description": "Filter out recombinant sites with Gubbins",
+                    "fa_icon": "fas fa-check-square",
+                    "help_text": "Filter out recombinant sites with Gubbins. You may choose this option if you are analyzing highly recombinant species."
+                },
+                "mashtree": {
+                    "type": "boolean",
+                    "description": "Analyze genomic distances and generate a tree with MashTree.",
+                    "fa_icon": "fas fa-check-square",
+                    "help_text": "Analyze genomic distances and generate a tree with MashTree. Requires assemblies for all samples in a given cluster. This fast analysis is good to analyze potential contamination or get a more general view of the genetic distances between isotales based on mash sketches."
+                },
+                "rename_files": {
+                    "type": "boolean",
+                    "description": "Do not rename files. By default the pipeline renames GFF and assemblies using the sample ID as the base name.",
+                    "fa_icon": "fas fa-ban",
+                    "hidden": true
+                },
+                "previous_results": {
+                    "type": "string",
+                    "description": "Path to previous results. By default the pipeline looks for prior Snippy results for the same cluster in the outdir.",
+                    "fa_icon": "fas fa-folder-open",
+                    "hidden": true
+                },
+                "save_snippy_run": {
+                    "type": "boolean",
+                    "description": "Do not publish Snippy run results. By default the pipeline saves the Snippy-run results per sample.",
+                    "fa_icon": "fas fa-ban",
+                    "hidden": true
                 },
                 "email": {
                     "type": "string",
@@ -39,44 +69,6 @@
                     "type": "string",
                     "description": "MultiQC report title. Printed as page header, used for filename if not otherwise specified.",
                     "fa_icon": "fas fa-file-signature"
-                }
-            }
-        },
-        "reference_genome_options": {
-            "title": "Reference genome options",
-            "type": "object",
-            "fa_icon": "fas fa-dna",
-            "description": "Reference genome related files and options required for the workflow.",
-            "properties": {
-                "genome": {
-                    "type": "string",
-                    "description": "Name of iGenomes reference.",
-                    "fa_icon": "fas fa-book",
-                    "help_text": "If using a reference genome configured in the pipeline using iGenomes, use this parameter to give the ID for the reference. This is then used to build the full paths for all required reference genome files e.g. `--genome GRCh38`. \n\nSee the [nf-core website docs](https://nf-co.re/usage/reference_genomes) for more details."
-                },
-                "fasta": {
-                    "type": "string",
-                    "format": "file-path",
-                    "mimetype": "text/plain",
-                    "pattern": "^\\S+\\.fn?a(sta)?(\\.gz)?$",
-                    "description": "Path to FASTA genome file.",
-                    "help_text": "This parameter is *mandatory* if `--genome` is not specified. If you don't have a BWA index available this will be generated for you automatically. Combine with `--save_reference` to save BWA index for future runs.",
-                    "fa_icon": "far fa-file-code"
-                },
-                "igenomes_base": {
-                    "type": "string",
-                    "format": "directory-path",
-                    "description": "Directory / URL base for iGenomes references.",
-                    "default": "s3://ngi-igenomes/igenomes",
-                    "fa_icon": "fas fa-cloud-download-alt",
-                    "hidden": true
-                },
-                "igenomes_ignore": {
-                    "type": "boolean",
-                    "description": "Do not load the iGenomes reference config.",
-                    "fa_icon": "fas fa-ban",
-                    "hidden": true,
-                    "help_text": "Do not load `igenomes.config` when running the pipeline. You may choose this option if you observe clashes between custom parameters and those supplied in `igenomes.config`."
                 }
             }
         },
