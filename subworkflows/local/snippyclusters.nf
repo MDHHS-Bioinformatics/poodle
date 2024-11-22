@@ -62,7 +62,6 @@ def read_aligned_fa(species,cluster_id,sample_id) {
 workflow SNIPPY_CLUSTERS {
 
     take:
-    // TODO nf-core: edit input (take) channels
     ch_input_files // channel: [ val(meta), [ files ], gff, ref ]
 
     main:
@@ -128,11 +127,11 @@ workflow SNIPPY_CLUSTERS {
         .map{meta, files, gff, ref, vcf_info ->
         tuple(meta, read_aligned_fa(meta.species, meta.cluster_id, meta.id))}
         .set{previous_aliged_fa}
-    //Add previous aligned fas to channel
+    //Add previous aligned fasta to channel
     ch_snippy_aligned_fas = ch_snippy_aligned_fas.mix(previous_aliged_fa)
     //Add new snippy results
     ch_snippy_aligned_fas = ch_snippy_aligned_fas.mix(SNIPPY_RUN.out.aligned_fa)
-    //Group Aligned fas by species and by cluster
+    //Group Aligned fasta by species and by cluster
     ch_snippy_aligned_fas
         .map { meta, aligned_fa -> tuple([[species:meta.species, cluster_id:meta.cluster_id], aligned_fa])}
         .groupTuple(by: [0])
