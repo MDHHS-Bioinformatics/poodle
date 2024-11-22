@@ -1,6 +1,6 @@
 {
-    "name": "nf-core/processclusterperspecies",
-    "homePage": "https://github.com/nf-core/processclusterperspecies",
+    "name": "MI-Bioinformatics/process-bact-cluster-per-species",
+    "homePage": "https://github.com/MI-Bioinformatics/process-bact-cluster-per-species",
     "repos": {
         "https://github.com/nf-core/modules.git": {
             "modules": {
