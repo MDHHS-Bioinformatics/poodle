@@ -33,8 +33,6 @@ ch_multiqc_custom_methods_description = params.multiqc_methods_description ? fil
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { RENAME_REFERENCE            } from '../modules/local/renamereference.nf'
-include { RENAME_INPUTS               } from '../modules/local/renameinputs.nf'
 include { CLEAN_TREE                  } from '../modules/local/cleantree'
 include { GENEDISTS                   } from '../modules/local/genedists'
 
@@ -55,8 +53,6 @@ include { SNIPPY_CLUSTERS             } from '../subworkflows/local/snippycluste
 //
 include { MULTIQC                      } from '../modules/nf-core/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS  } from '../modules/nf-core/custom/dumpsoftwareversions/main'
-include { SNIPPY_RUN                   } from '../modules/nf-core/snippy/run/main'
-include { SNIPPY_CORE                  } from '../modules/nf-core/snippy/core/main'
 include { SNPDISTS as SNPDISTS_SNIPPY  } from '../modules/nf-core/snpdists/main'
 include { SNPDISTS as SNPDISTS_GUBBINS } from '../modules/nf-core/snpdists/main'
 include { IQTREE                       } from '../modules/nf-core/iqtree/main'
@@ -84,7 +80,9 @@ workflow PROCESSCLUSTERPERSPECIES {
         ch_input
     )
     ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
-
+    //
+    // SUBWORKFLOW: Snippy run and Snippy core (verifying prior results and reference)
+    //
     SNIPPY_CLUSTERS(
         INPUT_CHECK.out.final_input_files
     )
