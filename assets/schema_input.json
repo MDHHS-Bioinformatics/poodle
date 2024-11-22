@@ -1,7 +1,7 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema",
-    "$id": "https://raw.githubusercontent.com/nf-core/processclusterperspecies/master/assets/schema_input.json",
-    "title": "nf-core/processclusterperspecies pipeline - params.input schema",
+    "$id": "https://example.com/schema_input.json",
+    "title": "MI-Bioinformatics/process-bact-cluster-per-species pipeline - params.input schema",
     "description": "Schema for the file provided with params.input",
     "type": "array",
     "items": {
@@ -13,24 +13,42 @@
                 "errorMessage": "Sample name must be provided and cannot contain spaces"
             },
             "fastq_1": {
-                "type": "string",
+                "type": ["string", "null"],
                 "pattern": "^\\S+\\.f(ast)?q\\.gz$",
-                "errorMessage": "FastQ file for reads 1 must be provided, cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'"
+                "errorMessage": "FastQ file for reads 1 must have extension '.fq.gz' or '.fastq.gz' and cannot contain spaces"
             },
             "fastq_2": {
-                "errorMessage": "FastQ file for reads 2 cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'",
-                "anyOf": [
-                    {
-                        "type": "string",
-                        "pattern": "^\\S+\\.f(ast)?q\\.gz$"
-                    },
-                    {
-                        "type": "string",
-                        "maxLength": 0
-                    }
-                ]
+                "type": ["string", "null"],
+                "pattern": "^\\S+\\.f(ast)?q\\.gz$",
+                "errorMessage": "FastQ file for reads 2 must have extension '.fq.gz' or '.fastq.gz' and cannot contain spaces"
+            },
+            "gff": {
+                "type": "string",
+                "pattern": "^\\S+\\.gff3?$",
+                "errorMessage": "GFF file must have extension '.gff' or '.gff3' and cannot contain spaces"
+            },
+            "assembly": {
+                "type": ["string", "null"],
+                "pattern": "^(NA|\\s*|\\S+\\.(fa|fna|fasta)(\\.gz)?)$",
+                "errorMessage": "Assembly FASTA file must be 'NA', empty, or have extension '.fasta', '.fna', or '.fa', optionally compressed as '.gz', and cannot contain spaces"
+            },
+            "cluster_id": {
+                "type": "string",
+                "pattern": "^\\S+$",
+                "errorMessage": "Cluster ID cannot contain spaces or special characters"
+            },
+            "species": {
+                "type": "string",
+                "pattern": "^[\\w\\s]+$",
+                "errorMessage": "Species ID cannot contain special characters"
+            },
+            "reference": {
+                "type": "string",
+                "pattern": "^\\S+\\.(fa|fna|fasta)(\\.gz)?$",
+                "errorMessage": "Reference FASTA file must have extension '.fasta', '.fna', or '.fa', optionally compressed as '.gz', and cannot contain spaces"
             }
         },
-        "required": ["sample", "fastq_1"]
+        "required": ["sample", "gff", "cluster_id", "species", "reference"],
+        "additionalProperties": false
     }
 }

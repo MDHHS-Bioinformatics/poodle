@@ -1,12 +1,9 @@
 #!/usr/bin/env nextflow
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    nf-core/processclusterperspecies
+    processclusterperspecies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Github : https://github.com/nf-core/processclusterperspecies
-
-    Website: https://nf-co.re/processclusterperspecies
-    Slack  : https://nfcore.slack.com/channels/processclusterperspecies
+    Github : https://github.com/MI-Bioinformatics/process-bact-cluster-per-species
 ----------------------------------------------------------------------------------------
 */
 
@@ -37,9 +34,9 @@ WorkflowMain.initialise(workflow, params, log)
 include { PROCESSCLUSTERPERSPECIES } from './workflows/processclusterperspecies'
 
 //
-// WORKFLOW: Run main nf-core/processclusterperspecies analysis pipeline
+// WORKFLOW: Run main processclusterperspecies analysis pipeline
 //
-workflow NFCORE_PROCESSCLUSTERPERSPECIES {
+workflow PROCESSCLUSTERPERSPECIES {
     PROCESSCLUSTERPERSPECIES ()
 }
 
@@ -51,10 +48,10 @@ workflow NFCORE_PROCESSCLUSTERPERSPECIES {
 
 //
 // WORKFLOW: Execute a single named workflow for the pipeline
-// See: https://github.com/nf-core/rnaseq/issues/619
+// See: https://github.com/MI-Bioinformatics/process-bact-cluster-per-species
 //
 workflow {
-    NFCORE_PROCESSCLUSTERPERSPECIES ()
+    PROCESSCLUSTERPERSPECIES ()
 }
 
 /*

@@ -1,4 +1,4 @@
-# nf-core/processclusterperspecies: Citations
+# process-bact-clusters: Citations
 
 ## [nf-core](https://pubmed.ncbi.nlm.nih.gov/32055031/)
 
@@ -10,10 +10,25 @@
 
 ## Pipeline tools
 
-- [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/)
+- [Snippy](https://github.com/tseemann/snippy)
 
+- [snp-dists](https://github.com/tseemann/snp-dists)
+
+- [IQ-TREE](https://www.iqtree.org/)
+  > Minh, Bui Quang, Heiko A. Schmidt, Olga Chernomor, Dominik Schrempf, Michael D. Woodhams, Arndt Von Haeseler, and Robert Lanfear. "IQ-TREE 2: new models and efficient methods for phylogenetic inference in the genomic era." Molecular biology and evolution 37, no. 5 (2020): 1530-1534.
+
+- [Gubbins](https://github.com/nickjcroucher/gubbins)
+  > Croucher, Nicholas J., Andrew J. Page, Thomas R. Connor, Aidan J. Delaney, Jacqueline A. Keane, Stephen D. Bentley, Julian Parkhill, and Simon R. Harris. "Rapid phylogenetic analysis of large samples of recombinant bacterial whole genome sequences using Gubbins." Nucleic acids research 43, no. 3 (2015): e15-e15.
+
+- [Panaroo](https://github.com/gtonkinhill/panaroo)
+  > Tonkin-Hill, Gerry, Neil MacAlasdair, Christopher Ruis, Aaron Weimann, Gal Horesh, John A. Lees, Rebecca A. Gladstone et al. "Producing polished prokaryotic pangenomes with the Panaroo pipeline." Genome biology 21 (2020): 1-21.
+
+- [MashTree](https://github.com/lskatz/mashtree)
+  > Katz, L. S., Griswold, T., Morrison, S., Caravas, J., Zhang, S., den Bakker, H.C., Deng, X., and Carleton, H. A., (2019). Mashtree: a rapid comparison of whole genome sequence files. Journal of Open Source Software, 4(44), 1762, https://doi.org/10.21105/joss.01762
+  
 - [MultiQC](https://pubmed.ncbi.nlm.nih.gov/27312411/)
   > Ewels P, Magnusson M, Lundin S, Käller M. MultiQC: summarize analysis results for multiple tools and samples in a single report. Bioinformatics. 2016 Oct 1;32(19):3047-8. doi: 10.1093/bioinformatics/btw354. Epub 2016 Jun 16. PubMed PMID: 27312411; PubMed Central PMCID: PMC5039924.
+
 
 ## Software packaging/containerisation tools
 

@@ -1,5 +1,4 @@
-# ![nf-core/processclusterperspecies](docs/images/nf-core-processclusterperspecies_logo_light.png#gh-light-mode-only) ![nf-core/processclusterperspecies](docs/images/nf-core-processclusterperspecies_logo_dark.png#gh-dark-mode-only)
-
+# ![MI-Bioinformatics/process-bact-cluster-per-species](docs/images/process_clusters_logo_light.png#gh-light-mode-only) ![nf-core/processclusterperspecies](docs/images/process_clusters_logo_dark.png#gh-dark-mode-only)
 
 [![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A522.10.1-23aa62.svg)](https://www.nextflow.io/)
 [![run with conda](http://img.shields.io/badge/run%20with-conda-3EB049?labelColor=000000&logo=anaconda)](https://docs.conda.io/en/latest/)
@@ -7,10 +6,7 @@
 [![run with singularity](https://img.shields.io/badge/run%20with-singularity-1d355c.svg?labelColor=000000)](https://sylabs.io/docs/)
 
 
-
 ## Introduction
-
-<!-- TODO nf-core: Write a 1-2 sentence summary of what data the pipeline is for and what it does -->
 
 **process-bact-cluster-per-species** is a bioinformatics best-practice analysis pipeline for phylogenetic analysis of bacterial clusters. This pipleine includes Snippy run, Snippy core, Gubbins (optional), Panaroo and MashTree (optional).
 
@@ -25,7 +21,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 5. Make a tree with Mash distances using [`MashTree`](https://github.com/lskatz/mashtree) (optional).
 6. Summary results ([`MultiQC`](http://multiqc.info/))
 
-![Pipeline Workflow](./processclusters-nf_flowchart.png)
+![Pipeline Workflow](./docs/images/processclustersperspecies_flowchart.png)
 
 
 ## Quick Start
@@ -37,7 +33,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 3. Clone this repository and test it on a minimal dataset with a single command:
 
    ```bash
-   nextflow run process-bact-clusters/main.nf -profile test,YOURPROFILE --outdir <OUTDIR>
+   nextflow run process-bact-clusters-per-species/main.nf -profile test,YOURPROFILE --outdir <OUTDIR>
    ```
 
    Note that some form of configuration will be needed so that Nextflow knows how to fetch the required software. This is usually done in the form of a config profile (`YOURPROFILE` in the example command above). You can chain multiple config profiles in a comma-separated string.
@@ -62,12 +58,14 @@ Prepare a manifest CSV file with paths to the trimmed FASTQ files, GFFs, assembl
 
 
    ```bash
-   nextflow run process-bact-clusters/main.nf --input manifest.csv --outdir <OUTDIR> --gubbins --mashtree -profile <docker/singularity/podman/shifter/charliecloud/conda/institute>
+   
+   nextflow run process-bact-clusters-per-species/main.nf --input manifest.csv --outdir <OUTDIR> --gubbins --mashtree -profile <docker/singularity/podman/shifter/charliecloud/conda/institute>
+
    ```
 
 ## Credits
 
-process-bact-clusters was originally written by MDHHS Genomics Analysis Unit with Karla Vasco and Douglas Maldonado-Torres as main mainteiners.
+process-bact-clusters-per-species was originally written by MDHHS Genomics Analysis Unit with Karla Vasco and Douglas Maldonado-Torres as main mainteiners.
 
 
 ## Citations

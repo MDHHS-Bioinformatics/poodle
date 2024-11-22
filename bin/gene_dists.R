@@ -6,7 +6,6 @@ panaroo_rtab_path <- args[1]         # Input file path (rtab file)
 output_file <- args[2]               # Output file path (profile)
 
 # Read the input file using base R
-# Assuming the file is a tab-delimited file, we use `read.table`
 pangenome_tab <- read.table(panaroo_rtab_path, header=TRUE, sep="\t", row.names=1,
                 check.names = FALSE)
 

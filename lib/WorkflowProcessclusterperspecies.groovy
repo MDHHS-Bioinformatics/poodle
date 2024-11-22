@@ -1,5 +1,5 @@
 //
-// This file holds several functions specific to the workflow/processclusterperspecies.nf in the nf-core/processclusterperspecies pipeline
+// This file holds several functions specific to the workflow/processclusterperspecies.nf in the MI-Bioinformatics/process-bact-cluster-per-species pipeline
 //
 
 import groovy.text.SimpleTemplateEngine

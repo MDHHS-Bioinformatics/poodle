@@ -17,7 +17,7 @@
                         "size": "Large",
                         "weight": "Bolder",
                         "color": "<% if (success) { %>Good<% } else { %>Attention<%} %>",
-                        "text": "nf-core/processclusterperspecies v${version} - ${runName}",
+                        "text": "MI-Bioinformatics/process-bact-cluster-per-species v${version} - ${runName}",
                         "wrap": true
                     },
                     {

@@ -114,7 +114,7 @@ class RowChecker:
         """
         Validate that either fastq_1 and fastq_2 or the assembly column is filled correctly.
 
-        - If fastq_1 and fastq_2 are empty, check if the assembly column ends with .fasta, .fna, or .fa.
+        - If fastq_1 and fastq_2 are empty, check if the assembly column ends with .fasta, .fna, or .fa (could be .gz compressed)
         - If fastq_1 or fastq_2 has data, validate its format.
         """
         fastq_1 = row[self._first_col]
@@ -242,7 +242,7 @@ def sniff_format(handle):
 
 def check_samplesheet(file_in, file_out):
     """
-    Check that the tabular samplesheet has the structure expected by nf-core pipelines.
+    Check that the tabular samplesheet has the structure expected by the pipeline.
 
     Validate the general shape of the table, expected columns, and each row. Also add
     an additional column which records whether one or two FASTQ reads were found.
@@ -257,11 +257,11 @@ def check_samplesheet(file_in, file_out):
         This function checks that the samplesheet follows the following structure,
         see also the `viral recon samplesheet`_::
 
-            sample,fastq_1,fastq_2,gff,assembly
-            SAMPLE_PE,SAMPLE_PE_RUN1_1.fastq.gz,SAMPLE_PE_RUN1_2.fastq.gz,SAMPLE_PE.gff
-            SAMPLE_PE,SAMPLE_PE_RUN2_1.fastq.gz,SAMPLE_PE_RUN2_2.fastq.gz,SAMPLE_PE.gff
-            SAMPLE_SE,SAMPLE_SE_RUN1_1.fastq.gz,SAMPLE_SE.gff
-            SAMPLE,,,SAMPLE.gff,SAMPLE.fna
+            sample,fastq_1,fastq_2,gff,assembly,cluster_id,species,reference
+            SAMPLE_PE,SAMPLE_PE_RUN1_1.fastq.gz,SAMPLE_PE_RUN1_2.fastq.gz,SAMPLE_PE.gff,SAMPLE_PE.fna,cluster_name,Genus_species,reference.fasta
+            SAMPLE_PE,SAMPLE_PE_RUN2_1.fastq.gz,SAMPLE_PE_RUN2_2.fastq.gz,SAMPLE_PE.gff,SAMPLE_PE.fna,cluster_name,Genus_species,reference.fasta
+            SAMPLE_SE,SAMPLE_SE_RUN1_1.fastq.gz,,SAMPLE_SE.gff,SAMPLE_PE.fna,cluster_name,Genus_species,reference.fasta
+            SAMPLE,,,SAMPLE.gff,SAMPLE.fna,cluster_name,Genus_species,reference.fasta
 
     .. _viral recon samplesheet:
         https://raw.githubusercontent.com/nf-core/test-datasets/viralrecon/samplesheet/samplesheet_test_illumina_amplicon.csv
@@ -286,7 +286,6 @@ def check_samplesheet(file_in, file_out):
                 logger.critical(f"{str(error)} On line {i + 2}.")
                 sys.exit(1)
         #checker.validate_unique_samples()
-        # checker.validate_unique_samples()
     header = list(reader.fieldnames)
     header.insert(1, "single_end")
     # See https://docs.python.org/3.9/library/csv.html#id3 to read up on `newline=""`.

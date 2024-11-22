@@ -1,5 +1,5 @@
 name: Feature request
-description: Suggest an idea for the nf-core/processclusterperspecies pipeline
+description: Suggest an idea for the processclusterperspecies pipeline
 labels: enhancement
 body:
   - type: textarea
