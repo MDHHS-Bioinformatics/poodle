@@ -1,6 +1,9 @@
 process RENAME_INPUTS {
     tag "$meta.id"
     label 'process_low'
+    
+    conda "conda-forge::bash=5.2.21"
+    container 'quay.io/jitesoft/alpine:3.20.3'
 
     input:
     tuple val(meta), path(input_files), path(gff), path(reference)
