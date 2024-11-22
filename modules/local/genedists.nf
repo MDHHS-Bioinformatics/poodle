@@ -1,6 +1,7 @@
 process GENEDISTS {
     tag '$meta.species'
     label 'process_low'
+    
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/r-base%3A4.4.1' :
         'quay.io/biocontainers/r-base:4.4.1' }"
@@ -15,7 +16,7 @@ process GENEDISTS {
     when:
     task.ext.when == null || task.ext.when
 
-    script:
+    script: // This script is bundled with the pipeline, in MI-Bioinformatics/process-bact-cluster-per-species/bin/
     def args = task.ext.args ?: ''
     prefix = task.ext.prefix ?: "${meta.species}_${meta.cluster_id}"
     cluster_id = task.ext.prefix ?: "${meta.cluster_id}"
