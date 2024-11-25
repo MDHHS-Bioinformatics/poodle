@@ -25,7 +25,7 @@ process SNPDISTS {
     """
     snp-dists \\
         $args \\
-        $alignment > ${prefix}.tsv
+        $alignment > ${prefix}_dist.tsv
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
