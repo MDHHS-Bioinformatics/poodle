@@ -43,16 +43,33 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
    > - If you are using `singularity`, please use the [`nf-core download`](https://nf-co.re/tools/#downloading-pipelines-for-offline-use) command to download images first, before running the pipeline. Setting the [`NXF_SINGULARITY_CACHEDIR` or `singularity.cacheDir`](https://www.nextflow.io/docs/latest/singularity.html?#singularity-docker-hub) Nextflow options enables you to store and re-use the images from a central location for future pipeline runs.
    > - If you are using `conda`, it is highly recommended to use the [`NXF_CONDA_CACHEDIR` or `conda.cacheDir`](https://www.nextflow.io/docs/latest/conda.html) settings to store the environments in a central location for future pipeline runs.
 
-4. Prepare a manifest CSV file with paths to the QC trimmed FASTQ files, GFFs, assemblies, cluster_id, species and reference:
+4. Prepare a Manifest CSV File
+
+Create a CSV file containing paths to the following: QC-trimmed FASTQ files, GFFs, assemblies, cluster_id, species, and reference. Snippy supports inputs in three formats: paired-end reads, single-end reads, or assemblies. 
+
+- **Paired-end reads**: Include paths for both `fastq_1` and `fastq_2`.
+- **Single-end reads**: Leave the `fastq_2` column blank.
+- **Assemblies only**: Leave both `fastq_1` and `fastq_2` columns blank.
+
+The following columns are **mandatory**:
+- `sample`
+- `gff`
+- `assembly`
+- `cluster_id`
+- `species`
+- `reference`
+
+Make sure to provide values for these columns even if certain input types do not require `fastq` paths.
 
 | sample                 | fastq_1                                              | fastq_2                                              | gff                      | assembly                     | cluster_id          | species                   | reference                          |
 |------------------------|-----------------------------------------------------|-----------------------------------------------------|--------------------------|------------------------------|---------------------|---------------------------|------------------------------------|
 | SAMPLE_1_PAIRED_END    | /path/to/qc/trimmed/fastq/files/SAMPLE1_1.trim.fastq.gz | /path/to/qc/trimmed/fastq/files/SAMPLE1_1.trim.fastq.gz | /path/to/gff/SAMPLE1.gff | /path/to/assembled/fasta/SAMPLE1.fasta | cluster_1          | Escherichia_coli         | /path/to/assembled/reference/reference1.fasta |
 | SAMPLE_2_PAIRED_END    | /path/to/qc/trimmed/fastq/files/SAMPLE2_1.trim.fastq.gz | /path/to/qc/trimmed/fastq/files/SAMPLE2_1.trim.fastq.gz | /path/to/gff/SAMPLE2.gff | /path/to/assembled/fasta/SAMPLE2.fasta | cluster_1          | Escherichia_coli         | /path/to/assembled/reference/reference1.fasta |
 | SAMPLE_3_PAIRED_END    | /path/to/qc/trimmed/fastq/files/SAMPLE3_1.trim.fastq.gz | /path/to/qc/trimmed/fastq/files/SAMPLE3_1.trim.fastq.gz | /path/to/gff/SAMPLE3.gff | /path/to/assembled/fasta/SAMPLE3.fasta | outbreak_facilityA | Pseudomonas aeruginosa   | /path/to/assembled/reference/reference2.fasta |
-| SAMPLE_5_ASSEMBLED     |                                                     |                                                     | /path/to/gff/SAMPLE4.gff | /path/to/assembled/fasta/SAMPLE4.fasta | outbreak_facilityA | Pseudomonas aeruginosa   | /path/to/assembled/reference/reference2.fasta |
-| SAMPLE_6_ASSEMBLED     |                                                     |                                                     | /path/to/gff/SAMPLE5.gff | /path/to/assembled/fasta/SAMPLE5.fasta | outbreak_facilityA | Pseudomonas aeruginosa   | /path/to/assembled/reference/reference2.fasta |
-| SAMPLE_7_ASSEMBLED     |                                                     |                                                     | /path/to/gff/SAMPLE6.gff | /path/to/assembled/fasta/SAMPLE6.fasta | cluster_1          | Escherichia_coli         | /path/to/assembled/reference/reference1.fasta |
+| SAMPLE_4_SINGLE_END    | /path/to/qc/trimmed/fastq/files/SAMPLE4_1.trim.fastq.gz |                                                         | /path/to/gff/SAMPLE3.gff | /path/to/assembled/fasta/SAMPLE4.fasta | outbreak_facilityA | Pseudomonas aeruginosa   | /path/to/assembled/reference/reference2.fasta |
+| SAMPLE_5_ASSEMBLED     |                                                     |                                                     | /path/to/gff/SAMPLE5.gff | /path/to/assembled/fasta/SAMPLE5.fasta | outbreak_facilityA | Pseudomonas aeruginosa   | /path/to/assembled/reference/reference2.fasta |
+| SAMPLE_6_ASSEMBLED     |                                                     |                                                     | /path/to/gff/SAMPLE6.gff | /path/to/assembled/fasta/SAMPLE6.fasta | outbreak_facilityA | Pseudomonas aeruginosa   | /path/to/assembled/reference/reference2.fasta |
+| SAMPLE_7_ASSEMBLED     |                                                     |                                                     | /path/to/gff/SAMPLE7.gff | /path/to/assembled/fasta/SAMPLE7.fasta | cluster_1          | Escherichia_coli         | /path/to/assembled/reference/reference1.fasta |
 
 5. Start running your own analysis!
 
