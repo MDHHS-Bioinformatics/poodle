@@ -47,14 +47,14 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 
 Prepare a manifest CSV file with paths to the trimmed FASTQ files, GFFs, assemblies, cluster_id, and species:
 
-| sample    | fastq_1                    | fastq_2                    | gff                  | assembly                       | reference                   | cluster_id | species      |
-|-----------|----------------------------|----------------------------|----------------------|--------------------------------|-----------------------------|------------|--------------|
-| sample_1  | /path/to/sample_1_R1.fastq.gz | /path/to/sample_1_R2.fastq.gz | /path/to/sample_1.gff | /path/to/sample_1_assembly.fasta | /path/to/sample_1_reference.fasta | cluster_1  | species_1    |
-| sample_2  | /path/to/sample_2_R1.fastq.gz | /path/to/sample_2_R2.fastq.gz | /path/to/sample_2.gff | /path/to/sample_2_assembly.fasta | /path/to/sample_2_reference.fasta | cluster_2  | species_2    |
-| sample_3  | /path/to/sample_3_R1.fastq.gz | /path/to/sample_3_R2.fastq.gz | /path/to/sample_3.gff | /path/to/sample_3_assembly.fasta | /path/to/sample_3_reference.fasta | cluster_3  | species_3    |
-| sample_4  | /path/to/sample_4_R1.fastq.gz | /path/to/sample_4_R2.fastq.gz | /path/to/sample_4.gff | /path/to/sample_4_assembly.fasta | /path/to/sample_4_reference.fasta | cluster_4  | species_4    |
-| sample_5  | /path/to/sample_5_R1.fastq.gz | /path/to/sample_5_R2.fastq.gz | /path/to/sample_5.gff | /path/to/sample_5_assembly.fasta | /path/to/sample_5_reference.fasta | cluster_5  | species_5    |
-
+| sample                 | fastq_1                                              | fastq_2                                              | gff                      | assembly                     | cluster_id          | species                   | reference                          |
+|------------------------|-----------------------------------------------------|-----------------------------------------------------|--------------------------|------------------------------|---------------------|---------------------------|------------------------------------|
+| SAMPLE_1_PAIRED_END    | /path/to/qc/trimmed/fastq/files/SAMPLE1_1.trim.fastq.gz | /path/to/qc/trimmed/fastq/files/SAMPLE1_1.trim.fastq.gz | /path/to/gff/SAMPLE1.gff | /path/to/assembled/fasta/SAMPLE1.fasta | cluster_1          | Escherichia_coli         | /path/to/assembled/reference/reference1.fasta |
+| SAMPLE_2_PAIRED_END    | /path/to/qc/trimmed/fastq/files/SAMPLE2_1.trim.fastq.gz | /path/to/qc/trimmed/fastq/files/SAMPLE2_1.trim.fastq.gz | /path/to/gff/SAMPLE2.gff | /path/to/assembled/fasta/SAMPLE2.fasta | cluster_1          | Escherichia_coli         | /path/to/assembled/reference/reference1.fasta |
+| SAMPLE_3_PAIRED_END    | /path/to/qc/trimmed/fastq/files/SAMPLE3_1.trim.fastq.gz | /path/to/qc/trimmed/fastq/files/SAMPLE3_1.trim.fastq.gz | /path/to/gff/SAMPLE3.gff | /path/to/assembled/fasta/SAMPLE3.fasta | outbreak_facilityA | Pseudomonas aeruginosa   | /path/to/assembled/reference/reference2.fasta |
+| SAMPLE_5_ASSEMBLED     |                                                     |                                                     | /path/to/gff/SAMPLE4.gff | /path/to/assembled/fasta/SAMPLE4.fasta | outbreak_facilityA | Pseudomonas aeruginosa   | /path/to/assembled/reference/reference2.fasta |
+| SAMPLE_6_ASSEMBLED     |                                                     |                                                     | /path/to/gff/SAMPLE5.gff | /path/to/assembled/fasta/SAMPLE5.fasta | outbreak_facilityA | Pseudomonas aeruginosa   | /path/to/assembled/reference/reference2.fasta |
+| SAMPLE_7_ASSEMBLED     |                                                     |                                                     | /path/to/gff/SAMPLE6.gff | /path/to/assembled/fasta/SAMPLE6.fasta | cluster_1          | Escherichia_coli         | /path/to/assembled/reference/reference1.fasta |
 
 
    ```bash
@@ -62,6 +62,116 @@ Prepare a manifest CSV file with paths to the trimmed FASTQ files, GFFs, assembl
    nextflow run process-bact-clusters-per-species/main.nf --input manifest.csv --outdir <OUTDIR> --gubbins --mashtree -profile <docker/singularity/podman/shifter/charliecloud/conda/institute>
 
    ```
+## Input/output options
+  --input                       [string]  Path to comma-separated file containing information about the samples and reference in the analysis (mandatory).
+  --outdir                      [string]  The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure (mandatory).  
+  --gubbins                     [boolean] Filter out recombinant sites with Gubbins (optional).
+  --mashtree                    [boolean] Analyze genomic distances and generate a tree with MashTree (optional).
+  --previous_results            [string]  Path to previous results. By default the pipeline looks for prior Snippy results for the same cluster in the outdir (optional). 
+  --save_snippy_run             [boolean] Do not publish Snippy run results. By default the pipeline saves the Snippy-run results per sample (optional).
+  --email                       [string]  Email address for completion summary (optional).
+  --multiqc_title               [string]  MultiQC report title. Printed as page header, used for filename if not otherwise specified (optional).
+
+## Institutional config options
+  --custom_config_version       [string]  Git commit id for Institutional configs. [default: master]
+  --custom_config_base          [string]  Base directory for Institutional configs. [default: https://raw.githubusercontent.com/nf-core/configs/master]
+  --config_profile_name         [string]  Institutional config name.
+  --config_profile_description  [string]  Institutional config description.
+  --config_profile_contact      [string]  Institutional config contact information.
+  --config_profile_url          [string]  Institutional config URL link.
+
+## Max job request options
+  --max_cpus                    [integer] Maximum number of CPUs that can be requested for any single job. [default: 16]
+  --max_memory                  [string]  Maximum amount of memory that can be requested for any single job. [default: 128.GB]
+  --max_time                    [string]  Maximum amount of time that can be requested for any single job. [default: 240.h]
+
+## Generic options
+  --help                        [boolean] Display help text.
+  --version                     [boolean] Display version and exit.
+  --publish_dir_mode            [string]  Method used to save pipeline results to output directory. [default: copy]
+  --email_on_fail               [string]  Email address for completion summary, only when pipeline fails.
+  --plaintext_email             [boolean] Send plain-text email instead of HTML.
+  --max_multiqc_email_size      [string]  File size limit when attaching MultiQC reports to summary emails. [default: 25.MB]
+  --monochrome_logs             [boolean] Do not use coloured log outputs.
+  --hook_url                    [string]  Incoming hook URL for messaging service
+  --multiqc_config              [string]  Custom config file to supply to MultiQC.
+  --multiqc_logo                [string]  Custom logo file to supply to MultiQC. File name must also be set in the MultiQC config file
+  --multiqc_methods_description [string]  Custom MultiQC yaml file containing HTML including a methods description.
+  --tracedir                    [string]  Directory to keep pipeline Nextflow logs and reports. [default: ${params.outdir}/pipeline_info]
+  --validate_params             [boolean] Boolean whether to validate parameters against the schema at runtime [default: true]
+  --show_hidden_params          [boolean] Show all params when using `--help`
+
+## Outputs
+Below is the structure of the output directory. 
+
+```
+📁 <outdir>
+└── 📁 <Species>
+    ├── 📁 clusters
+    │   └── 📁 <cluster_id>
+    │       ├── 📁 snippy_run
+    │       │   ├── 📁 <sample>
+    │       │   │   ├── 📄 <sample>.tab
+    │       │   │   ├── 📄 <sample>.csv
+    │       │   │   ├── 📄 <sample>.html
+    │       │   │   ├── 📄 <sample>.vcf
+    │       │   │   ├── 📄 <sample>.bed
+    │       │   │   ├── 📄 <sample>.gff
+    │       │   │   ├── 📄 <sample>.bam
+    │       │   │   ├── 📄 <sample>.bam.bai
+    │       │   │   ├── 📄 <sample>.log
+    │       │   │   ├── 📄 <sample>.aligned.fa
+    │       │   │   ├── 📄 <sample>.consensus.fa
+    │       │   │   ├── 📄 <sample>.consensus.subs.fa
+    │       │   │   ├── 📄 <sample>.raw.vcf
+    │       │   │   ├── 📄 <sample>.filt.vcf
+    │       │   │   ├── 📄 <sample>.vcf.gz
+    │       │   │   ├── 📄 <sample>.vcf.gz.csi
+    │       │   │   └── 📄 <sample>.txt
+    │       ├── 📁 snippy_core
+    │       │   ├── 📄 <Species>_<cluster_id>.aln
+    │       │   ├── 📄 <Species>_<cluster_id>.aln.iqtree
+    │       │   ├── 📄 <Species>_<cluster_id>.aln.treefile
+    │       │   ├── 📄 <Species>_<cluster_id>_dist.tsv
+    │       │   ├── 📄 <Species>_<cluster_id>.full.aln
+    │       │   ├── 📄 <Species>_<cluster_id>_clean.full.aln
+    │       │   ├── 📄 <Species>_<cluster_id>.tab
+    │       │   ├── 📄 <Species>_<cluster_id>.tre
+    │       │   ├── 📄 <Species>_<cluster_id>.txt
+    │       │   └── 📄 <Species>_<cluster_id>.vcf
+    │       ├── 📁 gubbins
+    │       │   ├── 📄 <Species>_<cluster_id>_clean.full.filtered_plymorphic_sites.fasta
+    │       │   ├── 📄 <Species>_<cluster_id>_clean.full.recombination_predictions.gff
+    │       │   ├── 📄 <Species>_<cluster_id>_clean.full.summary_of_snp_distribution.vcf
+    │       │   ├── 📄 <Species>_<cluster_id>_clean.full.per_branch_statistics.csv
+    │       │   ├── 📄 <Species>_<cluster_id>_clean.full.filtered_plymorphic_sites.phylip
+    │       │   ├── 📄 <Species>_<cluster_id>_clean.full.recombination_predictions.embl
+    │       │   ├── 📄 <Species>_<cluster_id>_clean.full.branch_base_reconstruction.embl
+    │       │   ├── 📄 <Species>_<cluster_id>_clean.full.final_tree.tre
+    │       │   ├── 📄 <Species>_<cluster_id>_clean.full.node_labelled.final_tree.tre
+    │       │   ├── 📄 <Species>_<cluster_id>_clean.full.final_bootstrapped_tree.tre
+    │       │   └── 📄 <Species>_<cluster_id>_dists.tsv
+    │       ├── 📁 panaroo
+    │       │   ├── 📄 gene_presence_absence_roary.csv
+    │       │   ├── 📄 gene_presence_absence.Rtab
+    │       │   ├── 📄 gene_presence_dist.tsv
+    │       │   └── 📄 summarystatistics.txt
+    │       ├── 📁 mashtree
+    │       │   ├── 📄 <Species>_<cluster_id>.dnd
+    │       │   └── 📄 <Species>_<cluster_id>.tsv
+    |       └── 📄 reference_evaluation.tsv
+    ├── 📁 pipeline_info
+    │   ├── 📄 execution_report_<date_time>.html
+    │   ├── 📄 execution_timeline_<date_time>.html
+    │   ├── 📄 execution_trace_<date_time>.txt
+    │   ├── 📄 pipeline_dag_<date_time>.html
+    │   ├── 📄 samplesheet.valid.csv
+    │   └── 📄 software_versions.yml
+    ├── 📁 multiqc
+    │   ├── 📁 multiqc_data
+    │   ├── 📁 multiqc_plots
+    └── └── 📄 multiqc_report.html
+```
 
 ## Credits
 
