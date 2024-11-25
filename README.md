@@ -43,9 +43,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
    > - If you are using `singularity`, please use the [`nf-core download`](https://nf-co.re/tools/#downloading-pipelines-for-offline-use) command to download images first, before running the pipeline. Setting the [`NXF_SINGULARITY_CACHEDIR` or `singularity.cacheDir`](https://www.nextflow.io/docs/latest/singularity.html?#singularity-docker-hub) Nextflow options enables you to store and re-use the images from a central location for future pipeline runs.
    > - If you are using `conda`, it is highly recommended to use the [`NXF_CONDA_CACHEDIR` or `conda.cacheDir`](https://www.nextflow.io/docs/latest/conda.html) settings to store the environments in a central location for future pipeline runs.
 
-4. Start running your own analysis!
-
-Prepare a manifest CSV file with paths to the trimmed FASTQ files, GFFs, assemblies, cluster_id, and species:
+4. Prepare a manifest CSV file with paths to the QC trimmed FASTQ files, GFFs, assemblies, cluster_id, species and reference:
 
 | sample                 | fastq_1                                              | fastq_2                                              | gff                      | assembly                     | cluster_id          | species                   | reference                          |
 |------------------------|-----------------------------------------------------|-----------------------------------------------------|--------------------------|------------------------------|---------------------|---------------------------|------------------------------------|
@@ -56,50 +54,51 @@ Prepare a manifest CSV file with paths to the trimmed FASTQ files, GFFs, assembl
 | SAMPLE_6_ASSEMBLED     |                                                     |                                                     | /path/to/gff/SAMPLE5.gff | /path/to/assembled/fasta/SAMPLE5.fasta | outbreak_facilityA | Pseudomonas aeruginosa   | /path/to/assembled/reference/reference2.fasta |
 | SAMPLE_7_ASSEMBLED     |                                                     |                                                     | /path/to/gff/SAMPLE6.gff | /path/to/assembled/fasta/SAMPLE6.fasta | cluster_1          | Escherichia_coli         | /path/to/assembled/reference/reference1.fasta |
 
+5. Start running your own analysis!
 
    ```bash
    
    nextflow run process-bact-clusters-per-species/main.nf --input manifest.csv --outdir <OUTDIR> --gubbins --mashtree -profile <docker/singularity/podman/shifter/charliecloud/conda/institute>
 
    ```
-## Input/output options
-  --input                       [string]  Path to comma-separated file containing information about the samples and reference in the analysis (mandatory).
-  --outdir                      [string]  The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure (mandatory).  
-  --gubbins                     [boolean] Filter out recombinant sites with Gubbins (optional).
-  --mashtree                    [boolean] Analyze genomic distances and generate a tree with MashTree (optional).
-  --previous_results            [string]  Path to previous results. By default the pipeline looks for prior Snippy results for the same cluster in the outdir (optional). 
-  --save_snippy_run             [boolean] Do not publish Snippy run results. By default the pipeline saves the Snippy-run results per sample (optional).
-  --email                       [string]  Email address for completion summary (optional).
-  --multiqc_title               [string]  MultiQC report title. Printed as page header, used for filename if not otherwise specified (optional).
+## Input/Output Options
+- `--input`                       [string]  Path to comma-separated file containing information about the samples and reference in the analysis (mandatory).
+- `--outdir`                      [string]  The output directory where the results will be saved. You must use absolute paths for storage on Cloud infrastructure (mandatory).  
+- `--gubbins`                     [boolean] Filter out recombinant sites with Gubbins (optional).
+- `--mashtree`                    [boolean] Analyze genomic distances and generate a tree with MashTree (optional).
+- `--previous_results`            [string]  Path to previous results. By default, the pipeline looks for prior Snippy results for the same cluster in the outdir (optional). 
+- `--save_snippy_run`             [boolean] Do not publish Snippy run results. By default, the pipeline saves the Snippy-run results per sample (optional).
+- `--email`                       [string]  Email address for completion summary (optional).
+- `--multiqc_title`               [string]  MultiQC report title. Printed as a page header and used for the filename if not otherwise specified (optional).
 
-## Institutional config options
-  --custom_config_version       [string]  Git commit id for Institutional configs. [default: master]
-  --custom_config_base          [string]  Base directory for Institutional configs. [default: https://raw.githubusercontent.com/nf-core/configs/master]
-  --config_profile_name         [string]  Institutional config name.
-  --config_profile_description  [string]  Institutional config description.
-  --config_profile_contact      [string]  Institutional config contact information.
-  --config_profile_url          [string]  Institutional config URL link.
+### Institutional Config Options
+- `--custom_config_version`       [string]  Git commit ID for institutional configs. [default: master]
+- `--custom_config_base`          [string]  Base directory for institutional configs. [default: https://raw.githubusercontent.com/nf-core/configs/master]
+- `--config_profile_name`         [string]  Institutional config name.
+- `--config_profile_description`  [string]  Institutional config description.
+- `--config_profile_contact`      [string]  Institutional config contact information.
+- `--config_profile_url`          [string]  Institutional config URL link.
 
-## Max job request options
-  --max_cpus                    [integer] Maximum number of CPUs that can be requested for any single job. [default: 16]
-  --max_memory                  [string]  Maximum amount of memory that can be requested for any single job. [default: 128.GB]
-  --max_time                    [string]  Maximum amount of time that can be requested for any single job. [default: 240.h]
+### Max Job Request Options
+- `--max_cpus`                    [integer] Maximum number of CPUs that can be requested for any single job. [default: 16]
+- `--max_memory`                  [string]  Maximum amount of memory that can be requested for any single job. [default: 128.GB]
+- `--max_time`                    [string]  Maximum amount of time that can be requested for any single job. [default: 240.h]
 
-## Generic options
-  --help                        [boolean] Display help text.
-  --version                     [boolean] Display version and exit.
-  --publish_dir_mode            [string]  Method used to save pipeline results to output directory. [default: copy]
-  --email_on_fail               [string]  Email address for completion summary, only when pipeline fails.
-  --plaintext_email             [boolean] Send plain-text email instead of HTML.
-  --max_multiqc_email_size      [string]  File size limit when attaching MultiQC reports to summary emails. [default: 25.MB]
-  --monochrome_logs             [boolean] Do not use coloured log outputs.
-  --hook_url                    [string]  Incoming hook URL for messaging service
-  --multiqc_config              [string]  Custom config file to supply to MultiQC.
-  --multiqc_logo                [string]  Custom logo file to supply to MultiQC. File name must also be set in the MultiQC config file
-  --multiqc_methods_description [string]  Custom MultiQC yaml file containing HTML including a methods description.
-  --tracedir                    [string]  Directory to keep pipeline Nextflow logs and reports. [default: ${params.outdir}/pipeline_info]
-  --validate_params             [boolean] Boolean whether to validate parameters against the schema at runtime [default: true]
-  --show_hidden_params          [boolean] Show all params when using `--help`
+### Generic Options
+- `--help`                        [boolean] Display help text.
+- `--version`                     [boolean] Display version and exit.
+- `--publish_dir_mode`            [string]  Method used to save pipeline results to the output directory. [default: copy]
+- `--email_on_fail`               [string]  Email address for completion summary, only when the pipeline fails.
+- `--plaintext_email`             [boolean] Send plain-text email instead of HTML.
+- `--max_multiqc_email_size`      [string]  File size limit when attaching MultiQC reports to summary emails. [default: 25.MB]
+- `--monochrome_logs`             [boolean] Do not use colored log outputs.
+- `--hook_url`                    [string]  Incoming hook URL for messaging service.
+- `--multiqc_config`              [string]  Custom config file to supply to MultiQC.
+- `--multiqc_logo`                [string]  Custom logo file to supply to MultiQC. The file name must also be set in the MultiQC config file.
+- `--multiqc_methods_description` [string]  Custom MultiQC YAML file containing HTML including a methods description.
+- `--tracedir`                    [string]  Directory to keep pipeline Nextflow logs and reports. [default: `${params.outdir}/pipeline_info`]
+- `--validate_params`             [boolean] Whether to validate parameters against the schema at runtime [default: true].
+- `--show_hidden_params`          [boolean] Show all params when using `--help`.
 
 ## Outputs
 Below is the structure of the output directory. 
