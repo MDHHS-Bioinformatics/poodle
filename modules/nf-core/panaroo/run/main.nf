@@ -42,7 +42,7 @@ process PANAROO_RUN {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        panaroo: \$(echo \$(panaroo --version 2>&1) | sed 's/^.*panaroo //' ))
+        panaroo: \$(echo \$(panaroo --version 2>&1) | sed 's/^.*panaroo //' )
     END_VERSIONS
     """
 }
