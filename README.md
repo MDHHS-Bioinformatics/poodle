@@ -75,7 +75,7 @@ Make sure to provide values for these columns even if certain input types do not
 
    ```bash
    
-   nextflow run process-bact-clusters-per-species/main.nf --input manifest.csv --outdir <OUTDIR> --gubbins --mashtree -profile <docker/singularity/podman/shifter/charliecloud/conda/institute>
+  nextflow run MI-Bioinformatics/process-bact-cluster-per-species --input samplesheet.csv --outdir <OUTDIR> --gubbins --mashtree -profile <docker/singularity/podman/shifter/charliecloud/conda/institute>
 
    ```
 > [!TIP]
