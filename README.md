@@ -78,6 +78,9 @@ Make sure to provide values for these columns even if certain input types do not
    nextflow run process-bact-clusters-per-species/main.nf --input manifest.csv --outdir <OUTDIR> --gubbins --mashtree -profile <docker/singularity/podman/shifter/charliecloud/conda/institute>
 
    ```
+> [!TIP]
+> Check detailed [usage instructions](../docs/usage.md) for the pipeline.
+
 ## Input/Output Options
 - `--input`                       [string]  Path to comma-separated file containing information about the samples and reference in the analysis (mandatory).
 - `--outdir`                      [string]  The output directory where the results will be saved. You must use absolute paths for storage on Cloud infrastructure (mandatory).  
@@ -88,105 +91,81 @@ Make sure to provide values for these columns even if certain input types do not
 - `--email`                       [string]  Email address for completion summary (optional).
 - `--multiqc_title`               [string]  MultiQC report title. Printed as a page header and used for the filename if not otherwise specified (optional).
 
-### Institutional Config Options
-- `--custom_config_version`       [string]  Git commit ID for institutional configs. [default: master]
-- `--custom_config_base`          [string]  Base directory for institutional configs. [default: https://raw.githubusercontent.com/nf-core/configs/master]
-- `--config_profile_name`         [string]  Institutional config name.
-- `--config_profile_description`  [string]  Institutional config description.
-- `--config_profile_contact`      [string]  Institutional config contact information.
-- `--config_profile_url`          [string]  Institutional config URL link.
-
-### Max Job Request Options
-- `--max_cpus`                    [integer] Maximum number of CPUs that can be requested for any single job. [default: 16]
-- `--max_memory`                  [string]  Maximum amount of memory that can be requested for any single job. [default: 128.GB]
-- `--max_time`                    [string]  Maximum amount of time that can be requested for any single job. [default: 240.h]
-
-### Generic Options
-- `--help`                        [boolean] Display help text.
-- `--version`                     [boolean] Display version and exit.
-- `--publish_dir_mode`            [string]  Method used to save pipeline results to the output directory. [default: copy]
-- `--email_on_fail`               [string]  Email address for completion summary, only when the pipeline fails.
-- `--plaintext_email`             [boolean] Send plain-text email instead of HTML.
-- `--max_multiqc_email_size`      [string]  File size limit when attaching MultiQC reports to summary emails. [default: 25.MB]
-- `--monochrome_logs`             [boolean] Do not use colored log outputs.
-- `--hook_url`                    [string]  Incoming hook URL for messaging service.
-- `--multiqc_config`              [string]  Custom config file to supply to MultiQC.
-- `--multiqc_logo`                [string]  Custom logo file to supply to MultiQC. The file name must also be set in the MultiQC config file.
-- `--multiqc_methods_description` [string]  Custom MultiQC YAML file containing HTML including a methods description.
-- `--tracedir`                    [string]  Directory to keep pipeline Nextflow logs and reports. [default: `${params.outdir}/pipeline_info`]
-- `--validate_params`             [boolean] Whether to validate parameters against the schema at runtime [default: true].
-- `--show_hidden_params`          [boolean] Show all params when using `--help`.
 
 ## Outputs
 Below is the structure of the output directory. 
 
+> [!TIP]
+> Check detailed [output information](../docs/output.md) for the pipeline.
+
 ```
 📁 <outdir>
-└── 📁 <Species>
-    ├── 📁 clusters
-    │   └── 📁 <cluster_id>
-    │       ├── 📁 snippy_run
-    │       │   ├── 📁 <sample>
-    │       │   │   ├── 📄 <sample>.tab
-    │       │   │   ├── 📄 <sample>.csv
-    │       │   │   ├── 📄 <sample>.html
-    │       │   │   ├── 📄 <sample>.vcf
-    │       │   │   ├── 📄 <sample>.bed
-    │       │   │   ├── 📄 <sample>.gff
-    │       │   │   ├── 📄 <sample>.bam
-    │       │   │   ├── 📄 <sample>.bam.bai
-    │       │   │   ├── 📄 <sample>.log
-    │       │   │   ├── 📄 <sample>.aligned.fa
-    │       │   │   ├── 📄 <sample>.consensus.fa
-    │       │   │   ├── 📄 <sample>.consensus.subs.fa
-    │       │   │   ├── 📄 <sample>.raw.vcf
-    │       │   │   ├── 📄 <sample>.filt.vcf
-    │       │   │   ├── 📄 <sample>.vcf.gz
-    │       │   │   ├── 📄 <sample>.vcf.gz.csi
-    │       │   │   └── 📄 <sample>.txt
-    │       ├── 📁 snippy_core
-    │       │   ├── 📄 <Species>_<cluster_id>.aln
-    │       │   ├── 📄 <Species>_<cluster_id>.aln.iqtree
-    │       │   ├── 📄 <Species>_<cluster_id>.aln.treefile
-    │       │   ├── 📄 <Species>_<cluster_id>_dist.tsv
-    │       │   ├── 📄 <Species>_<cluster_id>.full.aln
-    │       │   ├── 📄 <Species>_<cluster_id>_clean.full.aln
-    │       │   ├── 📄 <Species>_<cluster_id>.tab
-    │       │   ├── 📄 <Species>_<cluster_id>.tre
-    │       │   ├── 📄 <Species>_<cluster_id>.txt
-    │       │   └── 📄 <Species>_<cluster_id>.vcf
-    │       ├── 📁 gubbins
-    │       │   ├── 📄 <Species>_<cluster_id>_clean.full.filtered_plymorphic_sites.fasta
-    │       │   ├── 📄 <Species>_<cluster_id>_clean.full.recombination_predictions.gff
-    │       │   ├── 📄 <Species>_<cluster_id>_clean.full.summary_of_snp_distribution.vcf
-    │       │   ├── 📄 <Species>_<cluster_id>_clean.full.per_branch_statistics.csv
-    │       │   ├── 📄 <Species>_<cluster_id>_clean.full.filtered_plymorphic_sites.phylip
-    │       │   ├── 📄 <Species>_<cluster_id>_clean.full.recombination_predictions.embl
-    │       │   ├── 📄 <Species>_<cluster_id>_clean.full.branch_base_reconstruction.embl
-    │       │   ├── 📄 <Species>_<cluster_id>_clean.full.final_tree.tre
-    │       │   ├── 📄 <Species>_<cluster_id>_clean.full.node_labelled.final_tree.tre
-    │       │   ├── 📄 <Species>_<cluster_id>_clean.full.final_bootstrapped_tree.tre
-    │       │   └── 📄 <Species>_<cluster_id>_dists.tsv
-    │       ├── 📁 panaroo
-    │       │   ├── 📄 gene_presence_absence_roary.csv
-    │       │   ├── 📄 gene_presence_absence.Rtab
-    │       │   ├── 📄 gene_presence_dist.tsv
-    │       │   └── 📄 summarystatistics.txt
-    │       ├── 📁 mashtree
-    │       │   ├── 📄 <Species>_<cluster_id>.dnd
-    │       │   └── 📄 <Species>_<cluster_id>.tsv
-    |       └── 📄 reference_evaluation.tsv
-    ├── 📁 pipeline_info
-    │   ├── 📄 execution_report_<date_time>.html
-    │   ├── 📄 execution_timeline_<date_time>.html
-    │   ├── 📄 execution_trace_<date_time>.txt
-    │   ├── 📄 pipeline_dag_<date_time>.html
-    │   ├── 📄 samplesheet.valid.csv
-    │   └── 📄 software_versions.yml
-    ├── 📁 multiqc
-    │   ├── 📁 multiqc_data
-    │   ├── 📁 multiqc_plots
-    └── └── 📄 multiqc_report.html
+├── 📁 <Species>
+│   ├── 📁 clusters
+│   │   └── 📁 <cluster_id>
+│   │       ├── 📁 snippy_run
+│   │       │   ├── 📁 <sample>
+│   │       │   │   ├── 📄 <sample>.aligned.fa
+│   │       │   │   ├── 📄 <sample>.bam
+│   │       │   │   ├── 📄 <sample>.bam.bai
+│   │       │   │   ├── 📄 <sample>.bed
+│   │       │   │   ├── 📄 <sample>.consensus.fa
+│   │       │   │   ├── 📄 <sample>.consensus.subs.fa
+│   │       │   │   ├── 📄 <sample>.csv
+│   │       │   │   ├── 📄 <sample>.filt.vcf
+│   │       │   │   ├── 📄 <sample>.gff
+│   │       │   │   ├── 📄 <sample>.html
+│   │       │   │   ├── 📄 <sample>.log
+│   │       │   │   ├── 📄 <sample>.raw.vcf
+│   │       │   │   ├── 📄 <sample>.tab
+│   │       │   │   ├── 📄 <sample>.txt
+│   │       │   │   ├── 📄 <sample>.vcf
+│   │       │   │   ├── 📄 <sample>.vcf.gz
+│   │       │   │   └── 📄 <sample>.vcf.gz.csi
+│   │       ├── 📁 snippy_core
+│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.aln
+│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.full.aln
+│   │       │   ├── 📄 <Species>_<cluster_id>.aln
+│   │       │   ├── 📄 <Species>_<cluster_id>.aln.iqtree
+│   │       │   ├── 📄 <Species>_<cluster_id>.aln.treefile
+│   │       │   ├── 📄 <Species>_<cluster_id>.dist.tsv
+│   │       │   ├── 📄 <Species>_<cluster_id>.tab
+│   │       │   ├── 📄 <Species>_<cluster_id>.tre
+│   │       │   ├── 📄 <Species>_<cluster_id>.txt
+│   │       │   └── 📄 <Species>_<cluster_id>.vcf
+│   │       ├── 📁 gubbins
+│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.branch_base_reconstruction.embl
+│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.final_bootstrapped_tree.tre
+│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.final_tree.tre
+│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.filtered_plymorphic_sites.fasta
+│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.filtered_plymorphic_sites.phylip
+│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.node_labelled.final_tree.tre
+│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.per_branch_statistics.csv
+│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.recombination_predictions.embl
+│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.recombination_predictions.gff
+│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.summary_of_snp_distribution.vcf
+│   │       │   └── 📄 <Species>_<cluster_id>_dists.tsv
+│   │       ├── 📁 panaroo
+│   │       │   ├── 📄 gene_presence_absence.Rtab
+│   │       │   ├── 📄 gene_presence_absence_roary.csv
+│   │       │   ├── 📄 gene_presence_dist.tsv
+│   │       │   └── 📄 summarystatistics.txt
+│   │       ├── 📁 mashtree
+│   │       │   ├── 📄 <Species>_<cluster_id>.dnd
+│   │       │   └── 📄 <Species>_<cluster_id>.tsv
+│   │       └── 📄 reference_evaluation.tsv
+├── 📁 pipeline_info
+│   ├── 📄 execution_report_<date_time>.html
+│   ├── 📄 execution_timeline_<date_time>.html
+│   ├── 📄 execution_trace_<date_time>.txt
+│   ├── 📄 pipeline_dag_<date_time>.html
+│   ├── 📄 samplesheet.valid.csv
+│   └── 📄 software_versions.yml
+├── 📁 multiqc
+│   ├── 📁 multiqc_data
+│   ├── 📁 multiqc_plots
+│   └── 📄 multiqc_report.html
+
 ```
 
 ## Credits
