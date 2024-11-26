@@ -4,49 +4,55 @@
 
 ## Introduction
 
-<!-- TODO nf-core: Add documentation about anything specific to running your pipeline. For general topics, please point to (and add to) the main nf-core website. -->
-
 ## Samplesheet input
 
-You will need to create a samplesheet with information about the samples you would like to analyse before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row as shown in the examples below.
+You will need to create a samplesheet also known as manifest with information about the samples you would like to analyse before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 8 columns, and a header row as shown in the examples below.
 
 ```bash
 --input '[path to samplesheet file]'
 ```
 
-### Multiple runs of the same sample
+Create a CSV file containing paths to the following: QC-trimmed FASTQ files, GFFs, assemblies, cluster_id, species, and reference. Snippy supports inputs in three formats: paired-end reads, single-end reads, or assemblies. 
 
-The `sample` identifiers have to be the same when you have re-sequenced the same sample more than once e.g. to increase sequencing depth. The pipeline will concatenate the raw reads before performing any downstream analysis. Below is an example for the same sample sequenced across 3 lanes:
+- **Paired-end reads**: Include paths for both `fastq_1` and `fastq_2`.
+- **Single-end reads**: Leave the `fastq_2` column blank.
+- **Assemblies only**: Leave both `fastq_1` and `fastq_2` columns blank.
 
-```console
-sample,fastq_1,fastq_2
-CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz
-CONTROL_REP1,AEG588A1_S1_L003_R1_001.fastq.gz,AEG588A1_S1_L003_R2_001.fastq.gz
-CONTROL_REP1,AEG588A1_S1_L004_R1_001.fastq.gz,AEG588A1_S1_L004_R2_001.fastq.gz
-```
+The following columns are **mandatory**:
+- `sample`
+- `gff`
+- `assembly`
+- `cluster_id`
+- `species`
+- `reference`
+
 
 ### Full samplesheet
 
 The pipeline will auto-detect whether a sample is single- or paired-end using the information provided in the samplesheet. The samplesheet can have as many columns as you desire, however, there is a strict requirement for the first 3 columns to match those defined in the table below.
 
-A final samplesheet file consisting of both single- and paired-end data may look something like the one below. This is for 6 samples, where `TREATMENT_REP3` has been sequenced twice.
+A final samplesheet file consisting of either single-end, paired-end or assembly data may look something like the one below. This is for 7 samples, where two species and cluster_ids are included.
 
 ```console
-sample,fastq_1,fastq_2
-CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz
-CONTROL_REP2,AEG588A2_S2_L002_R1_001.fastq.gz,AEG588A2_S2_L002_R2_001.fastq.gz
-CONTROL_REP3,AEG588A3_S3_L002_R1_001.fastq.gz,AEG588A3_S3_L002_R2_001.fastq.gz
-TREATMENT_REP1,AEG588A4_S4_L003_R1_001.fastq.gz,
-TREATMENT_REP2,AEG588A5_S5_L003_R1_001.fastq.gz,
-TREATMENT_REP3,AEG588A6_S6_L003_R1_001.fastq.gz,
-TREATMENT_REP3,AEG588A6_S6_L004_R1_001.fastq.gz,
+sample,fastq_1,fastq_2,gff,assembly,cluster_id,species,reference
+SAMPLE_1_PAIRED_END,/path/to/qc/trimmed/fastq/files/SAMPLE1_1.trim.fastq.gz,/path/to/qc/trimmed/fastq/files/SAMPLE1_1.trim.fastq.gz,/path/to/gff/SAMPLE1.gff,/path/to/assembled/fasta/SAMPLE1.fasta,cluster_1,Escherichia_coli,/path/to/assembled/reference/reference1.fasta
+SAMPLE_2_PAIRED_END,/path/to/qc/trimmed/fastq/files/SAMPLE2_1.trim.fastq.gz,/path/to/qc/trimmed/fastq/files/SAMPLE2_1.trim.fastq.gz,/path/to/gff/SAMPLE2.gff,/path/to/assembled/fasta/SAMPLE2.fasta,cluster_1,Escherichia_coli,/path/to/assembled/reference/reference1.fasta
+SAMPLE_3_PAIRED_END,/path/to/qc/trimmed/fastq/files/SAMPLE3_1.trim.fastq.gz,/path/to/qc/trimmed/fastq/files/SAMPLE3_1.trim.fastq.gz,/path/to/gff/SAMPLE3.gff,/path/to/assembled/fasta/SAMPLE3.fasta,outbreak_facilityA,Pseudomonas aeruginosa,/path/to/assembled/reference/reference2.fasta
+SAMPLE_5_ASSEMBLED,,,/path/to/gff/SAMPLE4.gff,/path/to/assembled/fasta/SAMPLE4.fasta,outbreak_facilityA,Pseudomonas aeruginosa,/path/to/assembled/reference/reference2.fasta
+SAMPLE_6_ASSEMBLED,,,/path/to/gff/SAMPLE5.gff,/path/to/assembled/fasta/SAMPLE5.fasta,outbreak_facilityA,Pseudomonas aeruginosa,/path/to/assembled/reference/reference2.fasta
+SAMPLE_7_ASSEMBLED,,,/path/to/gff/SAMPLE6.gff,/path/to/assembled/fasta/SAMPLE6.fasta,cluster_1,Escherichia_coli,/path/to/assembled/reference/reference1.fasta
 ```
 
 | Column    | Description                                                                                                                                                                            |
 | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `sample`  | Custom sample name. This entry will be identical for multiple sequencing libraries/runs from the same sample. Spaces in sample names are automatically converted to underscores (`_`). |
-| `fastq_1` | Full path to FastQ file for Illumina short reads 1. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                                                             |
-| `fastq_2` | Full path to FastQ file for Illumina short reads 2. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                                                             |
+| `fastq_1` | Full path to FastQ file for Illumina QC trimmed short reads 1. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                                                  |
+| `fastq_2` | Full path to FastQ file for Illumina QC trimmed short reads 2. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                                                  |
+| `gff`     | Full path to GFF file with annotated genomes. File should have the extension ".gff" or ".gff3".                                                                                        |
+| `assembly` | Full path to assembled genome file. File can be gzipped and have the extension ".fasta", ".fa", ".fna", ".fasta.gz", ".fa.gz" or ".fna.gz"                                            |
+| `cluster_id` | Custom cluster id. This entry will be identical for multiple samples from the same cluster. Spaces in cluter ids are automatically converted to underscores (`_`).                  |
+| `species`  | Custom bacterial species name. This entry will be identical for multiple samples from the same species. Spaces in sample names are automatically converted to underscores (`_`).      |
+| `reference` | Full path to assembled reference genome file. This must be identical for multiple samples from the same cluster. File can be gzipped and have the extension ".fasta", ".fa", ".fna", ".fasta.gz", ".fa.gz" or ".fna.gz"                                 |
 
 An [example samplesheet](../assets/samplesheet.csv) has been provided with the pipeline.
 
@@ -55,10 +61,10 @@ An [example samplesheet](../assets/samplesheet.csv) has been provided with the p
 The typical command for running the pipeline is as follows:
 
 ```bash
-nextflow run MI-Bioinformatics/process-bact-cluster-per-species --input samplesheet.csv --outdir <OUTDIR> --genome GRCh37 -profile docker
+nextflow run MI-Bioinformatics/process-bact-cluster-per-species --input samplesheet.csv --outdir <OUTDIR> --gubbins --mashtree -profile singularity
 ```
 
-This will launch the pipeline with the `docker` configuration profile. See below for more information about profiles.
+This will launch the pipeline with the `singularity` configuration profile. See below for more information about profiles.
 
 Note that the pipeline will create the following files in your working directory:
 
@@ -266,3 +272,42 @@ We recommend adding the following line to your environment to limit this (typica
 ```bash
 NXF_OPTS='-Xms1g -Xmx4g'
 ```
+
+## Input/Output Options
+- `--input`                       [string]  Path to comma-separated file containing information about the samples and reference in the analysis (mandatory).
+- `--outdir`                      [string]  The output directory where the results will be saved. You must use absolute paths for storage on Cloud infrastructure (mandatory).  
+- `--gubbins`                     [boolean] Filter out recombinant sites with Gubbins (optional).
+- `--mashtree`                    [boolean] Analyze genomic distances and generate a tree with MashTree (optional).
+- `--previous_results`            [string]  Path to previous results. By default, the pipeline looks for prior Snippy results for the same cluster in the outdir (optional). 
+- `--save_snippy_run`             [boolean] Do not publish Snippy run results. By default, the pipeline saves the Snippy-run results per sample (optional).
+- `--email`                       [string]  Email address for completion summary (optional).
+- `--multiqc_title`               [string]  MultiQC report title. Printed as a page header and used for the filename if not otherwise specified (optional).
+
+### Institutional Config Options
+- `--custom_config_version`       [string]  Git commit ID for institutional configs. [default: master]
+- `--custom_config_base`          [string]  Base directory for institutional configs. [default: https://raw.githubusercontent.com/nf-core/configs/master]
+- `--config_profile_name`         [string]  Institutional config name.
+- `--config_profile_description`  [string]  Institutional config description.
+- `--config_profile_contact`      [string]  Institutional config contact information.
+- `--config_profile_url`          [string]  Institutional config URL link.
+
+### Max Job Request Options
+- `--max_cpus`                    [integer] Maximum number of CPUs that can be requested for any single job. [default: 16]
+- `--max_memory`                  [string]  Maximum amount of memory that can be requested for any single job. [default: 128.GB]
+- `--max_time`                    [string]  Maximum amount of time that can be requested for any single job. [default: 240.h]
+
+### Generic Options
+- `--help`                        [boolean] Display help text.
+- `--version`                     [boolean] Display version and exit.
+- `--publish_dir_mode`            [string]  Method used to save pipeline results to the output directory. [default: copy]
+- `--email_on_fail`               [string]  Email address for completion summary, only when the pipeline fails.
+- `--plaintext_email`             [boolean] Send plain-text email instead of HTML.
+- `--max_multiqc_email_size`      [string]  File size limit when attaching MultiQC reports to summary emails. [default: 25.MB]
+- `--monochrome_logs`             [boolean] Do not use colored log outputs.
+- `--hook_url`                    [string]  Incoming hook URL for messaging service.
+- `--multiqc_config`              [string]  Custom config file to supply to MultiQC.
+- `--multiqc_logo`                [string]  Custom logo file to supply to MultiQC. The file name must also be set in the MultiQC config file.
+- `--multiqc_methods_description` [string]  Custom MultiQC YAML file containing HTML including a methods description.
+- `--tracedir`                    [string]  Directory to keep pipeline Nextflow logs and reports. [default: `${params.outdir}/pipeline_info`]
+- `--validate_params`             [boolean] Whether to validate parameters against the schema at runtime [default: true].
+- `--show_hidden_params`          [boolean] Show all params when using `--help`.
