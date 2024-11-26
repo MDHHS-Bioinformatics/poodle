@@ -1,41 +1,127 @@
-# nf-core/processclusterperspecies: Output
+# MI-Bioinformatics/process-bact-cluster-per-species: Output
 
 ## Introduction
 
-This document describes the output produced by the pipeline. Most of the plots are taken from the MultiQC report, which summarises results at the end of the pipeline.
-
-The directories listed below will be created in the results directory after the pipeline has finished. All paths are relative to the top-level results directory.
-
-<!-- TODO nf-core: Write this documentation describing your workflow's output -->
+This document describes the output produced by the pipeline. The directories listed below will be created in the results directory after the pipeline has finished. All paths are relative to the top-level results directory.
 
 ## Pipeline overview
 
-The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes data using the following steps:
+The pipeline processes data using [Nextflow](https://www.nextflow.io/) and generates outputs in structured directories. These outputs include processed data, quality metrics, and reports.
 
-- [FastQC](#fastqc) - Raw read QC
-- [MultiQC](#multiqc) - Aggregate report describing results and QC from the whole pipeline
-- [Pipeline information](#pipeline-information) - Report metrics generated during the workflow execution
-
-### FastQC
+### Snippy Run
 
 <details markdown="1">
 <summary>Output files</summary>
 
-- `fastqc/`
-  - `*_fastqc.html`: FastQC report containing quality metrics.
-  - `*_fastqc.zip`: Zip archive containing the FastQC report, tab-delimited data file and plot images.
+- `<sample>.tab`: Tab-delimited table summarizing detected variants.
+- `<sample>.csv`: CSV file with detailed variant information.
+- `<sample>.html`: HTML report summarizing the Snippy run.
+- `<sample>.vcf`: Variants in VCF format.
+- `<sample>.bed`: BED file with variant locations.
+- `<sample>.gff`: GFF file containing annotated variants.
+- `<sample>.bam`: Alignment file in BAM format.
+- `<sample>.bam.bai`: BAM alignment index file.
+- `<sample>.log`: Log file from the Snippy run.
+- `<sample>.aligned.fa`: Aligned reference and consensus sequences in FASTA format.
+- `<sample>.consensus.fa`: Consensus sequence for the sample in FASTA format.
+- `<sample>.consensus.subs.fa`: Substitutions-only consensus sequence in FASTA format.
+- `<sample>.raw.vcf`: Raw variant calls in VCF format.
+- `<sample>.filt.vcf`: Filtered variant calls in VCF format.
+- `<sample>.vcf.gz`: Compressed VCF file.
+- `<sample>.vcf.gz.csi`: Index file for the compressed VCF.
+- `<sample>.txt`: Additional information or logs.
 
 </details>
 
-[FastQC](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/) gives general quality metrics about your sequenced reads. It provides information about the quality score distribution across your reads, per base sequence content (%A/T/G/C), adapter contamination and overrepresented sequences. For further reading and documentation see the [FastQC help pages](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/Help/).
+[Snippy](https://github.com/tseemann/snippy) is used for rapid bacterial variant calling and core genome alignment. The outputs include variant annotations, alignments, and detailed reports for each sample.
 
-![MultiQC - FastQC sequence counts plot](images/mqc_fastqc_counts.png)
+---
 
-![MultiQC - FastQC mean quality scores plot](images/mqc_fastqc_quality.png)
+### Snippy Core
 
-![MultiQC - FastQC adapter content plot](images/mqc_fastqc_adapter.png)
+<details markdown="1">
+<summary>Output files</summary>
 
-> **NB:** The FastQC plots displayed in the MultiQC report shows _untrimmed_ reads. They may contain adapter sequence and potentially regions with low quality.
+- `<Species>_<cluster_id>.aln`: Core genome alignment in FASTA format.
+- `<Species>_<cluster_id>.aln.iqtree`: IQ-TREE input file.
+- `<Species>_<cluster_id>.aln.treefile`: Phylogenetic tree based on the core genome alignment.
+- `<Species>_<cluster_id>_dist.tsv`: Pairwise SNP distances between genomes.
+- `<Species>_<cluster_id>.full.aln`: Full genome alignment.
+- `<Species>_<cluster_id>_clean.full.aln`: Cleaned full genome alignment.
+- `<Species>_<cluster_id>.tab`: Summary of core genome variants.
+- `<Species>_<cluster_id>.tre`: Phylogenetic tree in Newick format (reference tip dropped).
+- `<Species>_<cluster_id>.txt`: Additional metadata or logs.
+- `<Species>_<cluster_id>.vcf`: Core genome variants in VCF format.
+
+</details>
+
+These files summarize the core genome alignment and phylogenetic analysis for each cluster. The results include SNP distances, reference-based alignments, and tree files for visualization and downstream analyses.
+
+---
+
+### Gubbins
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `<Species>_<cluster_id>_clean.full.filtered_plymorphic_sites.fasta`: Filtered polymorphic sites in FASTA format.
+- `<Species>_<cluster_id>_clean.full.recombination_predictions.gff`: Recombination predictions in GFF format.
+- `<Species>_<cluster_id>_clean.full.summary_of_snp_distribution.vcf`: Summary of SNP distribution in VCF format.
+- `<Species>_<cluster_id>_clean.full.per_branch_statistics.csv`: Per-branch recombination statistics in CSV format.
+- `<Species>_<cluster_id>_clean.full.filtered_plymorphic_sites.phylip`: Polymorphic sites in PHYLIP format.
+- `<Species>_<cluster_id>_clean.full.recombination_predictions.embl`: Recombination predictions in EMBL format.
+- `<Species>_<cluster_id>_clean.full.branch_base_reconstruction.embl`: Branch base reconstruction in EMBL format.
+- `<Species>_<cluster_id>_clean.full.final_tree.tre`: Final phylogenetic tree.
+- `<Species>_<cluster_id>_clean.full.node_labelled.final_tree.tre`: Node-labeled phylogenetic tree.
+- `<Species>_<cluster_id>_clean.full.final_bootstrapped_tree.tre`: Bootstrapped phylogenetic tree.
+- `<Species>_<cluster_id>_dists.tsv`: Pairwise distance matrix.
+
+</details>
+
+[Gubbins](https://github.com/sanger-pathogens/gubbins) is used to detect and exclude recombination events from bacterial genome alignments. The outputs include recombination predictions, polymorphic site filtering, and phylogenetic trees.
+
+---
+
+### Panaroo
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `gene_presence_absence_roary.csv`: Gene presence-absence table in Roary format.
+- `gene_presence_absence.Rtab`: Tab-delimited matrix of gene presence.
+- `gene_presence_dist.tsv`: Gene presence-absence distance matrix.
+- `summarystatistics.txt`: Summary statistics for pan-genome analysis.
+
+</details>
+
+[Panaroo](https://github.com/gtonkinhill/panaroo) performs pan-genome analysis. The output includes gene presence-absence matrices, distance matrices, and summary statistics.
+
+---
+
+### Mashtree
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `<Species>_<cluster_id>.dnd`: Phylogenetic tree in Newick format generated by Mashtree.
+- `<Species>_<cluster_id>.tsv`: Mash distance matrix.
+
+</details>
+
+[Mashtree](https://github.com/lskatz/mashtree) calculates Mash distances and generates phylogenetic trees for genome comparisons.
+
+---
+
+### Reference Evaluation
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `reference_evaluation.tsv`: Summary of reference evaluation based on Snippy-core alignment results of genome fraction in tab-delimited format.
+
+</details>
+
+This file provides a detailed evaluation of the reference used based on Snippy-core alignment results of genome fraction in tab-delimited format.
 
 ### MultiQC
 
@@ -66,3 +152,75 @@ Results generated by MultiQC collate pipeline QC from supported tools e.g. FastQ
 </details>
 
 [Nextflow](https://www.nextflow.io/docs/latest/tracing.html) provides excellent functionality for generating various reports relevant to the running and execution of the pipeline. This will allow you to troubleshoot errors with the running of the pipeline, and also provide you with other information such as launch commands, run times and resource usage.
+
+## Outputs
+Below is the structure of the output directory. 
+
+```
+📁 <outdir>
+├── 📁 <Species>
+│   ├── 📁 clusters
+│   │   └── 📁 <cluster_id>
+│   │       ├── 📁 snippy_run
+│   │       │   ├── 📁 <sample>
+│   │       │   │   ├── 📄 <sample>.aligned.fa
+│   │       │   │   ├── 📄 <sample>.bam
+│   │       │   │   ├── 📄 <sample>.bam.bai
+│   │       │   │   ├── 📄 <sample>.bed
+│   │       │   │   ├── 📄 <sample>.consensus.fa
+│   │       │   │   ├── 📄 <sample>.consensus.subs.fa
+│   │       │   │   ├── 📄 <sample>.csv
+│   │       │   │   ├── 📄 <sample>.filt.vcf
+│   │       │   │   ├── 📄 <sample>.gff
+│   │       │   │   ├── 📄 <sample>.html
+│   │       │   │   ├── 📄 <sample>.log
+│   │       │   │   ├── 📄 <sample>.raw.vcf
+│   │       │   │   ├── 📄 <sample>.tab
+│   │       │   │   ├── 📄 <sample>.txt
+│   │       │   │   ├── 📄 <sample>.vcf
+│   │       │   │   ├── 📄 <sample>.vcf.gz
+│   │       │   │   └── 📄 <sample>.vcf.gz.csi
+│   │       ├── 📁 snippy_core
+│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.aln
+│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.full.aln
+│   │       │   ├── 📄 <Species>_<cluster_id>.aln
+│   │       │   ├── 📄 <Species>_<cluster_id>.aln.iqtree
+│   │       │   ├── 📄 <Species>_<cluster_id>.aln.treefile
+│   │       │   ├── 📄 <Species>_<cluster_id>.dist.tsv
+│   │       │   ├── 📄 <Species>_<cluster_id>.tab
+│   │       │   ├── 📄 <Species>_<cluster_id>.tre
+│   │       │   ├── 📄 <Species>_<cluster_id>.txt
+│   │       │   └── 📄 <Species>_<cluster_id>.vcf
+│   │       ├── 📁 gubbins
+│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.branch_base_reconstruction.embl
+│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.final_bootstrapped_tree.tre
+│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.final_tree.tre
+│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.filtered_plymorphic_sites.fasta
+│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.filtered_plymorphic_sites.phylip
+│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.node_labelled.final_tree.tre
+│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.per_branch_statistics.csv
+│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.recombination_predictions.embl
+│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.recombination_predictions.gff
+│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.summary_of_snp_distribution.vcf
+│   │       │   └── 📄 <Species>_<cluster_id>_dists.tsv
+│   │       ├── 📁 panaroo
+│   │       │   ├── 📄 gene_presence_absence.Rtab
+│   │       │   ├── 📄 gene_presence_absence_roary.csv
+│   │       │   ├── 📄 gene_presence_dist.tsv
+│   │       │   └── 📄 summarystatistics.txt
+│   │       ├── 📁 mashtree
+│   │       │   ├── 📄 <Species>_<cluster_id>.dnd
+│   │       │   └── 📄 <Species>_<cluster_id>.tsv
+│   │       └── 📄 reference_evaluation.tsv
+├── 📁 pipeline_info
+│   ├── 📄 execution_report_<date_time>.html
+│   ├── 📄 execution_timeline_<date_time>.html
+│   ├── 📄 execution_trace_<date_time>.txt
+│   ├── 📄 pipeline_dag_<date_time>.html
+│   ├── 📄 samplesheet.valid.csv
+│   └── 📄 software_versions.yml
+├── 📁 multiqc
+│   ├── 📁 multiqc_data
+│   ├── 📁 multiqc_plots
+│   └── 📄 multiqc_report.html
+```
