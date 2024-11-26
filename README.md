@@ -79,7 +79,7 @@ Make sure to provide values for these columns even if certain input types do not
 
    ```
 > [!TIP]
-> Check detailed [usage instructions](../docs/usage.md) for the pipeline.
+> Check detailed [usage instructions](./docs/usage.md) for the pipeline.
 
 ## Input/Output Options
 - `--input`                       [string]  Path to comma-separated file containing information about the samples and reference in the analysis (mandatory).
@@ -96,7 +96,7 @@ Make sure to provide values for these columns even if certain input types do not
 Below is the structure of the output directory. 
 
 > [!TIP]
-> Check detailed [output information](../docs/output.md) for the pipeline.
+> Check detailed [output information](./docs/output.md) for the pipeline.
 
 ```
 📁 <outdir>
