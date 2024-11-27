@@ -72,12 +72,10 @@ Make sure to provide values for these columns even if certain input types do not
 | SAMPLE_7_ASSEMBLED     |                                                     |                                                     | /path/to/gff/SAMPLE7.gff | /path/to/assembled/fasta/SAMPLE7.fasta | cluster_1          | Escherichia_coli         | /path/to/assembled/reference/reference1.fasta |
 
 5. Start running your own analysis!
-
-   ```bash
-   
+  ```bash
   nextflow run MI-Bioinformatics/process-bact-cluster-per-species --input samplesheet.csv --outdir <OUTDIR> --gubbins --mashtree -profile <docker/singularity/podman/shifter/charliecloud/conda/institute>
-
    ```
+
 > [!TIP]
 > Check detailed [usage instructions](./docs/usage.md) for the pipeline.
 
