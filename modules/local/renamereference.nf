@@ -2,9 +2,6 @@ process RENAME_REFERENCE {
     tag '$meta.id'
     label 'process_single'
     
-    conda "conda-forge::bash=5.2.21"
-    container 'quay.io/jitesoft/alpine:3.20.3'
-
     input:
     tuple val(meta), path(reference)
 
