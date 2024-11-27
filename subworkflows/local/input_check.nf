@@ -97,14 +97,14 @@ def create_fastq_channel(LinkedHashMap row) {
         if (meta.single_end) {
             // Single-end case
             meta.has_assembly = false
-            input_meta = [ meta, [ file(row.fastq_1) ], file(row.gff), file(row.reference) ]
+            input_meta = [ meta, [ file(row.fastq_1), file(row.assembly) ], file(row.gff), file(row.reference) ]
         } else {
             if (!file(row.fastq_2).exists()) {
                 exit 1, "ERROR: Please check input samplesheet -> Read 2 FastQ file does not exist!\n${row.fastq_2}"
             }
             // Paired-end case
             meta.has_assembly = false
-            input_meta = [ meta, [ file(row.fastq_1), file(row.fastq_2) ], file(row.gff), file(row.reference) ]
+            input_meta = [ meta, [ file(row.fastq_1), file(row.fastq_2), file(row.assembly)], file(row.gff), file(row.reference) ]
         }
     } else if (meta.has_assembly) {
         // If no reads but assembly is available, use the assembly
