@@ -35,7 +35,9 @@ ch_multiqc_custom_methods_description = params.multiqc_methods_description ? fil
 
 include { CLEAN_TREE                  } from '../modules/local/cleantree'
 include { GENEDISTS                   } from '../modules/local/genedists'
-
+include { SNIPPY_CORE                 } from '../modules/nf-core/snippy/core/main'
+include { SNIPPY_RUN                  } from '../modules/nf-core/snippy/run/main'
+include { REFERENCE_EVALUATION        } from '../modules/local/referenceevaluation.nf'
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
