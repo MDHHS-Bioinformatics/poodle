@@ -83,7 +83,9 @@ def create_fastq_channel(LinkedHashMap row) {
 
     // Validate and add file paths
     def input_meta = []
-
+    if (params.force_assemblies){
+        meta.has_reads = false
+    }
     if (meta.has_reads) {
         // If reads are available, check and add them to the meta map
         if (!file(row.fastq_1).exists()) {

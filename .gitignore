@@ -11,4 +11,4 @@ logs/
 *.fasta
 *.sh
 *.csv
-results*
+*results*
