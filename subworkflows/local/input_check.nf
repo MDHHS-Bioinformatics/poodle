@@ -83,35 +83,32 @@ def create_fastq_channel(LinkedHashMap row) {
 
     // Validate and add file paths
     def input_meta = []
-    if (params.force_assemblies){
-        meta.has_reads = false
+    if (params.force_reads){
+        meta.has_assembly = false
     }
-    if (meta.has_reads) {
-        // If reads are available, check and add them to the meta map
-        if (!file(row.fastq_1).exists()) {
-            exit 1, "ERROR: Please check input samplesheet -> Read 1 FastQ file does not exist!\n${row.fastq_1}"
-        }
-        if (meta.single_end) {
-            // Single-end case
-            meta.has_assembly = false
-            input_meta = [ meta, [ file(row.fastq_1) ], file(row.gff), file(row.reference) ]
-        } else {
-            if (!file(row.fastq_2).exists()) {
-                exit 1, "ERROR: Please check input samplesheet -> Read 2 FastQ file does not exist!\n${row.fastq_2}"
-            }
-            // Paired-end case
-            meta.has_assembly = false
-            input_meta = [ meta, [ file(row.fastq_1), file(row.fastq_2) ], file(row.gff), file(row.reference) ]
-        }
-    } else if (meta.has_assembly) {
-        // If no reads but assembly is available, use the assembly
+
+    if (meta.has_assembly){
+        //If assemblies are avaiable, check and add them to the meta map
         if (!file(row.assembly).exists()) {
             exit 1, "ERROR: Please check input samplesheet -> Assembly file does not exist!\n${row.assembly}"
         }
         // Add the assembly path to the meta map
+        meta.has_reads = false
         input_meta = [ meta, [ file(row.assembly) ], file(row.gff),file(row.reference)  ]
         //meta.assembly = row.assembly
+    } else if (meta.has_reads) {
+        // Validate reads
+        validateFile(row.fastq_1, "ERROR: Please check input samplesheet -> Read 1 FastQ file does not exist!\n${row.fastq_1}")
+        if (meta.single_end) {
+            // Single-end reads
+            input_meta = [ meta, [ file(row.fastq_1) ], file(row.gff), file(row.reference) ]
+        } else {
+            validateFile(row.fastq_2, "ERROR: Please check input samplesheet -> Read 2 FastQ file does not exist!\n${row.fastq_2}")
+            // Paired-end reads
+            input_meta = [ meta, [ file(row.fastq_1), file(row.fastq_2) ], file(row.gff), file(row.reference) ]
+        }
     } else {
+        // No valid reads or assembly
         exit 1, "ERROR: Sample ${row.sample} does not have valid reads or assembly!"
     }
 
