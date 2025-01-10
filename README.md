@@ -73,7 +73,7 @@ Make sure to provide values for these columns even if certain input types do not
 
 5. Start running your own analysis!
   ```bash
-  nextflow run MI-Bioinformatics/process-bact-cluster-per-species --input samplesheet.csv --outdir <OUTDIR> --gubbins --mashtree -profile <docker/singularity/podman/shifter/charliecloud/conda/institute>
+  nextflow run main.nf --input samplesheet.csv --outdir <OUTDIR> --gubbins --mashtree -profile <docker/singularity/podman/shifter/charliecloud/conda/institute>
    ```
 
 > [!TIP]
