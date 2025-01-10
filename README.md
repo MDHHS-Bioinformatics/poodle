@@ -159,10 +159,7 @@ Below is the structure of the output directory.
 │   ├── 📄 pipeline_dag_<date_time>.html
 │   ├── 📄 samplesheet.valid.csv
 │   └── 📄 software_versions.yml
-├── 📁 multiqc
-│   ├── 📁 multiqc_data
-│   ├── 📁 multiqc_plots
-│   └── 📄 multiqc_report.html
+
 
 ```
 
