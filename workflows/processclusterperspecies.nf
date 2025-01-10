@@ -48,7 +48,6 @@ include { SNIPPY_CLUSTERS             } from '../subworkflows/local/snippycluste
 //
 // MODULE: Installed directly from nf-core/modules
 //
-include { MULTIQC                      } from '../modules/nf-core/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS  } from '../modules/nf-core/custom/dumpsoftwareversions/main'
 include { SNPDISTS as SNPDISTS_SNIPPY  } from '../modules/nf-core/snpdists/main'
 include { SNPDISTS as SNPDISTS_GUBBINS } from '../modules/nf-core/snpdists/main'

@@ -45,7 +45,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 
 4. Prepare a Manifest CSV File
 
-Create a CSV file containing paths to the following: QC-trimmed FASTQ files, GFFs, assemblies, cluster_id, species, and reference. Snippy supports inputs in three formats: paired-end reads, single-end reads, or assemblies. 
+Create a CSV file containing paths to the following: QC-trimmed FASTQ files, GFFs, assemblies, cluster_id, species, and reference. Snippy supports inputs in three formats: paired-end reads, single-end reads, or assemblies.
 
 - **Paired-end reads**: Include paths for both `fastq_1` and `fastq_2`.
 - **Single-end reads**: Leave the `fastq_2` column blank.
@@ -81,17 +81,18 @@ Make sure to provide values for these columns even if certain input types do not
 
 ## Input/Output Options
 - `--input`                       [string]  Path to comma-separated file containing information about the samples and reference in the analysis (mandatory).
-- `--outdir`                      [string]  The output directory where the results will be saved. You must use absolute paths for storage on Cloud infrastructure (mandatory).  
+- `--outdir`                      [string]  The output directory where the results will be saved. You must use absolute paths for storage on Cloud infrastructure (mandatory).
 - `--gubbins`                     [boolean] Filter out recombinant sites with Gubbins (optional).
 - `--mashtree`                    [boolean] Analyze genomic distances and generate a tree with MashTree (optional).
-- `--previous_results`            [string]  Path to previous results. By default, the pipeline looks for prior Snippy results for the same cluster in the outdir (optional). 
+- `--previous_results`            [string]  Path to previous results. By default, the pipeline looks for prior Snippy results for the same cluster in the outdir (optional).
 - `--save_snippy_run`             [boolean] Do not publish Snippy run results. By default, the pipeline saves the Snippy-run results per sample (optional).
+ `--force_reads`             [boolean] If both reads and assemblies are present, but only reads want to be used, use this option to force the pipeline to use just the reads for all the samples. The pipeline will always default to using assemblies when they're avaiable otherwise (optional).
 - `--email`                       [string]  Email address for completion summary (optional).
 - `--multiqc_title`               [string]  MultiQC report title. Printed as a page header and used for the filename if not otherwise specified (optional).
 
 
 ## Outputs
-Below is the structure of the output directory. 
+Below is the structure of the output directory.
 
 > [!TIP]
 > Check detailed [output information](./docs/output.md) for the pipeline.
@@ -122,32 +123,31 @@ Below is the structure of the output directory.
 │   │       │   │   └── 📄 <sample>.vcf.gz.csi
 │   │       ├── 📁 snippy_core
 │   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.aln
-│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.full.aln
+│   │       │   ├── 📄 <Species>_<cluster_id>_dist.tsv
 │   │       │   ├── 📄 <Species>_<cluster_id>.aln
-│   │       │   ├── 📄 <Species>_<cluster_id>.aln.iqtree
-│   │       │   ├── 📄 <Species>_<cluster_id>.aln.treefile
-│   │       │   ├── 📄 <Species>_<cluster_id>.dist.tsv
+│   │       │   ├── 📄 <Species>_<cluster_id>.full.aln
+│   │       │   ├── 📄 <Species>_<cluster_id>.iqtree
 │   │       │   ├── 📄 <Species>_<cluster_id>.tab
 │   │       │   ├── 📄 <Species>_<cluster_id>.tre
+│   │       │   ├── 📄 <Species>_<cluster_id>.treefile
 │   │       │   ├── 📄 <Species>_<cluster_id>.txt
 │   │       │   └── 📄 <Species>_<cluster_id>.vcf
 │   │       ├── 📁 gubbins
-│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.branch_base_reconstruction.embl
-│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.final_bootstrapped_tree.tre
-│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.final_tree.tre
-│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.filtered_plymorphic_sites.fasta
-│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.filtered_plymorphic_sites.phylip
-│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.node_labelled.final_tree.tre
-│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.per_branch_statistics.csv
-│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.recombination_predictions.embl
-│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.recombination_predictions.gff
-│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.summary_of_snp_distribution.vcf
-│   │       │   └── 📄 <Species>_<cluster_id>_dists.tsv
+│   │       │   ├── 📄 <Species>_<cluster_id>_dist.tsv
+│   │       │   ├── 📄 <Species>_<cluster_id>.branch_base_reconstruction.embl
+│   │       │   ├── 📄 <Species>_<cluster_id>.filtered_plymorphic_sites.fasta
+│   │       │   ├── 📄 <Species>_<cluster_id>.filtered_plymorphic_sites.phylip
+│   │       │   ├── 📄 <Species>_<cluster_id>.final_tree.tre
+│   │       │   ├── 📄 <Species>_<cluster_id>.node_labelled.final_tree.tre
+│   │       │   ├── 📄 <Species>_<cluster_id>.per_branch_statistics.csv
+│   │       │   ├── 📄 <Species>_<cluster_id>.recombination_predictions.embl
+│   │       │   ├── 📄 <Species>_<cluster_id>.recombination_predictions.gff
+│   │       │   └── 📄 <Species>_<cluster_id>.summary_of_snp_distribution.vcf
 │   │       ├── 📁 panaroo
-│   │       │   ├── 📄 gene_presence_absence.Rtab
+│   │       │   ├── 📄 gene_presence_absence_dist.tsv
 │   │       │   ├── 📄 gene_presence_absence_roary.csv
-│   │       │   ├── 📄 gene_presence_dist.tsv
-│   │       │   └── 📄 summarystatistics.txt
+│   │       │   ├── 📄 gene_presence_absence.Rtab
+│   │       │   └── 📄 summary_statistics.txt
 │   │       ├── 📁 mashtree
 │   │       │   ├── 📄 <Species>_<cluster_id>.dnd
 │   │       │   └── 📄 <Species>_<cluster_id>.tsv
