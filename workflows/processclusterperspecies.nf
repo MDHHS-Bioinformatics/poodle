@@ -141,7 +141,7 @@ workflow PROCESSCLUSTERPERSPECIES {
     // MODULE: MashTree
     //
     if (params.mashtree){
-        INPUT_CHECK.out.final_input_files.view()
+        //INPUT_CHECK.out.final_input_files.view()
         // Get only assemblies from the input and place in a channel per species and cluster
         INPUT_CHECK.out.final_input_files
         .filter{meta, assembly, gff, reference -> meta.has_assembly == true}
