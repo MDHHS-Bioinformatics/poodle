@@ -14,20 +14,11 @@ process SNIPPY_RUN {
     output:
     tuple val(meta), path("${prefix}/${prefix}.tab")              , emit: tab
     tuple val(meta), path("${prefix}/${prefix}.csv")              , emit: csv
-    tuple val(meta), path("${prefix}/${prefix}.html")             , emit: html
     tuple val(meta), path("${prefix}/${prefix}.vcf")              , emit: vcf
-    tuple val(meta), path("${prefix}/${prefix}.bed")              , emit: bed
-    tuple val(meta), path("${prefix}/${prefix}.gff")              , emit: gff
-    tuple val(meta), path("${prefix}/${prefix}.bam")              , emit: bam
-    tuple val(meta), path("${prefix}/${prefix}.bam.bai")          , emit: bai
     tuple val(meta), path("${prefix}/${prefix}.log")              , emit: log
     tuple val(meta), path("${prefix}/${prefix}.aligned.fa")       , emit: aligned_fa
     tuple val(meta), path("${prefix}/${prefix}.consensus.fa")     , emit: consensus_fa
     tuple val(meta), path("${prefix}/${prefix}.consensus.subs.fa"), emit: consensus_subs_fa
-    tuple val(meta), path("${prefix}/${prefix}.raw.vcf")          , emit: raw_vcf
-    tuple val(meta), path("${prefix}/${prefix}.filt.vcf")         , emit: filt_vcf
-    tuple val(meta), path("${prefix}/${prefix}.vcf.gz")           , emit: vcf_gz
-    tuple val(meta), path("${prefix}/${prefix}.vcf.gz.csi")       , emit: vcf_csi
     tuple val(meta), path("${prefix}/${prefix}.txt")              , emit: txt
     path "versions.yml"                                           , emit: versions
 
