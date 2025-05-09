@@ -86,7 +86,6 @@ Make sure to provide values for these columns even if certain input types do not
 - `--mashtree`                    [boolean] Analyze genomic distances and generate a tree with MashTree (optional).
 - `--previous_results`            [string]  Path to previous results. By default, the pipeline looks for prior Snippy results for the same cluster in the outdir (optional).
 - `--save_snippy_run`             [boolean] Do not publish Snippy run results. By default, the pipeline saves the Snippy-run results per sample (optional).
-- `--force_reads`             [boolean] If both reads and assemblies are present, but only reads want to be used, use this option to force the pipeline to use just the reads for all the samples. The pipeline will always default to using assemblies when they're avaiable otherwise (optional).
 - `--email`                       [string]  Email address for completion summary (optional).
 - `--multiqc_title`               [string]  MultiQC report title. Printed as a page header and used for the filename if not otherwise specified (optional).
 
