@@ -53,7 +53,7 @@ include { SNPDISTS as SNPDISTS_SNIPPY  } from '../modules/nf-core/snpdists/main'
 include { SNPDISTS as SNPDISTS_GUBBINS } from '../modules/nf-core/snpdists/main'
 include { IQTREE                       } from '../modules/nf-core/iqtree/main'
 include { GUBBINS                      } from '../modules/nf-core/gubbins/main'
-include { SNPSITES                      } from '../modules/nf-core/snpsites/main'
+include { SNPSITES                     } from '../modules/nf-core/snpsites/main'
 include { PANAROO_RUN                  } from '../modules/nf-core/panaroo/run/main'
 include { MASHTREE                     } from '../modules/nf-core/mashtree/main'
 
