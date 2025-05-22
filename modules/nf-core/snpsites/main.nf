@@ -1,4 +1,5 @@
 process SNPSITES {
+    tag "$meta.species"
     label 'process_medium'
 
     conda "${moduleDir}/environment.yml"
@@ -10,9 +11,9 @@ process SNPSITES {
     tuple val(meta), path(msa)
 
     output:
-    path "*.fna"        , emit: snp_fasta
-    path "versions.yml" , emit: versions
-    env   CONSTANT_SITES, emit: constant_sites_string
+    tuple val(meta), path("${meta.species}_${meta.cluster_id}_snp-sites.fna"), emit: snp_fasta
+
+    path "versions.yml", emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -34,14 +35,5 @@ process SNPSITES {
         snpsites: \$(snp-sites -V 2>&1 | sed 's/snp-sites //')
     END_VERSIONS
     """
-    stub:
-    """
-    touch ${species}_${cluster_id}_snp-sites.fna
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        snpsites: \$(snp-sites -V 2>&1 | sed 's/snp-sites //')
-    END_VERSIONS
-    """
-
 }
+
