@@ -16,7 +16,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 
 1. Identify reference-based SNPs with [`Snippy`](https://github.com/tseemann/snippy)-run for each sample.
 2. Make a core genome alignment with [`Snippy`](https://github.com/tseemann/snippy)-core, generate a SNP tree with [`IQ-TREE`](https://www.iqtree.org/) and calculate SNP distances with [`snp-dists`](https://github.com/tseemann/snp-dists).
-3. Mask recombinant sites with [`Gubbins`](https://github.com/nickjcroucher/gubbins) and calculate SNP distances with [`snp-dists`](https://github.com/tseemann/snp-dists) (optional).
+3. Mask recombinant sites with [`Gubbins`](https://github.com/nickjcroucher/gubbins), extract ACGT positions with [`snp-sites`](https://sanger-pathogens.github.io/snp-sites/) and calculate SNP distances with [`snp-dists`](https://github.com/tseemann/snp-dists) (optional).
 4. Pangenome profile (gene presence-absence) with [`Panaroo`](https://github.com/gtonkinhill/panaroo) and calculate gene distances.
 5. Make a tree with Mash distances using [`MashTree`](https://github.com/lskatz/mashtree) (optional).
 6. Summary results ([`MultiQC`](http://multiqc.info/))
