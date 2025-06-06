@@ -36,17 +36,17 @@ def read_vcf_for_ref(species, cluster_id, sample_id, ref) {
         5.times { reader.readLine() } // Skip the first 5 lines
         line = reader.readLine() // Read the 6th line
         def rawReference = line.find(/ID=([^,]+)/) { match, id -> id } // Extract the ID value
-        if (rawReference) {
-            // Split at '_', take the first part, and append '.fna'
-            rawReference.split('_')[0] + '.fna'
-        }
     }
     }
-    // Extract just the filename from the full path of ref
-    def ref_filename = file(ref).name
+
+    // Read the first line of the reference filename
+    def ref_name = file(ref).withReader { reader ->
+        def line
+        line = reader.readLine()
+    }
 
     // Compare the reference in VCF with the provided reference filename
-    def reference_match = (reference_in_vcf == ref_filename)
+    def reference_match = (ref_name.contains(reference_in_vcf))
 
     return [reference_match, snippy_vcf_path] //[reference_in_vcf, reference_match, ref_filename]
 }
