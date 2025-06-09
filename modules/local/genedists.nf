@@ -2,9 +2,10 @@ process GENEDISTS {
     tag '$meta.species'
     label 'process_low'
     
+    conda "conda-forge::r-phytools=0.7_47"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/r-base%3A4.4.1' :
-        'quay.io/biocontainers/r-base:4.4.1' }"
+        'https://depot.galaxyproject.org/singularity/r-phytools:0.6_99--r40h6115d3f_1' :
+        'quay.io/biocontainers/r-phytools:0.6_44' }"
 
     input:
     tuple val(meta), path(rtab)
