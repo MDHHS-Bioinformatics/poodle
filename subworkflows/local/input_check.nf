@@ -53,35 +53,52 @@ workflow INPUT_CHECK {
     main_analysis = main_analysis.mix(input_branched.assembly_only)
     main_analysis = main_analysis.mix(both_split.reads_analysis)
     //main_analysis.view()
+
+    //
+    //Rename the reference file for all samples
+    //
+    RENAME_REFERENCE(
+        main_analysis.map{
+            meta, files, gff, reference -> tuple(meta,reference)
+        }
+    )
+    //RENAME_REFERENCE.out.renamed_files.view()
+
+    //Recreate the full channel with all the information we need
+    ch_renamed_refs = RENAME_REFERENCE.out.renamed_files.join(main_analysis)
+    ch_renamed_refs
+        .map{meta, new_reference, files, gff, old_reference -> tuple(meta, files, gff, new_reference)}
+        .set{new_input_files}
+    //new_input_files.view()
     //input_branched.assembly_only.view()
     //
     //Perform reference renaming if meta.has_assembly:true
-    main_analysis
-        .filter{meta, files, gff, reference -> meta.has_assembly == true}
-        .map{meta, files, gff, reference -> tuple(meta, reference)}
-        .set{ch_assemblies}
-    //
-    // //Store samples that don't have an assembly to recombined into the main channel later
-    main_analysis
-        .filter{meta, files, gff, reference -> meta.has_assembly == false}
-        .map{meta, files, gff, reference -> tuple(meta, files, gff, reference)}
-        .set{ch_non_assemblies}
+    // main_analysis
+    //     .filter{meta, files, gff, reference -> meta.has_assembly == true}
+    //     .map{meta, files, gff, reference -> tuple(meta, reference)}
+    //     .set{ch_assemblies}
+    // //
+    // // //Store samples that don't have an assembly to recombined into the main channel later
+    // main_analysis
+    //     .filter{meta, files, gff, reference -> meta.has_assembly == false}
+    //     .map{meta, files, gff, reference -> tuple(meta, files, gff, reference)}
+    //     .set{ch_non_assemblies}
 
-    //
-    //Rename the reference files for samples that have assemblies
-    RENAME_REFERENCE(ch_assemblies)
-    //
-    //Recreate the full channel with all the information we need
-    ch_joined_assemblies = RENAME_REFERENCE.out.renamed_files.join(input_files)
-    ch_joined_assemblies
-        .map{ meta, new_reference, empty_thing, files, gff, old_reference -> tuple(meta, files, gff, new_reference) }
-        .set{renamed_input_files}
+    // //
+    // //Rename the reference files for samples that have assemblies
+    // RENAME_REFERENCE(ch_assemblies)
+    // //
+    // //Recreate the full channel with all the information we need
+    // ch_joined_assemblies = RENAME_REFERENCE.out.renamed_files.join(input_files)
+    // ch_joined_assemblies
+    //     .map{ meta, new_reference, empty_thing, files, gff, old_reference -> tuple(meta, files, gff, new_reference) }
+    //     .set{renamed_input_files}
 
 
-    //Mix the values of the non assemblies channel and the assemblies channel
-    new_input_files = Channel.empty()
-    new_input_files = new_input_files.mix(ch_non_assemblies)
-    new_input_files = new_input_files.mix(renamed_input_files)
+    // //Mix the values of the non assemblies channel and the assemblies channel
+    // new_input_files = Channel.empty()
+    // new_input_files = new_input_files.mix(ch_non_assemblies)
+    // new_input_files = new_input_files.mix(renamed_input_files)
 
 
     final_input_files = Channel.empty()
@@ -104,10 +121,10 @@ workflow INPUT_CHECK {
 
     }
     final_input_files.view()
-    //emit:
-    // final_input_files                                 // channel: [ val(meta), [reads/assemblies], gff, reference]
-    // //input_files                                     // channel: [ val(meta), [ reads ] ]
-    // versions = SAMPLESHEET_CHECK.out.versions         // channel: [ versions.yml ]
+    emit:
+    final_input_files                                 // channel: [ val(meta), [reads/assemblies], gff, reference]
+    //input_files                                     // channel: [ val(meta), [ reads ] ]
+    versions = SAMPLESHEET_CHECK.out.versions         // channel: [ versions.yml ]
 }
 
 // Function to get list of [ meta, [ fastq_1, fastq_2 ] or [ assembly ], [ assembly ] or [], gff, reference ]
