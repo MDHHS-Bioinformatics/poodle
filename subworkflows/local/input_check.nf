@@ -2,20 +2,29 @@
 // Check input samplesheet and get read channels
 //
 
-include { SAMPLESHEET_CHECK           } from '../../modules/local/samplesheet_check'
+include { SAMPLESHEET_CHECK as SAMPLESHEET_CHECK_FILES         } from '../../modules/local/samplesheet_check'
+include { SAMPLESHEET_CHECK as SAMPLESHEET_CHECK_ASSEMBLIES           } from '../../modules/local/samplesheet_check'
 include { RENAME_REFERENCE            } from '../../modules/local/renamereference.nf'
-include { RENAME_INPUTS               } from '../../modules/local/renameinputs.nf'
+include { RENAME_INPUTS            } from '../../modules/local/renameinputs.nf'
+include { RENAME_ASSEMBLIES               } from '../../modules/local/renameassemblies.nf'
 
 workflow INPUT_CHECK {
     take:
     samplesheet // file: /path/to/samplesheet.csv
 
     main:
-    SAMPLESHEET_CHECK ( samplesheet )
+    SAMPLESHEET_CHECK_FILES ( samplesheet )
         .csv
         .splitCsv ( header:true, sep:',' )
         .map { create_fastq_channel(it) }
         .set { input_files }
+  
+    SAMPLESHEET_CHECK_ASSEMBLIES ( samplesheet )
+        .csv
+        .splitCsv ( header:true, sep:',' )
+        .map { create_assembly_channel(it) }
+        .set { assembly_files }
+
     //
     //Perform reference renaming if meta.has_assembly:true
     input_files
@@ -63,11 +72,23 @@ workflow INPUT_CHECK {
         final_input_files = final_input_files.mix(new_input_files)
 
     }
+
+    final_assembly_files = Channel.empty()
+    if (params.rename_files){
+        //rename the final files
+        RENAME_ASSEMBLIES(assembly_files)
+        final_assembly_files = RENAME_ASSEMBLIES.out.renamed_assemblies
+    }
+    else {
+        final_assembly_files = final_assembly_files.mix(assembly_files)
+    }
+    //final_assembly_files.view()
+
     //final_input_files.view()
     emit:
-    final_input_files                                 // channel: [ val(meta), [reads/assemblies], gff, reference]
-    //input_files                                     // channel: [ val(meta), [ reads ] ]
-    versions = SAMPLESHEET_CHECK.out.versions         // channel: [ versions.yml ]
+    final_input_files                                 // channel: [ val(meta), [reads/assemblies], gff, reference ]
+    final_assembly_files                              // channel: [ val(meta), assembly ]
+    versions = SAMPLESHEET_CHECK_FILES.out.versions         // channel: [ versions.yml ]
 }
 
 // Function to get list of [ meta, [ fastq_1, fastq_2 ] or [ assembly ] ]
@@ -111,4 +132,28 @@ def create_fastq_channel(LinkedHashMap row) {
     }
 
     return input_meta
+}
+
+def create_assembly_channel(LinkedHashMap row) {
+    // Create meta map
+    def meta = [:]
+    meta.id           = row.sample
+    meta.single_end   = row.single_end?.toBoolean() ?: false
+    meta.has_reads    = row.fastq_1 && row.fastq_1.trim()
+    meta.has_assembly = row.assembly && row.assembly.trim()
+    meta.cluster_id   = row.cluster_id
+    meta.species      = row.species
+
+    // Return null if no assembly – this will be filtered out in a map/filter
+    if (!meta.has_assembly) {
+        return null
+    }
+
+    // Validate file exists
+    def assembly_file = file(row.assembly)
+    if (!assembly_file.exists()) {
+        exit 1, "ERROR: Assembly file does not exist for sample '${row.sample}': ${row.assembly}"
+    }
+
+    return [meta, assembly_file]
 }
