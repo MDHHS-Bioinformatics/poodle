@@ -12,6 +12,7 @@ process RENAME_INPUTS {
 
     output:
     tuple val(meta), path("renamed_files/*"), path("renamed_gff/*"), path(reference), emit: renamed_files
+    path "versions.yml", emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -60,5 +61,10 @@ if gff:
     else:
         raise ValueError(f"Unrecognized GFF file format for {gff}")
 EOF
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        python: \$(python --version | sed 's/Python //g')
+    END_VERSIONS
     """
 }
