@@ -11,8 +11,8 @@ process CLEAN_TREE {
     tuple val(meta), path(tree)
 
     output:
-    path '*.tre'       , emit: tre
-    path "versions.yml", emit: versions
+    tuple val(meta), path('*.tre')       , emit: tre
+    path "versions.yml"                  , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
