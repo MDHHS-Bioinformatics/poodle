@@ -8,8 +8,8 @@ process SNIPPY_RUN {
         'biocontainers/snippy:4.6.0--hdfd78af_2' }"
 
     input:
-    tuple val(meta), path(input_files), path(gff), path(reference)
-    
+    //tuple val(meta), path(input_files), path(gff), path(reference)
+    tuple val(meta), path(reads), path(assemblies), path(gff), path(reference)
 
     output:
     tuple val(meta), path("${prefix}/${prefix}.tab")              , emit: tab
@@ -35,13 +35,13 @@ process SNIPPY_RUN {
     if (meta.has_reads) {
         // If reads are available, use them
         if (meta.single_end) {
-            input_command = "--se ${input_files[0]}"  // Single-end reads
+            input_command = "--se ${reads[0]}"  // Single-end reads
         } else {
-            input_command = "--R1 ${input_files[0]} --R2 ${input_files[1]}"  // Paired-end reads
+            input_command = "--R1 ${reads[0]} --R2 ${reads[1]}"  // Paired-end reads
         }
     } else if (meta.has_assembly) {
         // If no reads, fallback to the assembly
-        input_command = "--contigs ${input_files[0]}"  // Assembly (contigs)
+        input_command = "--contigs ${assemblies[0]}"  // Assembly (contigs)
     } else {
         exit 1, "ERROR: Sample ${meta.id} does not have valid reads or assembly!"
     }

@@ -76,104 +76,104 @@ workflow PROCESSCLUSTERPERSPECIES {
     INPUT_CHECK (
         ch_input
     )
-    //ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
-    // //
-    // // SUBWORKFLOW: Snippy run and Snippy core (verifying prior results and reference)
-    // //
-    // SNIPPY_CLUSTERS(
-    //     INPUT_CHECK.out.final_input_files
-    // )
-    // ch_versions = SNIPPY_CLUSTERS.out.versions
+    ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
 
-    // //
-    // // MODULE: Core SNP Distances
-    // //
-    // SNPDISTS_SNIPPY(
-    //     SNIPPY_CLUSTERS.out.aln
-    // )
-    // ch_versions = ch_versions.mix(SNPDISTS_SNIPPY.out.versions.first())
+    // SUBWORKFLOW: Snippy run and Snippy core (verifying prior results and reference)
+    //
+    SNIPPY_CLUSTERS(
+        INPUT_CHECK.out.final_input_files
+    )
+    //ch_versions = SNIPPY_CLUSTERS.out.versions
 
-    // //
-    // // MODULE: Create core-SNP phylogeny
-    // //
-    // IQTREE(SNIPPY_CLUSTERS.out.aln)
-    // ch_versions = ch_versions.mix(IQTREE.out.versions)
+    //
+    // MODULE: Core SNP Distances
+    //
+    SNPDISTS_SNIPPY(
+        SNIPPY_CLUSTERS.out.aln
+    )
+    ch_versions = ch_versions.mix(SNPDISTS_SNIPPY.out.versions.first())
 
-    // //
-    // // MODULE: Remove reference and root at midpoint
-    // //
-    // CLEAN_TREE(IQTREE.out.phylogeny)
-    // ch_versions = ch_versions.mix(CLEAN_TREE.out.versions)
+    //
+    // MODULE: Create core-SNP phylogeny
+    //
+    IQTREE(SNIPPY_CLUSTERS.out.aln)
+    ch_versions = ch_versions.mix(IQTREE.out.versions)
 
-    // //
-    // // MODULE: Gubbins
-    // //
-    // if (params.gubbins) {
-    //     GUBBINS(SNIPPY_CLUSTERS.out.clean_full_aln)
-    //     ch_versions = ch_versions.mix(GUBBINS.out.versions)
+    //
+    // MODULE: Remove reference and root at midpoint
+    //
+    CLEAN_TREE(IQTREE.out.phylogeny)
+    ch_versions = ch_versions.mix(CLEAN_TREE.out.versions)
 
-    //     // Output only columns containing exclusively ACGT
-    //     SNPSITES(GUBBINS.out.fasta)
-    //     ch_versions = ch_versions.mix(SNPSITES.out.versions)
+    //
+    // MODULE: Gubbins
+    //
+    if (params.gubbins) {
+        GUBBINS(SNIPPY_CLUSTERS.out.clean_full_aln)
+        ch_versions = ch_versions.mix(GUBBINS.out.versions)
 
-    //     // Get SNP distance matrix
-    //     SNPDISTS_GUBBINS(SNPSITES.out.snp_fasta)
-    //     ch_versions = ch_versions.mix(SNPDISTS_GUBBINS.out.versions)
-    // }
+        // Output only columns containing exclusively ACGT
+        SNPSITES(GUBBINS.out.fasta)
+        ch_versions = ch_versions.mix(SNPSITES.out.versions)
 
-    // //
-    // // MODULE: Gene-prescene abscence with Panaroo
-    // //
-    // //Collect GFF files by species and cluster
-    // INPUT_CHECK.out.final_input_files
-    // .map{meta, input_files, gff, reference -> tuple([[species:meta.species,cluster_id:meta.cluster_id],gff])}
-    // .groupTuple(by:[0])
-    // .set{ch_collected_gffs}
-    // //
-    // PANAROO_RUN(
-    //     ch_collected_gffs
-    // )
-    // ch_versions = ch_versions.mix(PANAROO_RUN.out.versions)
+        // Get SNP distance matrix
+        SNPDISTS_GUBBINS(SNPSITES.out.snp_fasta)
+        ch_versions = ch_versions.mix(SNPDISTS_GUBBINS.out.versions)
+    }
 
-    // //
-    // // MODULE: GENEDISTS prescence-abscence distances
-    // //
-    // GENEDISTS(
-    //     PANAROO_RUN.out.rtab
-    // )
-    // ch_versions = ch_versions.mix(GENEDISTS.out.versions)
+    //
+    // MODULE: Gene-prescene abscence with Panaroo
+    //
+    //Collect GFF files by species and cluster
+    INPUT_CHECK.out.final_input_files
+    .map{meta, reads, assembly, gff, reference -> tuple([[species:meta.species,cluster_id:meta.cluster_id],gff])}
+    .groupTuple(by:[0])
+    .set{ch_collected_gffs}
+    //
+    PANAROO_RUN(
+        ch_collected_gffs
+    )
+    ch_versions = ch_versions.mix(PANAROO_RUN.out.versions)
 
-    // //
-    // // MODULE: MashTree
-    // //
-    // if (params.mashtree){
-    //     //INPUT_CHECK.out.final_input_files.view()
-    //     // Get only assemblies from the input and place in a channel per species and cluster
-    //     INPUT_CHECK.out.final_input_files
-    //     .filter{meta, assembly, gff, reference -> meta.has_assembly == true}
-    //     .map{ meta, assembly, gff, reference -> tuple([[species:meta.species, cluster_id:meta.cluster_id], assembly[0]]) } //we need to do assembly [0] since its a tuple, should only have the one file if assembly
-    //     .groupTuple(by: [0])
-    //     .set{ ch_assemblies }
+    //
+    // MODULE: GENEDISTS prescence-abscence distances
+    //
+    GENEDISTS(
+        PANAROO_RUN.out.rtab
+    )
+    ch_versions = ch_versions.mix(GENEDISTS.out.versions)
 
-    //     //Run Mashtree
-    //     MASHTREE(
-    //         ch_assemblies
-    //     )
-    //     ch_versions = ch_versions.mix(MASHTREE.out.versions)
-    // }
+    //
+    // MODULE: MashTree
+    //
+    if (params.mashtree){
+        //INPUT_CHECK.out.final_input_files.view()
+        // Get only assemblies from the input and place in a channel per species and cluster
+        INPUT_CHECK.out.final_input_files
+        .filter{meta, reads, assembly, gff, reference -> meta.has_assembly == true}
+        .map{ meta, reads, assembly, gff, reference -> tuple([[species:meta.species, cluster_id:meta.cluster_id], assembly]) }
+        .groupTuple(by: [0])
+        .set{ ch_assemblies }
 
-    // //
-    // //MODULE: Get software versions
-    // //
-    // CUSTOM_DUMPSOFTWAREVERSIONS(
-    //     ch_versions.unique().collectFile(name:'collated_versions.yml')
-    // )
+        //Run Mashtree
+        MASHTREE(
+            ch_assemblies
+        )
+        ch_versions = ch_versions.mix(MASHTREE.out.versions)
+    }
 
-    // //
-    // // MODULE: MultiQC
-    // //
-    // workflow_summary    = WorkflowProcessclusterperspecies.paramsSummaryMultiqc(workflow, summary_params)
-    // ch_workflow_summary = Channel.value(workflow_summary)
+    //
+    //MODULE: Get software versions
+    //
+    CUSTOM_DUMPSOFTWAREVERSIONS(
+        ch_versions.unique().collectFile(name:'collated_versions.yml')
+    )
+
+    //
+    // MODULE: MultiQC
+    //
+    workflow_summary    = WorkflowProcessclusterperspecies.paramsSummaryMultiqc(workflow, summary_params)
+    ch_workflow_summary = Channel.value(workflow_summary)
 
 }
 

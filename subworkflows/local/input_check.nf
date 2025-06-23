@@ -17,7 +17,6 @@ workflow INPUT_CHECK {
         .splitCsv ( header:true, sep:',' )
         .map { create_fastq_channel(it) }
         .set { input_files }
-    //input_files.view()
 
     //
     //Rename the reference file for all samples
@@ -27,7 +26,6 @@ workflow INPUT_CHECK {
             meta, reads, assemblies, gff, reference -> tuple(meta,reference)
         }
     )
-    //RENAME_REFERENCE.out.view()
 
     //Recreate the full channel with all the information we need
     ch_renamed_refs = RENAME_REFERENCE.out.renamed_files.join(input_files)
@@ -64,11 +62,7 @@ workflow INPUT_CHECK {
         final_input_files = final_input_files.mix(new_input_files)
 
     }
-    //final_input_files.view()
 
-
-
-    // final_input_files.view()
     emit:
     final_input_files                                 // channel: [ val(meta), [reads/assemblies], gff, reference]
     //input_files                                     // channel: [ val(meta), [ reads ] ]

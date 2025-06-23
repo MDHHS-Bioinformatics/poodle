@@ -69,23 +69,24 @@ workflow SNIPPY_CLUSTERS {
     ch_versions = Channel.empty()
 
     ch_input_files
-    .map{ meta, files, gff, ref ->
-            tuple(meta, files, gff, ref, verify_previous_snippy_run(meta.species, meta.cluster_id, meta.id))}
+    .map{ meta, reads, assembly , gff, ref ->
+            tuple(meta, reads, assembly, gff, ref, verify_previous_snippy_run(meta.species, meta.cluster_id, meta.id))}
     .branch {
-        run_snippy: it[4] == false
-        verify_vcf: it[4] == true
+        run_snippy: it[5] == false
+        verify_vcf: it[5] == true
     }
     .set{input_files_status}
 
     //check the vcf file
     input_files_status.verify_vcf
-    .map { meta, files, gff, ref, status ->
-            tuple( meta, files, gff, ref, read_vcf_for_ref(meta.species, meta.cluster_id, meta.id, ref))}
+    .map { meta, reads, assembly, gff, ref, status ->
+            tuple( meta, reads, assembly, gff, ref, read_vcf_for_ref(meta.species, meta.cluster_id, meta.id, ref))}
     .branch {
-        vcf_match : it[4][0] == true
-        rerun_snippy: it[4][0] == false
+        vcf_match : it[5][0] == true
+        rerun_snippy: it[5][0] == false
     }
     .set{previous_vcf}
+
 
     //
     // Module: Run Snippy on the files
@@ -95,11 +96,14 @@ workflow SNIPPY_CLUSTERS {
     ch_snippy_to_run = Channel.empty()
     //Add the files that have never had snippy run on them
     ch_snippy_to_run = ch_snippy_to_run.mix( input_files_status.run_snippy
-        .map{ meta, files, gff, ref, status -> tuple(meta, files, gff, ref)})
+        .map{ meta, reads, assembly, gff, ref, status -> tuple(meta, reads, assembly, gff, ref)})
     //Add the files that need to have snippy rerun on them
     ch_snippy_to_run = ch_snippy_to_run.mix( previous_vcf.rerun_snippy
-        .map{meta, files, gff, ref, vcf_info -> tuple(meta, files, gff, ref)})
+        .map{meta, reads, assembly, gff, ref, vcf_info -> tuple(meta, reads, assembly, gff, ref)})
 
+    //
+    // MODULE: Snippy run
+    //
     SNIPPY_RUN(
         ch_snippy_to_run
     )
@@ -107,13 +111,15 @@ workflow SNIPPY_CLUSTERS {
 
     //Initialize channel to store VCF results
     ch_snippy_vcfs = Channel.empty()
+
     //Add the results from previous samples that already have a vcf
     ch_snippy_vcfs = ch_snippy_vcfs.mix(
         previous_vcf.vcf_match
-        .map{meta, files, gff, ref, vcf_info -> tuple(meta, vcf_info[1])}
+        .map{meta, reads, assembly, gff, ref, vcf_info -> tuple(meta, vcf_info[1])}
     )
     //Add the results from the Snippy run
     ch_snippy_vcfs = ch_snippy_vcfs.mix(SNIPPY_RUN.out.vcf)
+
     //Group VCFs by species and by cluster
     ch_snippy_vcfs
         .map { meta, vcf -> tuple([[species:meta.species, cluster_id:meta.cluster_id], vcf]) }
@@ -122,9 +128,10 @@ workflow SNIPPY_CLUSTERS {
 
     //Initialize empty channel to story aligned fa results
     ch_snippy_aligned_fas = Channel.empty()
+
     //Get the algined.fa from previously ran Samples
     previous_vcf.vcf_match
-        .map{meta, files, gff, ref, vcf_info ->
+        .map{meta, reads, assembly, gff, ref, vcf_info ->
         tuple(meta, read_aligned_fa(meta.species, meta.cluster_id, meta.id))}
         .set{previous_aliged_fa}
     //Add previous aligned fasta to channel
@@ -136,10 +143,9 @@ workflow SNIPPY_CLUSTERS {
         .map { meta, aligned_fa -> tuple([[species:meta.species, cluster_id:meta.cluster_id], aligned_fa])}
         .groupTuple(by: [0])
         .set {ch_collected_aligned_fa}
-
     //Get the unique reference per species per cluster
     ch_input_files
-    .map{ meta, input_files, gff, reference -> tuple([[species:meta.species, cluster_id:meta.cluster_id], reference])}
+    .map{ meta, reads, assembly, gff, reference -> tuple([[species:meta.species, cluster_id:meta.cluster_id], reference])}
     .distinct{ file(it[1]).name } // Use distinct to keep only unique reference values
     .set{ ch_ref_per_species_per_cluster }
 
