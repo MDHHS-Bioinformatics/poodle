@@ -52,8 +52,8 @@ include { SNIPPY_CLUSTERS             } from '../subworkflows/local/snippycluste
 // MODULE: Installed directly from nf-core/modules
 //
 include { CUSTOM_DUMPSOFTWAREVERSIONS  } from '../modules/nf-core/custom/dumpsoftwareversions/main'
-include { SNPDISTS  } from '../modules/nf-core/snpdists/main'
-include { SNPDISTS_GUBBINS } from '../modules/nf-core/snpdists/maingubbins'
+include { SNPDISTS                     } from '../modules/nf-core/snpdists/main'
+include { SNPDISTS_GUBBINS             } from '../modules/nf-core/snpdists/maingubbins'
 include { IQTREE                       } from '../modules/nf-core/iqtree/main'
 include { GUBBINS                      } from '../modules/nf-core/gubbins/main'
 include { SNPSITES                     } from '../modules/nf-core/snpsites/main'
