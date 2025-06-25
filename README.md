@@ -1,4 +1,4 @@
-# ![MI-Bioinformatics/process-bact-cluster-per-species](docs/images/process_clusters_logo_light.png#gh-light-mode-only) ![nf-core/processclusterperspecies](docs/images/process_clusters_logo_dark.png#gh-dark-mode-only)
+# ![MI-Bioinformatics/PoODLE](docs/images/process_clusters_logo_light.png#gh-light-mode-only) ![nf-core/processclusterperspecies](docs/images/process_clusters_logo_dark.png#gh-dark-mode-only)
 
 [![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A522.10.1-23aa62.svg)](https://www.nextflow.io/)
 [![run with conda](http://img.shields.io/badge/run%20with-conda-3EB049?labelColor=000000&logo=anaconda)](https://docs.conda.io/en/latest/)
@@ -8,7 +8,7 @@
 
 ## Introduction
 
-**process-bact-cluster-per-species** is a bioinformatics best-practice analysis pipeline for phylogenetic analysis of bacterial clusters. This pipleine includes Snippy run, Snippy core, Gubbins (optional), Panaroo and MashTree (optional).
+**PoODLE** (Phylogenomic Overview for the Detection of Linkages for Epidemiologists) is a bioinformatics best-practice analysis pipeline for phylogenetic analysis of bacterial clusters. This pipleine includes Snippy run, Snippy core, Gubbins (optional), Panaroo and MashTree (optional).
 
 The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool to run tasks across multiple compute infrastructures in a very portable manner. It uses Docker/Singularity containers making installation trivial and results highly reproducible. The [Nextflow DSL2](https://www.nextflow.io/docs/latest/dsl2.html) implementation of this pipeline uses one container per process which makes it much easier to maintain and update software dependencies. Where possible, these processes have been submitted to and installed from [nf-core/modules](https://github.com/nf-core/modules) in order to make them available to all nf-core pipelines, and to everyone within the Nextflow community!
 
@@ -19,9 +19,9 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 3. Mask recombinant sites with [`Gubbins`](https://github.com/nickjcroucher/gubbins), extract ACGT positions with [`snp-sites`](https://sanger-pathogens.github.io/snp-sites/) and calculate SNP distances with [`snp-dists`](https://github.com/tseemann/snp-dists) (optional).
 4. Pangenome profile (gene presence-absence) with [`Panaroo`](https://github.com/gtonkinhill/panaroo) and calculate gene distances.
 5. Make a tree with Mash distances using [`MashTree`](https://github.com/lskatz/mashtree) (optional).
-6. Summary results ([`MultiQC`](http://multiqc.info/))
+6. Summary report in HTML format including trees, pangenome profile and distance matrices.
 
-![Pipeline Workflow](./docs/images/processclustersperspecies_flowchart.png)
+![Pipeline Workflow](./docs/images/poodle_flowchart.png)
 
 
 ## Quick Start
@@ -72,6 +72,7 @@ Make sure to provide values for these columns even if certain input types do not
 | SAMPLE_7_ASSEMBLED     |                                                     |                                                     | /path/to/gff/SAMPLE7.gff | /path/to/assembled/fasta/SAMPLE7.fasta | cluster_1          | Escherichia_coli         | /path/to/assembled/reference/reference1.fasta |
 
 5. Start running your own analysis!
+
   ```bash
   nextflow run main.nf --input samplesheet.csv --outdir <OUTDIR> --gubbins --mashtree -profile <docker/singularity/podman/shifter/charliecloud/conda/institute>
    ```
@@ -84,6 +85,8 @@ Make sure to provide values for these columns even if certain input types do not
 - `--outdir`                      [string]  The output directory where the results will be saved. You must use absolute paths for storage on Cloud infrastructure (mandatory).
 - `--gubbins`                     [boolean] Filter out recombinant sites with Gubbins (optional).
 - `--mashtree`                    [boolean] Analyze genomic distances and generate a tree with MashTree (optional).
+- `--logo_report`                 [boolean] Logo in PNG format to include in the report header, DNA logo used as default (optional).
+- `--poodle_report`               [boolean] Quarto script to generate the report, "./modules/local/report/poodle_report.qmd" used as default (optional).
 - `--previous_results`            [string]  Path to previous results. By default, the pipeline looks for prior Snippy results for the same cluster in the outdir (optional).
 - `--save_snippy_run`             [boolean] Do not publish Snippy run results. By default, the pipeline saves the Snippy-run results per sample (optional).
 - `--email`                       [string]  Email address for completion summary (optional).
@@ -99,65 +102,56 @@ Below is the structure of the output directory.
 ```
 📁 <outdir>
 ├── 📁 <Species>
-│   ├── 📁 clusters
-│   │   └── 📁 <cluster_id>
-│   │       ├── 📁 snippy_run
-│   │       │   ├── 📁 <sample>
-│   │       │   │   ├── 📄 <sample>.aligned.fa
-│   │       │   │   ├── 📄 <sample>.bam
-│   │       │   │   ├── 📄 <sample>.bam.bai
-│   │       │   │   ├── 📄 <sample>.bed
-│   │       │   │   ├── 📄 <sample>.consensus.fa
-│   │       │   │   ├── 📄 <sample>.consensus.subs.fa
-│   │       │   │   ├── 📄 <sample>.csv
-│   │       │   │   ├── 📄 <sample>.filt.vcf
-│   │       │   │   ├── 📄 <sample>.gff
-│   │       │   │   ├── 📄 <sample>.html
-│   │       │   │   ├── 📄 <sample>.log
-│   │       │   │   ├── 📄 <sample>.raw.vcf
-│   │       │   │   ├── 📄 <sample>.tab
-│   │       │   │   ├── 📄 <sample>.txt
-│   │       │   │   ├── 📄 <sample>.vcf
-│   │       │   │   ├── 📄 <sample>.vcf.gz
-│   │       │   │   └── 📄 <sample>.vcf.gz.csi
-│   │       ├── 📁 snippy_core
-│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.aln
-│   │       │   ├── 📄 <Species>_<cluster_id>_dist.tsv
-│   │       │   ├── 📄 <Species>_<cluster_id>.aln
-│   │       │   ├── 📄 <Species>_<cluster_id>.full.aln
-│   │       │   ├── 📄 <Species>_<cluster_id>.iqtree
-│   │       │   ├── 📄 <Species>_<cluster_id>.tab
-│   │       │   ├── 📄 <Species>_<cluster_id>.tre
-│   │       │   ├── 📄 <Species>_<cluster_id>.treefile
-│   │       │   ├── 📄 <Species>_<cluster_id>.txt
-│   │       │   └── 📄 <Species>_<cluster_id>.vcf
-│   │       ├── 📁 gubbins
-│   │       │   ├── 📄 <Species>_<cluster_id>_dist.tsv
-│   │       │   ├── 📄 <Species>_<cluster_id>.branch_base_reconstruction.embl
-│   │       │   ├── 📄 <Species>_<cluster_id>.filtered_plymorphic_sites.fasta
-│   │       │   ├── 📄 <Species>_<cluster_id>.filtered_plymorphic_sites.phylip
-│   │       │   ├── 📄 <Species>_<cluster_id>.final_tree.tre
-│   │       │   ├── 📄 <Species>_<cluster_id>.node_labelled.final_tree.tre
-│   │       │   ├── 📄 <Species>_<cluster_id>.per_branch_statistics.csv
-│   │       │   ├── 📄 <Species>_<cluster_id>.recombination_predictions.embl
-│   │       │   ├── 📄 <Species>_<cluster_id>.recombination_predictions.gff
-│   │       │   └── 📄 <Species>_<cluster_id>.summary_of_snp_distribution.vcf
-│   │       ├── 📁 panaroo
-│   │       │   ├── 📄 gene_presence_absence_dist.tsv
-│   │       │   ├── 📄 gene_presence_absence_roary.csv
-│   │       │   ├── 📄 gene_presence_absence.Rtab
-│   │       │   └── 📄 summary_statistics.txt
-│   │       ├── 📁 mashtree
-│   │       │   ├── 📄 <Species>_<cluster_id>.dnd
-│   │       │   └── 📄 <Species>_<cluster_id>.tsv
-│   │       └── 📄 reference_evaluation.tsv
-├── 📁 pipeline_info
-│   ├── 📄 execution_report_<date_time>.html
-│   ├── 📄 execution_timeline_<date_time>.html
-│   ├── 📄 execution_trace_<date_time>.txt
-│   ├── 📄 pipeline_dag_<date_time>.html
-│   ├── 📄 samplesheet.valid.csv
-│   └── 📄 software_versions.yml
+│   └── 📁 clusters
+│       └── 📁 <cluster_id>
+│           ├── 📁 snippy_run
+│           │   ├── 📁 <sample>
+│           │   │   ├── 📄 <sample>.aligned.fa
+│           │   │   ├── 📄 <sample>.consensus.fa
+│           │   │   ├── 📄 <sample>.consensus.subs.fa
+│           │   │   ├── 📄 <sample>.csv
+│           │   │   ├── 📄 <sample>.log
+│           │   │   ├── 📄 <sample>.tab
+│           │   │   ├── 📄 <sample>.txt
+│           │   │   ├── 📄 <sample>.vcf
+│           ├── 📁 snippy_core
+│           │   ├── 📄 <Species>_<cluster_id>_clean.full.aln
+│           │   ├── 📄 <Species>_<cluster_id>_dist.tsv
+│           │   ├── 📄 <Species>_<cluster_id>.aln
+│           │   ├── 📄 <Species>_<cluster_id>.full.aln
+│           │   ├── 📄 <Species>_<cluster_id>.iqtree
+│           │   ├── 📄 <Species>_<cluster_id>.tab
+│           │   ├── 📄 <Species>_<cluster_id>.tre
+│           │   ├── 📄 <Species>_<cluster_id>.treefile
+│           │   ├── 📄 <Species>_<cluster_id>.txt
+│           │   └── 📄 <Species>_<cluster_id>.vcf
+│           ├── 📁 gubbins
+│           │   ├── 📄 <Species>_<cluster_id>_dist.tsv
+│           │   ├── 📄 <Species>_<cluster_id>.branch_base_reconstruction.embl
+│           │   ├── 📄 <Species>_<cluster_id>.filtered_plymorphic_sites.fasta
+│           │   ├── 📄 <Species>_<cluster_id>.filtered_plymorphic_sites.phylip
+│           │   ├── 📄 <Species>_<cluster_id>.final_tree.tre
+│           │   ├── 📄 <Species>_<cluster_id>.node_labelled.final_tree.tre
+│           │   ├── 📄 <Species>_<cluster_id>.per_branch_statistics.csv
+│           │   ├── 📄 <Species>_<cluster_id>.recombination_predictions.embl
+│           │   ├── 📄 <Species>_<cluster_id>.recombination_predictions.gff
+│           │   └── 📄 <Species>_<cluster_id>.summary_of_snp_distribution.vcf
+│           ├── 📁 panaroo
+│           │   ├── 📄 gene_presence_absence_dist.tsv
+│           │   ├── 📄 gene_presence_absence_roary.csv
+│           │   ├── 📄 gene_presence_absence.Rtab
+│           │   └── 📄 summary_statistics.txt
+│           ├── 📁 mashtree
+│           │   ├── 📄 <Species>_<cluster_id>.dnd
+│           │   └── 📄 <Species>_<cluster_id>.tsv
+│           └── 📄 reference_evaluation.tsv
+└── 📁 pipeline_info
+    ├── 📄 execution_report_<date_time>.html
+    ├── 📄 execution_timeline_<date_time>.html
+    ├── 📄 execution_trace_<date_time>.txt
+    ├── 📄 pipeline_dag_<date_time>.html
+    ├── 📄 samplesheet.valid.csv
+    └── 📄 software_versions.yml
 
 
 ```

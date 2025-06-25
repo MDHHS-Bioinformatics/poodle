@@ -15,20 +15,11 @@ The pipeline processes data using [Nextflow](https://www.nextflow.io/) and gener
 
 - `<sample>.tab`: Tab-delimited table summarizing detected variants.
 - `<sample>.csv`: CSV file with detailed variant information.
-- `<sample>.html`: HTML report summarizing the Snippy run.
 - `<sample>.vcf`: Variants in VCF format.
-- `<sample>.bed`: BED file with variant locations.
-- `<sample>.gff`: GFF file containing annotated variants.
-- `<sample>.bam`: Alignment file in BAM format.
-- `<sample>.bam.bai`: BAM alignment index file.
 - `<sample>.log`: Log file from the Snippy run.
 - `<sample>.aligned.fa`: Aligned reference and consensus sequences in FASTA format.
 - `<sample>.consensus.fa`: Consensus sequence for the sample in FASTA format.
 - `<sample>.consensus.subs.fa`: Substitutions-only consensus sequence in FASTA format.
-- `<sample>.raw.vcf`: Raw variant calls in VCF format.
-- `<sample>.filt.vcf`: Filtered variant calls in VCF format.
-- `<sample>.vcf.gz`: Compressed VCF file.
-- `<sample>.vcf.gz.csi`: Index file for the compressed VCF.
 - `<sample>.txt`: Additional information or logs.
 
 </details>
@@ -159,68 +150,54 @@ Below is the structure of the output directory.
 ```
 📁 <outdir>
 ├── 📁 <Species>
-│   ├── 📁 clusters
-│   │   └── 📁 <cluster_id>
-│   │       ├── 📁 snippy_run
-│   │       │   ├── 📁 <sample>
-│   │       │   │   ├── 📄 <sample>.aligned.fa
-│   │       │   │   ├── 📄 <sample>.bam
-│   │       │   │   ├── 📄 <sample>.bam.bai
-│   │       │   │   ├── 📄 <sample>.bed
-│   │       │   │   ├── 📄 <sample>.consensus.fa
-│   │       │   │   ├── 📄 <sample>.consensus.subs.fa
-│   │       │   │   ├── 📄 <sample>.csv
-│   │       │   │   ├── 📄 <sample>.filt.vcf
-│   │       │   │   ├── 📄 <sample>.gff
-│   │       │   │   ├── 📄 <sample>.html
-│   │       │   │   ├── 📄 <sample>.log
-│   │       │   │   ├── 📄 <sample>.raw.vcf
-│   │       │   │   ├── 📄 <sample>.tab
-│   │       │   │   ├── 📄 <sample>.txt
-│   │       │   │   ├── 📄 <sample>.vcf
-│   │       │   │   ├── 📄 <sample>.vcf.gz
-│   │       │   │   └── 📄 <sample>.vcf.gz.csi
-│   │       ├── 📁 snippy_core
-│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.aln
-│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.full.aln
-│   │       │   ├── 📄 <Species>_<cluster_id>.aln
-│   │       │   ├── 📄 <Species>_<cluster_id>.aln.iqtree
-│   │       │   ├── 📄 <Species>_<cluster_id>.aln.treefile
-│   │       │   ├── 📄 <Species>_<cluster_id>.dist.tsv
-│   │       │   ├── 📄 <Species>_<cluster_id>.tab
-│   │       │   ├── 📄 <Species>_<cluster_id>.tre
-│   │       │   ├── 📄 <Species>_<cluster_id>.txt
-│   │       │   └── 📄 <Species>_<cluster_id>.vcf
-│   │       ├── 📁 gubbins
-│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.branch_base_reconstruction.embl
-│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.final_bootstrapped_tree.tre
-│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.final_tree.tre
-│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.filtered_plymorphic_sites.fasta
-│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.filtered_plymorphic_sites.phylip
-│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.node_labelled.final_tree.tre
-│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.per_branch_statistics.csv
-│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.recombination_predictions.embl
-│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.recombination_predictions.gff
-│   │       │   ├── 📄 <Species>_<cluster_id>_clean.full.summary_of_snp_distribution.vcf
-│   │       │   └── 📄 <Species>_<cluster_id>_dists.tsv
-│   │       ├── 📁 panaroo
-│   │       │   ├── 📄 gene_presence_absence.Rtab
-│   │       │   ├── 📄 gene_presence_absence_roary.csv
-│   │       │   ├── 📄 gene_presence_dist.tsv
-│   │       │   └── 📄 summarystatistics.txt
-│   │       ├── 📁 mashtree
-│   │       │   ├── 📄 <Species>_<cluster_id>.dnd
-│   │       │   └── 📄 <Species>_<cluster_id>.tsv
-│   │       └── 📄 reference_evaluation.tsv
-├── 📁 pipeline_info
-│   ├── 📄 execution_report_<date_time>.html
-│   ├── 📄 execution_timeline_<date_time>.html
-│   ├── 📄 execution_trace_<date_time>.txt
-│   ├── 📄 pipeline_dag_<date_time>.html
-│   ├── 📄 samplesheet.valid.csv
-│   └── 📄 software_versions.yml
-├── 📁 multiqc
-│   ├── 📁 multiqc_data
-│   ├── 📁 multiqc_plots
-│   └── 📄 multiqc_report.html
+│   └── 📁 clusters
+│       └── 📁 <cluster_id>
+│           ├── 📁 snippy_run
+│           │   ├── 📁 <sample>
+│           │   │   ├── 📄 <sample>.aligned.fa
+│           │   │   ├── 📄 <sample>.consensus.fa
+│           │   │   ├── 📄 <sample>.consensus.subs.fa
+│           │   │   ├── 📄 <sample>.csv
+│           │   │   ├── 📄 <sample>.log
+│           │   │   ├── 📄 <sample>.tab
+│           │   │   ├── 📄 <sample>.txt
+│           │   │   ├── 📄 <sample>.vcf
+│           ├── 📁 snippy_core
+│           │   ├── 📄 <Species>_<cluster_id>_clean.full.aln
+│           │   ├── 📄 <Species>_<cluster_id>_dist.tsv
+│           │   ├── 📄 <Species>_<cluster_id>.aln
+│           │   ├── 📄 <Species>_<cluster_id>.full.aln
+│           │   ├── 📄 <Species>_<cluster_id>.iqtree
+│           │   ├── 📄 <Species>_<cluster_id>.tab
+│           │   ├── 📄 <Species>_<cluster_id>.tre
+│           │   ├── 📄 <Species>_<cluster_id>.treefile
+│           │   ├── 📄 <Species>_<cluster_id>.txt
+│           │   └── 📄 <Species>_<cluster_id>.vcf
+│           ├── 📁 gubbins
+│           │   ├── 📄 <Species>_<cluster_id>_dist.tsv
+│           │   ├── 📄 <Species>_<cluster_id>.branch_base_reconstruction.embl
+│           │   ├── 📄 <Species>_<cluster_id>.filtered_plymorphic_sites.fasta
+│           │   ├── 📄 <Species>_<cluster_id>.filtered_plymorphic_sites.phylip
+│           │   ├── 📄 <Species>_<cluster_id>.final_tree.tre
+│           │   ├── 📄 <Species>_<cluster_id>.node_labelled.final_tree.tre
+│           │   ├── 📄 <Species>_<cluster_id>.per_branch_statistics.csv
+│           │   ├── 📄 <Species>_<cluster_id>.recombination_predictions.embl
+│           │   ├── 📄 <Species>_<cluster_id>.recombination_predictions.gff
+│           │   └── 📄 <Species>_<cluster_id>.summary_of_snp_distribution.vcf
+│           ├── 📁 panaroo
+│           │   ├── 📄 gene_presence_absence_dist.tsv
+│           │   ├── 📄 gene_presence_absence_roary.csv
+│           │   ├── 📄 gene_presence_absence.Rtab
+│           │   └── 📄 summary_statistics.txt
+│           ├── 📁 mashtree
+│           │   ├── 📄 <Species>_<cluster_id>.dnd
+│           │   └── 📄 <Species>_<cluster_id>.tsv
+│           └── 📄 reference_evaluation.tsv
+└── 📁 pipeline_info
+    ├── 📄 execution_report_<date_time>.html
+    ├── 📄 execution_timeline_<date_time>.html
+    ├── 📄 execution_trace_<date_time>.txt
+    ├── 📄 pipeline_dag_<date_time>.html
+    ├── 📄 samplesheet.valid.csv
+    └── 📄 software_versions.yml
 ```
