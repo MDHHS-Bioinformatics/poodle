@@ -85,8 +85,8 @@ Make sure to provide values for these columns even if certain input types do not
 - `--outdir`                      [string]  The output directory where the results will be saved. You must use absolute paths for storage on Cloud infrastructure (mandatory).
 - `--gubbins`                     [boolean] Filter out recombinant sites with Gubbins (optional).
 - `--mashtree`                    [boolean] Analyze genomic distances and generate a tree with MashTree (optional).
-- `--logo_report`                 [boolean] Logo in PNG format to include in the report header, DNA logo used as default (optional).
-- `--poodle_report`               [boolean] Quarto script to generate the report, "./modules/local/report/poodle_report.qmd" used as default (optional).
+- `--logo_report`                 [string] Logo in PNG format to include in the report header, DNA logo used as default (optional).
+- `--poodle_report`               [string] Quarto script to generate the report, "./modules/local/report/poodle_report.qmd" used as default (optional).
 - `--previous_results`            [string]  Path to previous results. By default, the pipeline looks for prior Snippy results for the same cluster in the outdir (optional).
 - `--save_snippy_run`             [boolean] Do not publish Snippy run results. By default, the pipeline saves the Snippy-run results per sample (optional).
 - `--email`                       [string]  Email address for completion summary (optional).
