@@ -66,7 +66,6 @@ workflow INPUT_CHECK {
 
     emit:
     final_input_files                                 // channel: [ val(meta), [reads/assemblies], gff, reference ]
-    final_assembly_files                              // channel: [ val(meta), assembly ]
     versions = SAMPLESHEET_CHECK_FILES.out.versions         // channel: [ versions.yml ]
 }
 
