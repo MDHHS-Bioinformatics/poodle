@@ -126,7 +126,6 @@ snp_matrix <- as.matrix(snp_df[, -1])
 rownames(snp_matrix) <- row_names
 colnames(snp_matrix) <- row_names
 snp_matrix <- snp_matrix[snp_tree_tip_order, snp_tree_tip_order]
-snp_matrix_links <- snp_matrix[snp_tree_tip_order, snp_tree_tip_order]
 snp_matrix[upper.tri(snp_matrix)] <- NA
 
 # Read and reorder Gubbins SNP distance matrix
@@ -136,7 +135,6 @@ gub_snp_matrix <- as.matrix(gub_snp_df[, -1])
 rownames(gub_snp_matrix) <- row_names
 colnames(gub_snp_matrix) <- row_names
 gub_snp_matrix <- gub_snp_matrix[snp_tree_tip_order, snp_tree_tip_order]
-gub_snp_matrix_links <- gub_snp_matrix[snp_tree_tip_order, snp_tree_tip_order]
 gub_snp_matrix[upper.tri(gub_snp_matrix)] <- NA
 
 # Read and reorder Mash distance matrix
@@ -145,8 +143,10 @@ row_names <- mash_df[[1]]
 mash_matrix <- as.matrix(mash_df[, -1])
 rownames(mash_matrix) <- row_names
 colnames(mash_matrix) <- row_names
-mash_matrix <- mash_matrix[snp_tree_tip_order, snp_tree_tip_order]
-mash_matrix <- mash_matrix[snp_tree_tip_order, snp_tree_tip_order]
+# Keep only those tree tip labels that are also present in the matrix
+common_labels <- snp_tree_tip_order[snp_tree_tip_order %in% rownames(mash_matrix)]
+# Reorder the matrix rows and columns accordingly
+mash_matrix <- mash_matrix[common_labels, common_labels]
 mash_matrix[upper.tri(mash_matrix)] <- NA
 
 #----- PANGENOME WRANGLING ------# 
@@ -248,7 +248,7 @@ phylocanvas(
       showscalebar = TRUE)
 ```
 
-***Figure 3.**Tree based on pairwise Mash distances, constructed using MashTree, which applies the MinHash algorithm to estimate genomic distance. The reference genome is excluded; the tree is midpoint-rooted. Visualization created using Phylocanvas.*
+***Figure 3.**Tree based on pairwise Mash distances, constructed using MashTree, which applies the MinHash algorithm to estimate genomic distance. The reference genome is excluded; the tree is midpoint-rooted. Only samples with assemblies were included for Mash analysis. Visualization created using Phylocanvas.*
 
 ### Pangenome profile
 
