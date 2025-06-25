@@ -171,11 +171,12 @@ workflow SNIPPY_CLUSTERS {
         SNIPPY_CORE.out.txt
     )
 
-
     emit:
     versions        = ch_versions                     // channel: [ versions.yml ]
     aln             = SNIPPY_CORE.out.aln             // channel: [ val(meta), aln]
     clean_full_aln  = SNIPPY_CORE.out.clean_full_aln  // channel: [ val(meta), clean_full_aln]
     snippy_txt      = SNIPPY_RUN.out.txt              // channel: [ val(meta), txt]
+    ref_evaluation  = REFERENCE_EVALUATION.out.tsv    // channel: [ val(meta), tsv]
+
 }
 

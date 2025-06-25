@@ -11,8 +11,8 @@ process REFERENCE_EVALUATION {
     tuple val(meta), path(txt)
 
     output:
-    path "reference_evaluation.tsv", emit: tsv
-
+    tuple val(meta), path("reference_evaluation.tsv"), emit: tsv
+    
     script:
     prefix = task.ext.prefix ?: "${meta.species}_${meta.cluster_id}"
     cluster_id = task.ext.prefix ?: "${meta.cluster_id}"

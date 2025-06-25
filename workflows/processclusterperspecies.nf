@@ -33,6 +33,9 @@ include { GENEDISTS                   } from '../modules/local/genedists'
 include { SNIPPY_CORE                 } from '../modules/nf-core/snippy/core/main'
 include { SNIPPY_RUN                  } from '../modules/nf-core/snippy/run/main'
 include { REFERENCE_EVALUATION        } from '../modules/local/referenceevaluation.nf'
+include { YAML_REPORT                 } from '../modules/local/report/yamlreport.nf'
+include { QUARTO_REPORT               } from '../modules/local/report/quartoreport.nf'
+
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
@@ -49,13 +52,14 @@ include { SNIPPY_CLUSTERS             } from '../subworkflows/local/snippycluste
 // MODULE: Installed directly from nf-core/modules
 //
 include { CUSTOM_DUMPSOFTWAREVERSIONS  } from '../modules/nf-core/custom/dumpsoftwareversions/main'
-include { SNPDISTS as SNPDISTS_SNIPPY  } from '../modules/nf-core/snpdists/main'
-include { SNPDISTS as SNPDISTS_GUBBINS } from '../modules/nf-core/snpdists/main'
+include { SNPDISTS                     } from '../modules/nf-core/snpdists/main'
+include { SNPDISTS_GUBBINS             } from '../modules/nf-core/snpdists/maingubbins'
 include { IQTREE                       } from '../modules/nf-core/iqtree/main'
 include { GUBBINS                      } from '../modules/nf-core/gubbins/main'
 include { SNPSITES                     } from '../modules/nf-core/snpsites/main'
 include { PANAROO_RUN                  } from '../modules/nf-core/panaroo/run/main'
 include { MASHTREE                     } from '../modules/nf-core/mashtree/main'
+
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -88,10 +92,10 @@ workflow PROCESSCLUSTERPERSPECIES {
     //
     // MODULE: Core SNP Distances
     //
-    SNPDISTS_SNIPPY(
+    SNPDISTS(
         SNIPPY_CLUSTERS.out.aln
     )
-    ch_versions = ch_versions.mix(SNPDISTS_SNIPPY.out.versions.first())
+    ch_versions = ch_versions.mix(SNPDISTS.out.versions.first())
 
     //
     // MODULE: Create core-SNP phylogeny
@@ -122,7 +126,7 @@ workflow PROCESSCLUSTERPERSPECIES {
     }
 
     //
-    // MODULE: Gene-prescene abscence with Panaroo
+    // MODULE: Gene-presence abscence with Panaroo
     //
     //Collect GFF files by species and cluster
     INPUT_CHECK.out.final_input_files
@@ -162,6 +166,50 @@ workflow PROCESSCLUSTERPERSPECIES {
         ch_versions = ch_versions.mix(MASHTREE.out.versions)
     }
 
+    //
+    // MODULE: YAML
+    //
+    if (params.mashtree && params.gubbins) {
+        // Channel with finished results
+        ch_clusters = SNIPPY_CLUSTERS.out.ref_evaluation
+            .join(CLEAN_TREE.out.tre, by: 0)
+            .join(SNPDISTS.out.tsv, by: 0)
+            .join(PANAROO_RUN.out.summary, by: 0)
+            .join(PANAROO_RUN.out.csv, by: 0)
+            .join(PANAROO_RUN.out.rtab, by: 0)
+            .join(GENEDISTS.out.tsv, by: 0)
+            .join(GUBBINS.out.tree_labelled, by: 0)
+            .join(SNPDISTS_GUBBINS.out.tsv, by: 0)
+            .join(MASHTREE.out.tree, by: 0)
+            .join(MASHTREE.out.matrix, by: 0)
+            .map { meta, ref_eval, snptree, snpmatrix,  pan_summary, pan_roary, pan_rtab, pan_genedists, gubtree, gubmatrix,
+                    mashtree, mashmatrix ->
+                tuple([meta,
+                        ref_eval, snptree, snpmatrix,
+                        pan_summary, pan_roary, pan_rtab, pan_genedists,
+                        gubtree, gubmatrix,
+                        mashtree, mashmatrix]) }
+        //ch_clusters.view()
+        // Create YAML file for reports
+        YAML_REPORT(
+            ch_clusters
+        )
+
+        // Channel to pass the Quarto Notebook
+        Channel.value(file(params.poodle_report)).set { ch_qmd }
+        Channel.value(file(params.logo_report)).set { ch_logo }
+
+        //
+        // MODULE: QUARTO
+        //
+        QUARTO_REPORT(
+            YAML_REPORT.out.files,
+            YAML_REPORT.out.yaml,
+            ch_qmd,
+            ch_logo
+        )
+        ch_versions = ch_versions.mix(QUARTO_REPORT.out.versions)
+    }
     //
     //MODULE: Get software versions
     //

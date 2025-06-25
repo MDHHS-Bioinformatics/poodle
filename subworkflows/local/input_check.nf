@@ -2,7 +2,8 @@
 // Check input samplesheet and get read channels
 //
 
-include { SAMPLESHEET_CHECK           } from '../../modules/local/samplesheet_check'
+include { SAMPLESHEET_CHECK as SAMPLESHEET_CHECK_FILES         } from '../../modules/local/samplesheet_check'
+include { SAMPLESHEET_CHECK as SAMPLESHEET_CHECK_ASSEMBLIES           } from '../../modules/local/samplesheet_check'
 include { RENAME_REFERENCE            } from '../../modules/local/renamereference.nf'
 include { RENAME_INPUTS               } from '../../modules/local/renameinputs.nf'
 include { RENAME_GFF                  } from '../../modules/local/rename_gff.nf'
@@ -12,7 +13,7 @@ workflow INPUT_CHECK {
     samplesheet // file: /path/to/samplesheet.csv
 
     main:
-    SAMPLESHEET_CHECK ( samplesheet )
+    SAMPLESHEET_CHECK_FILES ( samplesheet )
         .csv
         .splitCsv ( header:true, sep:',' )
         .map { create_fastq_channel(it) }
@@ -64,9 +65,9 @@ workflow INPUT_CHECK {
     }
 
     emit:
-    final_input_files                                 // channel: [ val(meta), [reads/assemblies], gff, reference]
-    //input_files                                     // channel: [ val(meta), [ reads ] ]
-    versions = SAMPLESHEET_CHECK.out.versions         // channel: [ versions.yml ]
+    final_input_files                                 // channel: [ val(meta), [reads/assemblies], gff, reference ]
+    final_assembly_files                              // channel: [ val(meta), assembly ]
+    versions = SAMPLESHEET_CHECK_FILES.out.versions         // channel: [ versions.yml ]
 }
 
 // Function to get list of [ meta, [ fastq_1, fastq_2 ] or [ assembly ], [ assembly ] or [], gff, reference ]
@@ -120,4 +121,28 @@ def create_fastq_channel(LinkedHashMap row) {
     def input_meta = [ meta, reads_files, assembly_files, file(row.gff), file(row.reference) ]
 
     return input_meta
+}
+
+def create_assembly_channel(LinkedHashMap row) {
+    // Create meta map
+    def meta = [:]
+    meta.id           = row.sample
+    meta.single_end   = row.single_end?.toBoolean() ?: false
+    meta.has_reads    = row.fastq_1 && row.fastq_1.trim()
+    meta.has_assembly = row.assembly && row.assembly.trim()
+    meta.cluster_id   = row.cluster_id
+    meta.species      = row.species
+
+    // Return null if no assembly – this will be filtered out in a map/filter
+    if (!meta.has_assembly) {
+        return null
+    }
+
+    // Validate file exists
+    def assembly_file = file(row.assembly)
+    if (!assembly_file.exists()) {
+        exit 1, "ERROR: Assembly file does not exist for sample '${row.sample}': ${row.assembly}"
+    }
+
+    return [meta, assembly_file]
 }
