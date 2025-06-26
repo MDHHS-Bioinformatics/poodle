@@ -102,7 +102,6 @@ Below is the structure of the output directory.
 ```
 📁 <outdir>
 ├── 📁 <Species>
-│   └── 📁 clusters
 │       └── 📁 <cluster_id>
 │           ├── 📁 snippy_run
 │           │   ├── 📁 <sample>
@@ -144,6 +143,7 @@ Below is the structure of the output directory.
 │           ├── 📁 mashtree
 │           │   ├── 📄 <Species>_<cluster_id>.dnd
 │           │   └── 📄 <Species>_<cluster_id>.tsv
+│           ├── 📄 <Species>_<cluster_id>.html
 │           └── 📄 reference_evaluation.tsv
 └── 📁 pipeline_info
     ├── 📄 execution_report_<date_time>.html
