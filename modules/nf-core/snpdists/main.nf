@@ -19,13 +19,14 @@ process SNPDISTS {
 
     script:
     def args = task.ext.args ?: ''
+    def args_extension = task.ext.args_extension ?: ''
     prefix = task.ext.prefix ?: "${meta.species}_${meta.cluster_id}"
     cluster_id = task.ext.prefix ?: "${meta.cluster_id}"
     species = task.ext.prefix ?: "${meta.species}"
     """
     snp-dists \\
         $args \\
-        $alignment > ${prefix}_dist.tsv
+        $alignment > ${prefix}_${args_extension}dist.tsv
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

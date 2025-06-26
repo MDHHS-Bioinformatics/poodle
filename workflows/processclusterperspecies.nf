@@ -52,8 +52,8 @@ include { SNIPPY_CLUSTERS             } from '../subworkflows/local/snippycluste
 // MODULE: Installed directly from nf-core/modules
 //
 include { CUSTOM_DUMPSOFTWAREVERSIONS  } from '../modules/nf-core/custom/dumpsoftwareversions/main'
-include { SNPDISTS                     } from '../modules/nf-core/snpdists/main'
-include { SNPDISTS_GUBBINS             } from '../modules/nf-core/snpdists/maingubbins'
+include { SNPDISTS as SNPDISTS_SNIPPY  } from '../modules/nf-core/snpdists/main'
+include { SNPDISTS as SNPDISTS_GUBBINS } from '../modules/nf-core/snpdists/main'
 include { IQTREE                       } from '../modules/nf-core/iqtree/main'
 include { GUBBINS                      } from '../modules/nf-core/gubbins/main'
 include { SNPSITES                     } from '../modules/nf-core/snpsites/main'
@@ -92,10 +92,10 @@ workflow PROCESSCLUSTERPERSPECIES {
     //
     // MODULE: Core SNP Distances
     //
-    SNPDISTS(
+    SNPDISTS_SNIPPY(
         SNIPPY_CLUSTERS.out.aln
     )
-    ch_versions = ch_versions.mix(SNPDISTS.out.versions.first())
+    ch_versions = ch_versions.mix(SNPDISTS_SNIPPY.out.versions.first())
 
     //
     // MODULE: Create core-SNP phylogeny
@@ -173,7 +173,7 @@ workflow PROCESSCLUSTERPERSPECIES {
         // Channel with finished results
         ch_clusters = SNIPPY_CLUSTERS.out.ref_evaluation
             .join(CLEAN_TREE.out.tre, by: 0)
-            .join(SNPDISTS.out.tsv, by: 0)
+            .join(SNPDISTS_SNIPPY.out.tsv, by: 0)
             .join(PANAROO_RUN.out.summary, by: 0)
             .join(PANAROO_RUN.out.csv, by: 0)
             .join(PANAROO_RUN.out.rtab, by: 0)
