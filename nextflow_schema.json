@@ -58,6 +58,18 @@
                     "fa_icon": "fas fa-ban",
                     "hidden": true
                 },
+                "poodle_report": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "Quarto script to generate the report, ./modules/local/report/poodle_report.qmd used as default (optional).",
+                    "fa_icon": "fas fa-folder-open"
+                },
+                "logo_report": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "Path to the logo in PNG format to include in the report header, DNA logo used as default (optional).",
+                    "fa_icon": "fas fa-folder-open"
+                },
                 "email": {
                     "type": "string",
                     "description": "Email address for completion summary.",
