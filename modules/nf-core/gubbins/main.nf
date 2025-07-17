@@ -38,6 +38,8 @@ process GUBBINS {
     run_gubbins.py \\
         --threads $task.cpus \\
         --prefix $prefix \\
+        --first-tree-builder iqtree-fast \\
+        --tree-builder iqtree \\
         $args \\
         $msa
     cat <<-END_VERSIONS > versions.yml
