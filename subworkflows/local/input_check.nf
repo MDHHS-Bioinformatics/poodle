@@ -5,7 +5,6 @@
 include { SAMPLESHEET_CHECK as SAMPLESHEET_CHECK_FILES         } from '../../modules/local/samplesheet_check'
 include { SAMPLESHEET_CHECK as SAMPLESHEET_CHECK_ASSEMBLIES           } from '../../modules/local/samplesheet_check'
 include { RENAME_REFERENCE            } from '../../modules/local/renamereference.nf'
-include { RENAME_INPUTS               } from '../../modules/local/renameinputs.nf'
 include { RENAME_GFF                  } from '../../modules/local/rename_gff.nf'
 include { RENAME_ASSEMBLY             } from '../../modules/local/rename_assembly.nf'
 workflow INPUT_CHECK {
