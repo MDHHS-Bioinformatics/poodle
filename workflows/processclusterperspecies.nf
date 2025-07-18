@@ -125,10 +125,21 @@ workflow PROCESSCLUSTERPERSPECIES {
     //
     // MODULE: Gubbins
     //
+
+    const_ch=CONSTANTSITES.out.constant_sites.map { meta, constant_sites_path ->
+    def constant_sites_string = ''
+    if (constant_sites_path.exists()) {
+        constant_sites_string = constant_sites_path.text.trim()
+    } else {
+        println "File does not exist: ${constant_sites_path}"
+    }
+    return [[meta], constant_sites_string]
+    }
+
     if (params.gubbins) {
 
         ch_clean_aln_sites = SNIPPY_CLUSTERS.out.clean_full_aln
-        .join(CONSTANTSITES.out.constant_sites, by: 0)
+        .join(const_ch, by: 0)
 
         GUBBINS(ch_clean_aln_sites)
         ch_versions = ch_versions.mix(GUBBINS.out.versions)
