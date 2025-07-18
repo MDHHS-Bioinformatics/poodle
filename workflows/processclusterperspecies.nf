@@ -32,6 +32,7 @@ include { CLEAN_TREE                  } from '../modules/local/cleantree'
 include { GENEDISTS                   } from '../modules/local/genedists'
 include { SNIPPY_CORE                 } from '../modules/nf-core/snippy/core/main'
 include { SNIPPY_RUN                  } from '../modules/nf-core/snippy/run/main'
+include { CONSTANTSITES               } from '../modules/local/constantsites/main'
 include { REFERENCE_EVALUATION        } from '../modules/local/referenceevaluation.nf'
 include { YAML_REPORT                 } from '../modules/local/report/yamlreport.nf'
 include { QUARTO_REPORT               } from '../modules/local/report/quartoreport.nf'
@@ -98,9 +99,21 @@ workflow PROCESSCLUSTERPERSPECIES {
     ch_versions = ch_versions.mix(SNPDISTS_SNIPPY.out.versions.first())
 
     //
+    // MODULE: Output count of constant sites (suitable for IQ-TREE -fconst)
+    //
+    CONSTANTSITES(
+        SNIPPY_CLUSTERS.out.clean_full_aln
+    )
+    ch_versions = ch_versions.mix(CONSTANTSITES.out.versions.first())
+
+    //
     // MODULE: Create core-SNP phylogeny
     //
-    IQTREE(SNIPPY_CLUSTERS.out.aln)
+    // Join number 
+    ch_aln_sites = SNIPPY_CLUSTERS.out.aln
+    .join(CONSTANTSITES.out.constant_sites, by: 0)
+
+    IQTREE(ch_aln_sites)
     ch_versions = ch_versions.mix(IQTREE.out.versions)
 
     //
@@ -113,7 +126,11 @@ workflow PROCESSCLUSTERPERSPECIES {
     // MODULE: Gubbins
     //
     if (params.gubbins) {
-        GUBBINS(SNIPPY_CLUSTERS.out.clean_full_aln)
+
+        ch_clean_aln_sites = SNIPPY_CLUSTERS.out.clean_full_aln
+        .join(CONSTANTSITES.out.constant_sites, by: 0)
+
+        GUBBINS(ch_clean_aln_sites)
         ch_versions = ch_versions.mix(GUBBINS.out.versions)
 
         // Output only columns containing exclusively ACGT
