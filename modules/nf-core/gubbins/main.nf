@@ -7,7 +7,7 @@ process GUBBINS {
         'biocontainers/gubbins:3.3.5--py39pl5321he4a0461_0' }"
 
     input:
-    tuple val(meta), path(msa)
+    tuple val(meta), path(msa), path(constant_sites)
 
     output:
     tuple val(meta), path("*.fasta")                             , emit: fasta
@@ -34,12 +34,15 @@ process GUBBINS {
     """
     mkdir numba_cache_dir
     export NUMBA_CACHE_DIR='./numba_cache_dir'
+    
+    echo "\"-fconst \$(cat $constant_sites)\"" > const.txt
 
     run_gubbins.py \\
         --threads $task.cpus \\
         --prefix $prefix \\
         --first-tree-builder iqtree-fast \\
         --tree-builder iqtree \\
+        --tree-args \$(cat const.txt) \\
         $args \\
         $msa
     cat <<-END_VERSIONS > versions.yml
