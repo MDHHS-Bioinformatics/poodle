@@ -8,7 +8,7 @@ process IQTREE {
         'biocontainers/iqtree:2.3.4--h21ec9f0_0' }"
 
     input:
-    tuple val(meta), path(alignment)
+    tuple val(meta), path(alignment), path(constant_sites)
 
     output:
     tuple val(meta), path("*.treefile")      , emit: phylogeny     , optional: true
@@ -19,8 +19,8 @@ process IQTREE {
     task.ext.when == null || task.ext.when
 
     script:
-    def args                        = task.ext.args           ?: ''
-    def alignment_arg               = alignment               ? "-s $alignment"                 : ''
+    def args                     = task.ext.args           ?: ''
+    def alignment_arg            = alignment               ? "-s $alignment": ''
     prefix = task.ext.prefix ?: "${meta.species}_${meta.cluster_id}"
     cluster_id = task.ext.prefix ?: "${meta.cluster_id}"
     species = task.ext.prefix ?: "${meta.species}"
@@ -29,8 +29,12 @@ process IQTREE {
     iqtree \\
         $args \\
         $alignment_arg \\
+        -fconst \$(cat $constant_sites) \\
         -pre $prefix \\
         -nt AUTO \\
+        -safe \\
+        -redo \\
+        -m GTR+G4 \\
         -ntmax $task.cpus \\
         -mem $memory \\
 
