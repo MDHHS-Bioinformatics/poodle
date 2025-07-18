@@ -127,14 +127,8 @@ workflow PROCESSCLUSTERPERSPECIES {
     //
 
     const_ch=CONSTANTSITES.out.constant_sites.map { meta, constant_sites_path ->
-    def constant_sites_string = ''
-    if (constant_sites_path.exists()) {
-        constant_sites_string = constant_sites_path.text.trim()
-    } else {
-        println "File does not exist: ${constant_sites_path}"
-    }
-    return [[meta], constant_sites_string]
-    }
+    constant_sites_string = constant_sites_path.text.trim()
+    return [meta, constant_sites_string]}
 
     if (params.gubbins) {
 
