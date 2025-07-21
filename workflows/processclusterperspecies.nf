@@ -106,12 +106,17 @@ workflow PROCESSCLUSTERPERSPECIES {
     )
     ch_versions = ch_versions.mix(CONSTANTSITES.out.versions.first())
 
+    // Convert constant sites file to value
+    const_ch = CONSTANTSITES.out.constant_sites.map { meta, constant_sites_path ->
+    constant_sites_string = constant_sites_path.text.trim()
+    return [meta, constant_sites_string]}
+    
     //
     // MODULE: Create core-SNP phylogeny
     //
     // Join number 
     ch_aln_sites = SNIPPY_CLUSTERS.out.aln
-    .join(CONSTANTSITES.out.constant_sites, by: 0)
+    .join(const_ch, by: 0)
 
     IQTREE(ch_aln_sites)
     ch_versions = ch_versions.mix(IQTREE.out.versions)
@@ -125,11 +130,6 @@ workflow PROCESSCLUSTERPERSPECIES {
     //
     // MODULE: Gubbins
     //
-
-    const_ch=CONSTANTSITES.out.constant_sites.map { meta, constant_sites_path ->
-    constant_sites_string = constant_sites_path.text.trim()
-    return [meta, constant_sites_string]}
-
     if (params.gubbins) {
 
         ch_clean_aln_sites = SNIPPY_CLUSTERS.out.clean_full_aln

@@ -8,7 +8,7 @@ process IQTREE {
         'biocontainers/iqtree:2.3.4--h21ec9f0_0' }"
 
     input:
-    tuple val(meta), path(alignment), path(constant_sites)
+    tuple val(meta), path(alignment), val(constant_sites)
 
     output:
     tuple val(meta), path("*.treefile")      , emit: phylogeny     , optional: true
@@ -29,7 +29,7 @@ process IQTREE {
     iqtree \\
         $args \\
         $alignment_arg \\
-        -fconst \$(cat $constant_sites) \\
+        -fconst $constant_sites \\
         -pre $prefix \\
         -nt AUTO \\
         -safe \\
