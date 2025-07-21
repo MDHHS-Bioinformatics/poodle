@@ -222,7 +222,7 @@ phylocanvas(
       showscalebar = TRUE)
 ```
 
-***Figure 1.** Maximum-likelihood phylogenetic tree based on core single nucleotide polymorphisms (SNPs) identified using Snippy-core. Tree construction was performed with IQ-TREE with model selection via ModelFinder. The reference genome is excluded; the tree is midpoint-rooted. Visualization created using Phylocanvas.*
+***Figure 1.** Maximum-likelihood phylogenetic tree constructed from core single nucleotide polymorphisms (SNPs) identified using Snippy-core. Tree inference was performed with IQ-TREE under the GTR+G4 substitution model. Branch lengths represent the average number of nucleotide substitutions per site across the core genome alignment with constant sites included, incorporating site-specific rate variation modeled by a gamma distribution. As horizontal gene transfer (HGT) and recombination can obscure vertical inheritance, branch lengths should be interpreted with caution. The reference genome was excluded, and the tree was midpoint-rooted. Visualization was generated using Phylocanvas.*
 
 ### Recombination filtered Tree
 
@@ -234,7 +234,7 @@ phylocanvas(
       treetype = "rectangular",
       showscalebar = TRUE)
 ```
-***Figure 2.** Maximum-likelihood phylogenetic tree based on recombination-filtered polymorphic sites, constructed using Gubbins and RAxML with the GTR-GAMMA model. The reference genome is excluded; the tree is midpoint-rooted. Visualization created using Phylocanvas.*
+***Figure 2.** Maximum-likelihood phylogenetic tree based on recombination-filtered core single nucleotide polymorphisms (SNPs), inferred using Gubbins and constructed with IQ-TREE under the GTR+G4 substitution model. The alignment includes both variable and invariant sites, allowing branch lengths to represent the average number of nucleotide substitutions per site across the core genome alignment. The reference genome was excluded, and the tree is midpoint-rooted. Visualization was generated using Phylocanvas.*
 
 
 ### Mash Tree
@@ -248,7 +248,7 @@ phylocanvas(
       showscalebar = TRUE)
 ```
 
-***Figure 3.**Tree based on pairwise Mash distances, constructed using MashTree, which applies the MinHash algorithm to estimate genomic distance. The reference genome is excluded; the tree is midpoint-rooted. Only samples with assemblies were included for Mash analysis. Visualization created using Phylocanvas.*
+***Figure 3.**Tree constructed using MashTree based on pairwise genomic distances estimated by the MinHash algorithm (Mash). Distances were used to generate a dendrogram via the neighbor-joining (NJ) algorithm implemented in QuickTree. This tree reflects overall genomic similarity and does not represent a true phylogeny. Only samples with available genome assemblies were included in the Mash analysis. The reference genome was excluded, and the tree is midpoint-rooted. Visualization was created using Phylocanvas.*
 
 ### Pangenome profile
 
