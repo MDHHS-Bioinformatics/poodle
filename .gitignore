@@ -10,3 +10,4 @@ python_notebooks/
 logs/
 *.sh
 *results*
+*.csv
