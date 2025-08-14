@@ -1,6 +1,7 @@
 process QUARTO_REPORT {
-    tag "$meta.species"
+    tag "${meta.species}_${meta.cluster_id}"
     label 'process_medium'
+    errorStrategy 'ignore'
 
     //conda "${moduleDir}/environment.yml"
     container "r-quarto-phylo.sif"
