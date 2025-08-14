@@ -1,5 +1,5 @@
 process YAML_REPORT {
-    tag "$meta.species"
+    tag "${meta.species}_${meta.cluster_id}"
     label 'process_single'
 
     input:

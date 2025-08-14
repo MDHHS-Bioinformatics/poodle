@@ -1,5 +1,5 @@
 process MASHTREE {
-    tag "species.id"
+    tag "${meta.species}_${meta.cluster_id}"
     label 'process_medium'
 
     conda "${moduleDir}/environment.yml"

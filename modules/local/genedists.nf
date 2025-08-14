@@ -1,5 +1,5 @@
 process GENEDISTS {
-    tag '$meta.species'
+    tag "${meta.species}_${meta.cluster_id}"
     label 'process_low'
     
     conda "conda-forge::r-phytools=0.7_47"

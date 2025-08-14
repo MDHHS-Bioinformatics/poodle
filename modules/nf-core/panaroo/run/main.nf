@@ -1,5 +1,5 @@
 process PANAROO_RUN {
-    tag "$meta.species"
+    tag "${meta.species}_${meta.cluster_id}"
     label 'process_medium'
 
     conda "${moduleDir}/environment.yml"

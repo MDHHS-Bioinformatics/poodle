@@ -1,5 +1,5 @@
 process SNPDISTS {
-    tag "$meta.species"
+    tag "${meta.species}_${meta.cluster_id}"
     label 'process_low'
 
     conda "${moduleDir}/environment.yml"

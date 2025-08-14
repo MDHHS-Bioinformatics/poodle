@@ -1,5 +1,5 @@
 process REFERENCE_EVALUATION {
-    tag "$meta.species"
+    tag "${meta.species}_${meta.cluster_id}"
     label 'process_single'
 
     conda "conda-forge::python=3.8.3"
