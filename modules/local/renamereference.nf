@@ -1,5 +1,5 @@
 process RENAME_REFERENCE {
-    tag '$meta.id'
+    tag "$meta.id"
     label 'process_single'
     
     input:
