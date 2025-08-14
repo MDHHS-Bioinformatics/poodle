@@ -1,5 +1,8 @@
 process GUBBINS {
+    tag "${meta.species}_${meta.cluster_id}"
     label 'process_medium'
+    
+    errorStrategy 'ignore'
 
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
