@@ -1,0 +1,384 @@
+---
+title: PoODLE (Phylogenomic Overview for the Detection of Linkages for Epidemiologists)
+subtitle: |
+  WGS Report<br>Developed by the Genomic Analysis Unit<br>Michigan Department of Health & Human Services (MDHHS)
+description: |
+  <p class="description">Repository: <a href="PoODLE GitHub" style="color: blue;">https://github.com/MI-Bioinformatics/process-bact-cluster-per-species</a></p>
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+format: 
+  html:
+    title-block-banner: "#F0F0F0"
+    embed-resources: true
+    smooth-scroll: true
+    page-layout: full
+    code: false
+    fontcolor: black
+params:
+  species: "Acinetobacter_baumannii"
+  cluster_id: "HC48-C9"
+  ref_eval: "poodle/Acinetobacter_baumannii/HC48-C9/reference_evaluation.tsv"
+  snptree: "poodle/Acinetobacter_baumannii/HC48-C9/snippy_core/Acinetobacter_baumannii_HC48-C9.tre"
+  snpmatrix: "poodle/Acinetobacter_baumannii/HC48-C9/snippy_core/Acinetobacter_baumannii_HC48-C9_dist.tsv"
+  pan_summary: "poodle/Acinetobacter_baumannii/HC48-C9/panaroo/summary_statistics.txt"
+  pan_roary: "poodle/Acinetobacter_baumannii/HC48-C9/panaroo/gene_presence_absence_roary.csv"
+  pan_rtab: "poodle/Acinetobacter_baumannii/HC48-C9/panaroo/gene_presence_absence.Rtab"
+  pan_genedists: "poodle/Acinetobacter_baumannii/HC48-C9/panaroo/gene_presence_absence_dist.tsv"
+  mashtree: "poodle/Acinetobacter_baumannii/HC48-C9/mashtree/Acinetobacter_baumannii_HC48-C9.dnd"
+  mashmatrix: "poodle/Acinetobacter_baumannii/HC48-C9/mashtree/Acinetobacter_baumannii_HC48-C9.tsv"
+
+---
+
+```{r parse-arguments, include=FALSE}
+cluster_id <- params$cluster_id
+species <- params$species
+ref_eval <- params$ref_eval
+snptree <- params$snptree
+snpmatrix <- params$snpmatrix
+pan_summary <- params$pan_summary
+pan_roary <- params$pan_roary
+pan_rtab <- params$pan_rtab
+pan_genedists <- params$pan_genedists
+mashtree <- params$mashtree
+mashmatrix <- params$mashmatrix
+```
+
+```{css quarto-settings, echo=FALSE}
+.quarto-title-block .quarto-title-banner {
+  background-image: url(DNA_logo.png);
+  background-size: 300px;
+  background-position: left;
+  background-repeat: no-repeat;
+  padding-left: 50px;
+  background-origin: content-box;
+}
+
+.quarto-title-block .quarto-title,
+.quarto-title-block .quarto-subtitle,
+.quarto-title-block .quarto-description {
+  color: black !important;
+  padding-left: 350px;
+}
+
+.title {
+  color: black !important;
+}
+
+.container {
+  margin: 0 auto;
+  width: 100%;
+  max-width: 960px;
+}
+
+.shiny-frame{
+  width: 1000px;
+  height: 800px;
+}
+```
+
+```{r libraries, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE, 
+  warning = FALSE, 
+  message = FALSE)
+library(data.table)
+library(tidyr)
+library(dplyr)
+library(ape)
+library(phytools)
+library(ggplot2)
+library(plotly)
+library(Cairo)
+library(phylocanvas)
+options(bitmapType = 'cairo')
+```
+
+```{r import_files, include=FALSE}
+samples <- fread(ref_eval) %>% rename(sample_id = sample) %>% filter(sample_id != "Reference")
+
+#----- CORE SNP TREE WRANGLING ------# 
+
+## Read tree and extract tip order
+snp_tree <- read.tree(snptree)
+snp_tree <- midpoint_root(snp_tree)
+snp_tree <- ladderize(snp_tree, right = F) 
+snp_tree_tip_order <- rev(snp_tree$tip.label) 
+
+#------------ MASH TREE ----------------------#
+mash_tree <- read.tree(mashtree)
+if (!is.null(mash_tree$edge.length) && sum(mash_tree$edge.length) > 0) {
+  mash_tree <- midpoint_root(mash_tree)
+}
+mash_tree <- ladderize(mash_tree, right = F) 
+
+#----- DISTANCE MATRICES WRANGLING ------# 
+# Read and reorder SNP distance matrix
+snp_df <- fread(snpmatrix, data.table = FALSE) 
+row_names <- snp_df[[1]]
+snp_matrix <- as.matrix(snp_df[, -1])
+rownames(snp_matrix) <- row_names
+colnames(snp_matrix) <- row_names
+snp_matrix <- snp_matrix[snp_tree_tip_order, snp_tree_tip_order]
+snp_matrix[upper.tri(snp_matrix)] <- NA
+
+# Read and reorder Mash distance matrix
+mash_df <- fread(mashmatrix, data.table = FALSE) 
+row_names <- mash_df[[1]]
+mash_matrix <- as.matrix(mash_df[, -1])
+rownames(mash_matrix) <- row_names
+colnames(mash_matrix) <- row_names
+# Keep only those tree tip labels that are also present in the matrix
+common_labels <- snp_tree_tip_order[snp_tree_tip_order %in% rownames(mash_matrix)]
+# Reorder the matrix rows and columns accordingly
+mash_matrix <- mash_matrix[common_labels, common_labels]
+mash_matrix[upper.tri(mash_matrix)] <- NA
+
+#----- PANGENOME WRANGLING ------# 
+
+# Read and manipulate gene presence-absence data (Panaroo)
+pangenome_tab <- fread(pan_rtab)
+pangenome_roary <- fread(pan_roary) %>%
+  select(Gene, Annotation,`Genome Fragment`)
+
+pangenome <- pangenome_tab %>%
+  pivot_longer(cols = -Gene, names_to = "sample_id", values_to = "Value") %>%
+  mutate(tempvar = "Gene-presence absence",
+         Gene = factor(Gene, levels = pangenome_tab$Gene),
+         sample_id = factor(sample_id, levels = snp_tree_tip_order)
+         ) %>% 
+  merge(pangenome_roary, by = "Gene") %>%
+  mutate(hovertext = paste("Gene:", Gene, "<br>",
+                            "Annotation:", Annotation, "<br>",
+                            "Genome Fragment:", `Genome Fragment`,  "<br>"
+                              ))
+
+## Read and reorder Gene distance matrix (Panaroo)
+genes_df <- fread(pan_genedists)
+row_names <- genes_df[[1]]
+genes_matrix <- as.matrix(genes_df[, -1])
+rownames(genes_matrix) <- row_names
+colnames(genes_matrix) <- row_names
+genes_matrix <- genes_matrix[snp_tree_tip_order, snp_tree_tip_order]
+genes_matrix[upper.tri(genes_matrix)] <- NA
+
+## Read Pangenome statistics
+panaroo_stats_text <- readLines(pan_summary)
+
+# Ensure Pangenome statistics file ends with a newline character
+if (length(panaroo_stats_text) > 0 && !grepl("\\n$", panaroo_stats_text[length(panaroo_stats_text)])) {
+    writeLines(c(panaroo_stats_text, ""), pan_summary)
+}
+
+# Custom function
+custom_plot_function <- function(plot) {
+  if (length(samples$sample_id) > 35) {
+    size <- length(samples$sample_id) * 20
+    ggplotly(plot, tooltip = "text", height = size, width = size)
+  } else if (length(samples$sample_id) > 20) {
+    size <- length(samples$sample_id) * 20
+    ggplotly(plot, tooltip = "text", height = size)
+  } else {
+    ggplotly(plot, tooltip = "text")
+  }
+}
+
+```
+
+## Disclaimer
+
+***This report is only for investigation and epidemiology use. It should NOT be used for diagnosis, treatment, or management of patients and should NOT be included in any patient health record.***
+
+*The data presented in this report has not been validated or subjected to CLIA standards for diagnosing and treating disease. Methods outlined throughout the report are still in development and may be subject to change.*
+
+
+## Genomic Assessment
+
+Cluster analysis was performed on `r length(unique(samples$sample_id))` samples of the species *`r species`* in the cluster named **`r cluster_id`**. Core genome and pangenome profiles were compared between isolates.
+
+### Core-SNP Tree
+
+```{r snp-tree-plot}
+knitr::opts_chunk$set(cache.vars = TRUE)
+
+phylocanvas(
+      snp_tree,
+      treetype = "rectangular",
+      showscalebar = TRUE)
+```
+
+***Figure 1.** Maximum-likelihood phylogenetic tree constructed from core single nucleotide polymorphisms (SNPs) identified using Snippy-core. Tree inference was performed with IQ-TREE under the GTR+G4 substitution model. Branch lengths represent the average number of nucleotide substitutions per site across the core genome alignment with constant sites included, incorporating site-specific rate variation modeled by a gamma distribution. As horizontal gene transfer (HGT) and recombination can obscure vertical inheritance, branch lengths should be interpreted with caution. The reference genome was excluded, and the tree was midpoint-rooted. Visualization was generated using Phylocanvas.*
+
+
+
+### Mash Tree
+
+```{r mash-tree-plot}
+knitr::opts_chunk$set(cache.vars = TRUE)
+
+phylocanvas(
+      mash_tree,
+      treetype = "rectangular",
+      showscalebar = TRUE)
+```
+
+***Figure 2.**Tree constructed using MashTree based on pairwise genomic distances estimated by the MinHash algorithm (Mash). Distances were used to generate a dendrogram via the neighbor-joining (NJ) algorithm implemented in QuickTree. This tree reflects overall genomic similarity and does not represent a true phylogeny. Only samples with available genome assemblies were included in the Mash analysis. The reference genome was excluded, and the tree is midpoint-rooted. Visualization was created using Phylocanvas.*
+
+### Pangenome profile
+
+The Pangenome summary statistics for cluster `r cluster_id` are as follows:
+
+```{r panaroo-stats, echo=FALSE}
+# Print the filtered lines
+cat(panaroo_stats_text, sep="\n")
+```
+
+```{r pangenome-plot}
+knitr::opts_chunk$set(cache.vars = TRUE)
+
+#----- PANGENOME HEATMAP ------#
+pangenome_plot <- ggplot(pangenome, aes(y = sample_id, x = Gene, fill = Value, text = hovertext)) +
+  geom_tile() +
+  scale_color_identity() +
+  theme_minimal() +
+  theme(axis.text.x = element_blank(),axis.title.x = element_blank(),
+        axis.text.y = element_text(size = 8), 
+        axis.title.y = element_blank(),
+        axis.ticks = element_blank(),
+        legend.position = "none"
+        ) +
+  scale_fill_gradient(low = "white", high = "darkblue")
+
+custom_plot_function(pangenome_plot)
+```
+
+***Figure 3.** Gene presence–absence heatmap from a pangenome analysis performed with Panaroo. Blue indicates gene presence; white indicates absence. The x-axis represents individual genes, and the y-axis represents isolates. Sample order follows the core SNP-based phylogeny. Gene names and annotation can be interactively displayed when hovering the cursor over individual tiles. Visualization created using ggplot2 and plotly.*
+
+### Core SNP distance matrix
+
+```{r snp-matrix}
+
+##---CORE SNP MATRIX---###
+
+# Convert matrix to data frame
+snp_df <- as.data.frame(as.table(as.matrix(snp_matrix)))
+colnames(snp_df) <- c("sample_id_row", "sample_id_col", "value")
+snp_df <- snp_df %>% 
+  mutate(sample_id_row = factor(sample_id_row, levels = snp_tree_tip_order),
+         sample_id_col = factor(sample_id_col, levels = snp_tree_tip_order),
+         hovertext = paste0("Row: ", sample_id_row, "<br>",
+                           "Col: ", sample_id_col, "<br>",
+                           "SNPs: ", value, "<br>"
+                           ))
+
+# Filter the data to include only significant SNP values
+snp_df_links <- snp_df %>%
+filter(value <= 40)
+    
+# Create the heatmap
+snps_heatmap_plot <- ggplot(snp_df, aes(x = sample_id_col, y = sample_id_row, fill = value, text = hovertext)) +
+  geom_tile(color = "white", size = 0.2) +
+  geom_text(data = snp_df_links, aes(label = value), color = "black", size = 3, vjust = 0.5, hjust = 0.5) +
+  scale_fill_gradient(low = "#4E79A7", high = "white") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 8),
+        axis.text.y = element_text(size = 8),
+        axis.title = element_blank()) +
+  labs(fill = "SNPs")
+  
+# Convert to plotly object and add hover info from text by using tooltip
+custom_plot_function(snps_heatmap_plot)
+```
+
+***Figure 4.** Heatmap of core SNP distances among isolates. Values are shown for 0-40 SNPs. SNP distances were determined using the core-SNP alignment generated by Snippy, subsequently analyzed using snp-dists. Specific SNP differences can be displayed upon hovering over the heatmap cells. Sample order follows the core SNP-based phylogeny. Visualization created using ggplot2 and plotly.*
+
+### Mash distance matrix
+
+```{r mash-matrix}
+
+##---MASH distance MATRIX---###
+
+# Convert matrix to data frame
+mash_df <- as.data.frame(as.table(as.matrix(mash_matrix)))
+colnames(mash_df) <- c("sample_id_row", "sample_id_col", "value")
+mash_df <- mash_df %>% 
+  mutate(sample_id_row = factor(sample_id_row),
+         sample_id_col = factor(sample_id_col),
+         hovertext = paste0("Row: ", sample_id_row, "<br>",
+                           "Col: ", sample_id_col, "<br>",
+                           "Mash: ", value, "<br>"
+                           ))
+    
+# Create the heatmap
+mash_heatmap_plot <- ggplot(mash_df, aes(x = sample_id_col, y = sample_id_row, fill = value, text = hovertext)) +
+  geom_tile(color = "white", size = 0.2) +
+  #geom_text(aes(label = value), color = "black", size = 1, vjust = 0.5, hjust = 0.5) +
+  scale_fill_gradient(low = "orange3", high = "white") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 8),
+        axis.text.y = element_text(size = 8),
+        axis.title = element_blank()) +
+  labs(fill = "Mash")
+  
+# Convert to plotly object and add hover info from text by using tooltip
+custom_plot_function(mash_heatmap_plot)
+```
+
+***Figure 5.** Heatmap of pairwise Mash distances, calculated using MashTree. Distances reflect genome-wide similarity based on MinHash sketches. Specific distances can be displayed upon hovering over the heatmap cells. Sample order follows the core SNP-based phylogeny. Visualization created using ggplot2 and plotly.*
+
+### Gene presence-absence distance matrix
+```{r gene-matrix}
+
+##---CORE GENE MATRIX---###
+
+# Convert matrix to data frame
+genes_df <- as.data.frame(as.table(as.matrix(genes_matrix)))
+colnames(genes_df) <- c("sample_id_row", "sample_id_col", "value")
+genes_df <- genes_df %>% 
+  mutate(sample_id_row = factor(sample_id_row, levels = snp_tree_tip_order),
+         sample_id_col = factor(sample_id_col, levels = snp_tree_tip_order),
+         hovertext = paste0("Row: ", sample_id_row, "<br>",
+                           "Col: ", sample_id_col, "<br>",
+                           "Genes: ", value, "<br>"
+                           ))
+
+# Filter the data to include only significant gene values 
+genes_df_links <- genes_df %>%
+filter(value <= 40)
+
+# Create the heatmap
+genes_heatmap_plot <- ggplot(genes_df, aes(x = sample_id_col, y = sample_id_row, fill = value, text = hovertext)) +
+  geom_tile(color = "white",  size = 0.2) +
+  geom_text(data = genes_df_links, aes(label = value), color = "black", size = 3, vjust = 0.5, hjust = 0.5) +
+  scale_fill_gradient(low = "#AA4A44", high = "white") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 8),
+        axis.text.y = element_text(size = 8),
+        axis.title = element_blank()) +
+  labs(fill = "Genes")
+  
+#Print gene matrix
+custom_plot_function(genes_heatmap_plot)
+```
+
+***Figure 6.** Heatmap of pairwise gene content distances based on a presence–absence matrix generated by Panaroo. Sample order follows the core SNP-based phylogeny. Values are shown for 0-40 genes of distance. Exact gene differences are displayed on hover. Visualization created using ggplot2 and plotly.*
+
+## Methods
+
+### SNP Analysis
+
+Reference-based SNP analysis was accomplished using Snippy v4.6.0^1^ within a species-specific clusters. Phylogenetic trees were generated using IQTREE2 v2.3.4^2^ and pairwise SNP distances were calculated using snp-dists v0.8.2^3^.
+
+### Pangenome Analysis
+
+The gene presence-absence profile was identified using the pangenome tool Panaroo v1.5.2^4^ with a strict mode, using 95% sequence identity for clustering and a 70% protein family sequence identity threshold.
+
+### Mash Analysis
+
+The determination of MinHash distances and Mash tree generation were done with MashTree v1.2.0^5^.
+
+## References
+
+1.  <https://github.com/tseemann/snippy>
+2.  <https://github.com/iqtree/iqtree2>
+3.  <https://github.com/tseemann/snp-dists>
+4. <https://github.com/gtonkinhill/panaroo>
+5. <https://github.com/lskatz/mashtree>

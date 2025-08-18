@@ -34,10 +34,15 @@ include { SNIPPY_CORE                 } from '../modules/nf-core/snippy/core/mai
 include { SNIPPY_RUN                  } from '../modules/nf-core/snippy/run/main'
 include { CONSTANTSITES               } from '../modules/local/constantsites/main'
 include { REFERENCE_EVALUATION        } from '../modules/local/referenceevaluation.nf'
-include { YAML_REPORT                 } from '../modules/local/report/yamlreport.nf'
-include { QUARTO_REPORT               } from '../modules/local/report/quartoreport.nf'
+include { YAML_BOTH                   } from '../modules/local/report/yaml_both.nf'
+include { YAML_GUB_ONLY               } from '../modules/local/report/yaml_gub_only.nf'
+include { YAML_MASH_ONLY              } from '../modules/local/report/yaml_mash_only.nf'
+include { YAML_NEITHER                } from '../modules/local/report/yaml_neither.nf'
+include { QUARTO_BOTH                 } from '../modules/local/report/quarto_both.nf'
+include { QUARTO_GUB_ONLY             } from '../modules/local/report/quarto_gub_only.nf'
+include { QUARTO_MASH_ONLY            } from '../modules/local/report/quarto_mash_only.nf'
+include { QUARTO_NEITHER              } from '../modules/local/report/quarto_neither.nf'
 
-//
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
 include { INPUT_CHECK                 } from '../subworkflows/local/input_check'
@@ -107,10 +112,8 @@ workflow PROCESSCLUSTERPERSPECIES {
     ch_versions = ch_versions.mix(CONSTANTSITES.out.versions.first())
 
     // Convert constant sites file to value
-    const_ch = CONSTANTSITES.out.constant_sites.map { meta, constant_sites_path ->
-    constant_sites_string = constant_sites_path.text.trim()
-    return [meta, constant_sites_string]}
-    
+    const_ch = CONSTANTSITES.out.constant_sites.map { meta, p -> tuple(meta, p.text.trim())}
+
     //
     // MODULE: Create core-SNP phylogeny
     //
@@ -189,49 +192,105 @@ workflow PROCESSCLUSTERPERSPECIES {
     }
 
     //
-    // MODULE: YAML
-    //
-    if (params.mashtree && params.gubbins) {
-        // Channel with finished results
-        ch_clusters = SNIPPY_CLUSTERS.out.ref_evaluation
-            .join(CLEAN_TREE.out.tre, by: 0)
-            .join(SNPDISTS_SNIPPY.out.tsv, by: 0)
-            .join(PANAROO_RUN.out.summary, by: 0)
-            .join(PANAROO_RUN.out.csv, by: 0)
-            .join(PANAROO_RUN.out.rtab, by: 0)
-            .join(GENEDISTS.out.tsv, by: 0)
-            .join(GUBBINS.out.tree_labelled, by: 0)
-            .join(SNPDISTS_GUBBINS.out.tsv, by: 0)
-            .join(MASHTREE.out.tree, by: 0)
-            .join(MASHTREE.out.matrix, by: 0)
-            .map { meta, ref_eval, snptree, snpmatrix,  pan_summary, pan_roary, pan_rtab, pan_genedists, gubtree, gubmatrix,
-                    mashtree, mashmatrix ->
-                tuple([meta,
-                        ref_eval, snptree, snpmatrix,
-                        pan_summary, pan_roary, pan_rtab, pan_genedists,
-                        gubtree, gubmatrix,
-                        mashtree, mashmatrix]) }
-        //ch_clusters.view()
-        // Create YAML file for reports
-        YAML_REPORT(
-            ch_clusters
-        )
+    // GENERATING REPORTS BASED ON DIFFERENT CASES
+    // Provide the QMDs + logo
+    Channel.value(file(params.qmd_both    )).set { ch_qmd_both     }
+    Channel.value(file(params.qmd_gubonly )).set { ch_qmd_gubonly  }
+    Channel.value(file(params.qmd_mashonly)).set { ch_qmd_mashonly }
+    Channel.value(file(params.qmd_neither )).set { ch_qmd_neither  }
+    Channel.value(file(params.logo_report )).set { ch_logo         }
 
-        // Channel to pass the Quarto Notebook
-        Channel.value(file(params.poodle_report)).set { ch_qmd }
-        Channel.value(file(params.logo_report)).set { ch_logo }
-
-        //
-        // MODULE: QUARTO
-        //
-        QUARTO_REPORT(
-            YAML_REPORT.out.files,
-            YAML_REPORT.out.yaml,
-            ch_qmd,
-            ch_logo
+    // BOTH
+    if (params.gubbins && params.mashtree) {
+        ch_clusters_both = SNIPPY_CLUSTERS.out.ref_evaluation
+        .join(CLEAN_TREE.out.tre,          by: 0)
+        .join(SNPDISTS_SNIPPY.out.tsv,     by: 0)
+        .join(PANAROO_RUN.out.summary,     by: 0)
+        .join(PANAROO_RUN.out.csv,         by: 0)
+        .join(PANAROO_RUN.out.rtab,        by: 0)
+        .join(GENEDISTS.out.tsv,           by: 0)
+        .join(GUBBINS.out.tree_labelled,     by: 0)
+        .join(SNPDISTS_GUBBINS.out.tsv,      by: 0)
+        .join(MASHTREE.out.tree,             by: 0)
+        .join(MASHTREE.out.matrix,           by: 0)
+        .map { meta, ref_eval, snptree, snpmatrix, pan_summary, pan_roary, pan_rtab, pan_genedists, gubtree, gubmatrix, mashtree, mashmatrix ->
+            tuple(meta, ref_eval, snptree, snpmatrix, pan_summary, pan_roary, pan_rtab, pan_genedists, gubtree, gubmatrix, mashtree, mashmatrix)
+        }
+        
+        YAML_BOTH(ch_clusters_both )
+        QUARTO_BOTH(
+        YAML_BOTH.out.files, YAML_BOTH.out.yaml,
+        ch_qmd_both, ch_logo
         )
-        ch_versions = ch_versions.mix(QUARTO_REPORT.out.versions)
+        ch_versions = ch_versions.mix(QUARTO_BOTH.out.versions)
     }
+
+    // GUBBINS ONLY
+    if (params.gubbins && !params.mashtree) {
+        ch_clusters_gub = SNIPPY_CLUSTERS.out.ref_evaluation
+        .join(CLEAN_TREE.out.tre,          by: 0)
+        .join(SNPDISTS_SNIPPY.out.tsv,     by: 0)
+        .join(PANAROO_RUN.out.summary,     by: 0)
+        .join(PANAROO_RUN.out.csv,         by: 0)
+        .join(PANAROO_RUN.out.rtab,        by: 0)
+        .join(GENEDISTS.out.tsv,           by: 0)
+        .join(GUBBINS.out.tree_labelled,     by: 0)
+        .join(SNPDISTS_GUBBINS.out.tsv,      by: 0)
+        .map { meta, ref_eval, snptree, snpmatrix, pan_summary, pan_roary, pan_rtab, pan_genedists, gubtree, gubmatrix ->
+            tuple(meta, ref_eval, snptree, snpmatrix, pan_summary, pan_roary, pan_rtab, pan_genedists, gubtree, gubmatrix)
+        }
+        YAML_GUB_ONLY( ch_clusters_gub )
+        QUARTO_GUB_ONLY(
+        YAML_GUB_ONLY.out.files, YAML_GUB_ONLY.out.yaml,
+        ch_qmd_gubonly, ch_logo
+        )
+       ch_versions = ch_versions.mix(QUARTO_GUB_ONLY.out.versions)
+    }
+
+    // MASH ONLY
+    if (!params.gubbins && params.mashtree) {
+        ch_clusters_mash = SNIPPY_CLUSTERS.out.ref_evaluation
+        .join(CLEAN_TREE.out.tre,          by: 0)
+        .join(SNPDISTS_SNIPPY.out.tsv,     by: 0)
+        .join(PANAROO_RUN.out.summary,     by: 0)
+        .join(PANAROO_RUN.out.csv,         by: 0)
+        .join(PANAROO_RUN.out.rtab,        by: 0)
+        .join(GENEDISTS.out.tsv,           by: 0)
+        .join(MASHTREE.out.tree,             by: 0)
+        .join(MASHTREE.out.matrix,           by: 0)
+        .map { meta, ref_eval, snptree, snpmatrix, pan_summary, pan_roary, pan_rtab, pan_genedists,
+                mashtree, mashmatrix ->
+            tuple(meta, ref_eval, snptree, snpmatrix, pan_summary, pan_roary, pan_rtab, pan_genedists,
+                mashtree, mashmatrix)
+        }
+        YAML_MASH_ONLY(ch_clusters_mash)
+        QUARTO_MASH_ONLY(
+        YAML_MASH_ONLY.out.files, YAML_MASH_ONLY.out.yaml,
+        ch_qmd_mashonly, ch_logo
+        )
+        ch_versions = ch_versions.mix(QUARTO_MASH_ONLY.out.versions)
+    }
+
+    // NEITHER
+    if (!params.gubbins && !params.gubbins) {
+        ch_clusters_core = SNIPPY_CLUSTERS.out.ref_evaluation
+        .join(CLEAN_TREE.out.tre,          by: 0)
+        .join(SNPDISTS_SNIPPY.out.tsv,     by: 0)
+        .join(PANAROO_RUN.out.summary,     by: 0)
+        .join(PANAROO_RUN.out.csv,         by: 0)
+        .join(PANAROO_RUN.out.rtab,        by: 0)
+        .join(GENEDISTS.out.tsv,           by: 0)
+        .map { meta, ref_eval, snptree, snpmatrix, pan_summary, pan_roary, pan_rtab, pan_genedists ->
+            tuple(meta, ref_eval, snptree, snpmatrix, pan_summary, pan_roary, pan_rtab, pan_genedists)
+        }
+        YAML_NEITHER(  ch_clusters_core )
+        QUARTO_NEITHER(
+        YAML_NEITHER.out.files, YAML_NEITHER.out.yaml,
+        ch_qmd_neither, ch_logo
+        )
+        ch_versions = ch_versions.mix(QUARTO_NEITHER.out.versions)
+    }
+
     //
     //MODULE: Get software versions
     //
