@@ -23,7 +23,7 @@ WorkflowMain.initialise(workflow, params, log)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { PROCESSCLUSTERPERSPECIES } from './workflows/processclusterperspecies'
+include { PROCESSCLUSTERPERSPECIES } from './workflows/processclusterperspecies.nf'
 
 //
 // WORKFLOW: Run main processclusterperspecies analysis pipeline
