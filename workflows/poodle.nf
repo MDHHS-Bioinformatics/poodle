@@ -78,7 +78,7 @@ include { MASHTREE                     } from '../modules/nf-core/mashtree/main'
 // Info required for completion email and summary
 def multiqc_report = []
 
-workflow PROCESSCLUSTERPERSPECIES {
+workflow POODLE {
 
     ch_versions = Channel.empty()
 
