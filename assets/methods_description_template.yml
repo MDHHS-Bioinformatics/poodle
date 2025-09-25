@@ -1,7 +1,7 @@
 id: "nf-core-processclusterperspecies-methods-description"
 description: "process-bact-cluster-per-species is a bioinformatics best-practice analysis pipeline for phylogenetic analysis of bacterial clusters. This pipleine includes Snippy run, Snippy core, Gubbins (optional), Panaroo and MashTree (optional)."
 section_name: "MI-Bioinformatics/process-bact-cluster-per-species Methods Description"
-section_href: "https://github.com/MI-Bioinformatics/process-bact-cluster-per-species"
+section_href: "https://github.com/MI-Bioinformatics/poodle"
 plot_type: "html"
 ## TODO nf-core: Update the HTML below to your prefered methods description, e.g. add publication citation for this pipeline
 ## You inject any metadata in the Nextflow '${workflow}' object

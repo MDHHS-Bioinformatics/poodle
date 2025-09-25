@@ -3,7 +3,7 @@ title: PoODLE (Phylogenomic Overview for the Detection of Linkages for Epidemiol
 subtitle: |
   WGS Report<br>Developed by the Genomic Analysis Unit<br>Michigan Department of Health & Human Services (MDHHS)
 description: |
-  <p class="description">Repository: <a href="PoODLE GitHub" style="color: blue;">https://github.com/MI-Bioinformatics/process-bact-cluster-per-species</a></p>
+  <p class="description">Repository: <a href="PoODLE GitHub" style="color: blue;">https://github.com/MI-Bioinformatics/poodle</a></p>
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 format: 
   html:

@@ -36,4 +36,4 @@ Pipeline Configuration:
 
 --
 MI-Bioinformatics/process-bact-cluster-per-species
-https://github.com/MI-Bioinformatics/process-bact-cluster-per-species
+https://github.com/MI-Bioinformatics/poodle

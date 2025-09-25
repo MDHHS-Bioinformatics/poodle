@@ -15,7 +15,7 @@ class WorkflowMain {
             "* The nf-core framework\n" +
             "  https://doi.org/10.1038/s41587-020-0439-x\n\n" +
             "* Software dependencies\n" +
-            "  https://github.com/MI-Bioinformatics/process-bact-cluster-per-species/blob/master/CITATIONS.md"
+            "  https://github.com/MI-Bioinformatics/poodle/blob/master/CITATIONS.md"
     }
 
     //

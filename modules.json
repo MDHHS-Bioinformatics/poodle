@@ -1,6 +1,6 @@
 {
     "name": "MI-Bioinformatics/process-bact-cluster-per-species",
-    "homePage": "https://github.com/MI-Bioinformatics/process-bact-cluster-per-species",
+    "homePage": "https://github.com/MI-Bioinformatics/poodle",
     "repos": {
         "https://github.com/nf-core/modules.git": {
             "modules": {

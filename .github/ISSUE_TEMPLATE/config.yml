@@ -3,5 +3,5 @@ contact_links:
     url: https://nf-co.re/join
     about: Please join the nf-core community here
   - name: "Process clusters per species pipeline"
-    url: https://github.com/MI-Bioinformatics/process-bact-cluster-per-species
+    url: https://github.com/MI-Bioinformatics/poodle
     about: Discussion about the processclusterperspecies pipeline
