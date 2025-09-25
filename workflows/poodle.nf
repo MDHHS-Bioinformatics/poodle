@@ -28,7 +28,8 @@ if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input sample
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { CLEAN_TREE                  } from '../modules/local/cleantree'
+include { CLEAN_TREE as SNIPPY_TREE   } from '../modules/local/cleantree'
+include { CLEAN_TREE as GUBBINS_TREE  } from '../modules/local/cleantree'
 include { GENEDISTS                   } from '../modules/local/genedists'
 include { SNIPPY_CORE                 } from '../modules/nf-core/snippy/core/main'
 include { SNIPPY_RUN                  } from '../modules/nf-core/snippy/run/main'
@@ -60,7 +61,8 @@ include { SNIPPY_CLUSTERS             } from '../subworkflows/local/snippycluste
 include { CUSTOM_DUMPSOFTWAREVERSIONS  } from '../modules/nf-core/custom/dumpsoftwareversions/main'
 include { SNPDISTS as SNPDISTS_SNIPPY  } from '../modules/nf-core/snpdists/main'
 include { SNPDISTS as SNPDISTS_GUBBINS } from '../modules/nf-core/snpdists/main'
-include { IQTREE                       } from '../modules/nf-core/iqtree/main'
+include { IQTREE as IQTREE_SNIPPY      } from '../modules/nf-core/iqtree/main'
+include { IQTREE as IQTREE_GUBBINS     } from '../modules/nf-core/iqtree/main'
 include { GUBBINS                      } from '../modules/nf-core/gubbins/main'
 include { SNPSITES                     } from '../modules/nf-core/snpsites/main'
 include { PANAROO_RUN                  } from '../modules/nf-core/panaroo/run/main'
@@ -121,14 +123,14 @@ workflow PROCESSCLUSTERPERSPECIES {
     ch_aln_sites = SNIPPY_CLUSTERS.out.aln
     .join(const_ch, by: 0)
 
-    IQTREE(ch_aln_sites)
-    ch_versions = ch_versions.mix(IQTREE.out.versions)
+    IQTREE_SNIPPY(ch_aln_sites)
+    ch_versions = ch_versions.mix(IQTREE_SNIPPY.out.versions)
 
     //
     // MODULE: Remove reference and root at midpoint
     //
-    CLEAN_TREE(IQTREE.out.phylogeny)
-    ch_versions = ch_versions.mix(CLEAN_TREE.out.versions)
+    SNIPPY_TREE(IQTREE_SNIPPY.out.phylogeny)
+    ch_versions = ch_versions.mix(SNIPPY_TREE.out.versions)
 
     //
     // MODULE: Gubbins
@@ -148,6 +150,18 @@ workflow PROCESSCLUSTERPERSPECIES {
         // Get SNP distance matrix
         SNPDISTS_GUBBINS(SNPSITES.out.snp_fasta)
         ch_versions = ch_versions.mix(SNPDISTS_GUBBINS.out.versions)
+        
+        // Join SNP aln with constant sites 
+        ch_aln_sites_gub = SNPSITES.out.snp_fasta
+        .join(const_ch, by: 0)
+
+        // Make filtered-recommbination SNP Tree
+        IQTREE_GUBBINS(ch_aln_sites_gub)
+        ch_versions = ch_versions.mix(IQTREE_GUBBINS.out.versions)
+
+        // Midpoint rooting and removing reference
+        GUBBINS_TREE(IQTREE_GUBBINS.out.phylogeny)
+        ch_versions = ch_versions.mix(GUBBINS_TREE.out.versions)
     }
 
     //
@@ -203,16 +217,16 @@ workflow PROCESSCLUSTERPERSPECIES {
     // BOTH
     if (params.gubbins && params.mashtree) {
         ch_clusters_both = SNIPPY_CLUSTERS.out.ref_evaluation
-        .join(CLEAN_TREE.out.tre,          by: 0)
+        .join(SNIPPY_TREE.out.tre,          by: 0)
         .join(SNPDISTS_SNIPPY.out.tsv,     by: 0)
         .join(PANAROO_RUN.out.summary,     by: 0)
         .join(PANAROO_RUN.out.csv,         by: 0)
         .join(PANAROO_RUN.out.rtab,        by: 0)
         .join(GENEDISTS.out.tsv,           by: 0)
-        .join(GUBBINS.out.tree_labelled,     by: 0)
-        .join(SNPDISTS_GUBBINS.out.tsv,      by: 0)
-        .join(MASHTREE.out.tree,             by: 0)
-        .join(MASHTREE.out.matrix,           by: 0)
+        .join(GUBBINS_TREE.out.tre,        by: 0)
+        .join(SNPDISTS_GUBBINS.out.tsv,    by: 0)
+        .join(MASHTREE.out.tree,           by: 0)
+        .join(MASHTREE.out.matrix,         by: 0)
         .map { meta, ref_eval, snptree, snpmatrix, pan_summary, pan_roary, pan_rtab, pan_genedists, gubtree, gubmatrix, mashtree, mashmatrix ->
             tuple(meta, ref_eval, snptree, snpmatrix, pan_summary, pan_roary, pan_rtab, pan_genedists, gubtree, gubmatrix, mashtree, mashmatrix)
         }
@@ -228,13 +242,13 @@ workflow PROCESSCLUSTERPERSPECIES {
     // GUBBINS ONLY
     if (params.gubbins && !params.mashtree) {
         ch_clusters_gub = SNIPPY_CLUSTERS.out.ref_evaluation
-        .join(CLEAN_TREE.out.tre,          by: 0)
+        .join(SNIPPY_TREE.out.tre,          by: 0)
         .join(SNPDISTS_SNIPPY.out.tsv,     by: 0)
         .join(PANAROO_RUN.out.summary,     by: 0)
         .join(PANAROO_RUN.out.csv,         by: 0)
         .join(PANAROO_RUN.out.rtab,        by: 0)
         .join(GENEDISTS.out.tsv,           by: 0)
-        .join(GUBBINS.out.tree_labelled,     by: 0)
+        .join(GUBBINS_TREE.out.tre,        by: 0)
         .join(SNPDISTS_GUBBINS.out.tsv,      by: 0)
         .map { meta, ref_eval, snptree, snpmatrix, pan_summary, pan_roary, pan_rtab, pan_genedists, gubtree, gubmatrix ->
             tuple(meta, ref_eval, snptree, snpmatrix, pan_summary, pan_roary, pan_rtab, pan_genedists, gubtree, gubmatrix)
@@ -250,7 +264,7 @@ workflow PROCESSCLUSTERPERSPECIES {
     // MASH ONLY
     if (!params.gubbins && params.mashtree) {
         ch_clusters_mash = SNIPPY_CLUSTERS.out.ref_evaluation
-        .join(CLEAN_TREE.out.tre,          by: 0)
+        .join(SNIPPY_TREE.out.tre,          by: 0)
         .join(SNPDISTS_SNIPPY.out.tsv,     by: 0)
         .join(PANAROO_RUN.out.summary,     by: 0)
         .join(PANAROO_RUN.out.csv,         by: 0)
@@ -274,7 +288,7 @@ workflow PROCESSCLUSTERPERSPECIES {
     // NEITHER
     if (!params.gubbins && !params.gubbins) {
         ch_clusters_core = SNIPPY_CLUSTERS.out.ref_evaluation
-        .join(CLEAN_TREE.out.tre,          by: 0)
+        .join(SNIPPY_TREE.out.tre,          by: 0)
         .join(SNPDISTS_SNIPPY.out.tsv,     by: 0)
         .join(PANAROO_RUN.out.summary,     by: 0)
         .join(PANAROO_RUN.out.csv,         by: 0)
