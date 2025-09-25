@@ -1,9 +1,9 @@
 #!/usr/bin/env nextflow
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    processclusterperspecies
+    poodle
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Github : https://github.com/MI-Bioinformatics/process-bact-cluster-per-species
+    Github : https://github.com/MI-Bioinformatics/poodle
 ----------------------------------------------------------------------------------------
 */
 
@@ -23,13 +23,13 @@ WorkflowMain.initialise(workflow, params, log)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { PROCESSCLUSTERPERSPECIES } from './workflows/processclusterperspecies.nf'
+include { POODLE } from './workflows/poodle.nf'
 
 //
-// WORKFLOW: Run main processclusterperspecies analysis pipeline
+// WORKFLOW: Run main poodle analysis pipeline
 //
 // workflow {
-//    PROCESSCLUSTERPERSPECIES ()
+//    POODLE ()
 //}
 
 /*
@@ -40,10 +40,10 @@ include { PROCESSCLUSTERPERSPECIES } from './workflows/processclusterperspecies.
 
 //
 // WORKFLOW: Execute a single named workflow for the pipeline
-// See: https://github.com/MI-Bioinformatics/process-bact-cluster-per-species
+// See: https://github.com/MI-Bioinformatics/poodle
 //
 workflow {
-    PROCESSCLUSTERPERSPECIES ()
+    POODLE ()
 }
 
 /*

@@ -17,7 +17,7 @@ process GENEDISTS {
     when:
     task.ext.when == null || task.ext.when
 
-    script: // This script is bundled with the pipeline, in MI-Bioinformatics/process-bact-cluster-per-species/bin/
+    script: // This script is bundled with the pipeline, in MI-Bioinformatics/poodle/bin/
     def args = task.ext.args ?: ''
     prefix = task.ext.prefix ?: "${meta.species}_${meta.cluster_id}"
     cluster_id = task.ext.prefix ?: "${meta.cluster_id}"
