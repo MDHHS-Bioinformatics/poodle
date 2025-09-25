@@ -1,4 +1,4 @@
-# ![MI-Bioinformatics/PoODLE](docs/images/process_clusters_logo_light.png#gh-light-mode-only) ![nf-core/poodle](docs/images/process_clusters_logo_dark.png#gh-dark-mode-only)
+# ![MI-Bioinformatics/PoODLE](docs/images/poodle_logo_light.png#gh-light-mode-only) ![nf-core/poodle](docs/images/poodle_logo_light.png#gh-dark-mode-only)
 
 [![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A522.10.1-23aa62.svg)](https://www.nextflow.io/)
 [![run with conda](http://img.shields.io/badge/run%20with-conda-3EB049?labelColor=000000&logo=anaconda)](https://docs.conda.io/en/latest/)
@@ -16,7 +16,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 
 1. Identify reference-based SNPs with [`Snippy`](https://github.com/tseemann/snippy)-run for each sample.
 2. Make a core genome alignment with [`Snippy`](https://github.com/tseemann/snippy)-core, generate a SNP tree with [`IQ-TREE`](https://www.iqtree.org/) and calculate SNP distances with [`snp-dists`](https://github.com/tseemann/snp-dists).
-3. Mask recombinant sites with [`Gubbins`](https://github.com/nickjcroucher/gubbins), extract ACGT positions with [`snp-sites`](https://sanger-pathogens.github.io/snp-sites/) and calculate SNP distances with [`snp-dists`](https://github.com/tseemann/snp-dists) (optional).
+3. Mask recombinant sites with [`Gubbins`](https://github.com/nickjcroucher/gubbins) (optional), extract ACGT positions with [`snp-sites`](https://sanger-pathogens.github.io/snp-sites/), generate a SNP tree with [`IQ-TREE`](https://www.iqtree.org/) and calculate SNP distances with [`snp-dists`](https://github.com/tseemann/snp-dists).
 4. Pangenome profile (gene presence-absence) with [`Panaroo`](https://github.com/gtonkinhill/panaroo) and calculate gene distances.
 5. Make a tree with Mash distances using [`MashTree`](https://github.com/lskatz/mashtree) (optional).
 6. Summary report in HTML format including trees, pangenome profile and distance matrices.
@@ -86,7 +86,6 @@ Make sure to provide values for these columns even if certain input types do not
 - `--gubbins`                     [boolean] Filter out recombinant sites with Gubbins (optional).
 - `--mashtree`                    [boolean] Analyze genomic distances and generate a tree with MashTree (optional).
 - `--logo_report`                 [string] Logo in PNG format to include in the report header, DNA logo used as default (optional).
-- `--poodle_report`               [string] Quarto script to generate the report, "./modules/local/report/poodle_report.qmd" used as default (optional).
 - `--previous_results`            [string]  Path to previous results. By default, the pipeline looks for prior Snippy results for the same cluster in the outdir (optional).
 - `--save_snippy_run`             [boolean] Do not publish Snippy run results. By default, the pipeline saves the Snippy-run results per sample (optional).
 - `--email`                       [string]  Email address for completion summary (optional).
@@ -119,13 +118,18 @@ Below is the structure of the output directory.
 │           │   ├── 📄 <Species>_<cluster_id>.aln
 │           │   ├── 📄 <Species>_<cluster_id>.full.aln
 │           │   ├── 📄 <Species>_<cluster_id>.iqtree
+│           │   ├── 📄 <Species>_<cluster_id>.nwk
 │           │   ├── 📄 <Species>_<cluster_id>.tab
 │           │   ├── 📄 <Species>_<cluster_id>.tre
-│           │   ├── 📄 <Species>_<cluster_id>.treefile
 │           │   ├── 📄 <Species>_<cluster_id>.txt
 │           │   └── 📄 <Species>_<cluster_id>.vcf
 │           ├── 📁 gubbins
-│           │   ├── 📄 <Species>_<cluster_id>_dist.tsv
+│           │   ├── 📄 <Species>_<cluster_id>_gubbins_dist.tsv
+│           │   ├── 📄 <Species>_<cluster_id>_gubbins.iqtree
+│           │   ├── 📄 <Species>_<cluster_id>_gubbins.nwk
+│           │   ├── 📄 <Species>_<cluster_id>_gubbins.iqtree
+│           │   ├── 📄 <Species>_<cluster_id>_gubbins.tre
+│           │   ├── 📄 <Species>_<cluster_id>_snp-sites.fna
 │           │   ├── 📄 <Species>_<cluster_id>.branch_base_reconstruction.embl
 │           │   ├── 📄 <Species>_<cluster_id>.filtered_plymorphic_sites.fasta
 │           │   ├── 📄 <Species>_<cluster_id>.filtered_plymorphic_sites.phylip
