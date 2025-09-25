@@ -11,7 +11,7 @@ process IQTREE {
     tuple val(meta), path(alignment), val(constant_sites)
 
     output:
-    tuple val(meta), path("*.treefile")      , emit: phylogeny     , optional: true
+    tuple val(meta), path("*.nwk")      , emit: phylogeny     , optional: true
     tuple val(meta), path("*.iqtree")        , emit: report        , optional: true
     path "versions.yml"                      , emit: versions
 
@@ -21,22 +21,43 @@ process IQTREE {
     script:
     def args                     = task.ext.args           ?: ''
     def alignment_arg            = alignment               ? "-s $alignment": ''
+    def args_extension = task.ext.args_extension ?: ''
     prefix = task.ext.prefix ?: "${meta.species}_${meta.cluster_id}"
     cluster_id = task.ext.prefix ?: "${meta.cluster_id}"
     species = task.ext.prefix ?: "${meta.species}"
     def memory                      = task.memory.toString().replaceAll(' ', '')
     """
+    # Count number of samples (FASTA format)
+    count=\$(grep -c "^>" "$alignment")
+
+    # Perform bootstrapping if there are more than 4 samples
+    if [[ \$count -gt 4 ]]; then
+        bs="-B 1000"
+    else
+        bs=""
+    fi
+
     iqtree \\
         $args \\
         $alignment_arg \\
         -fconst $constant_sites \\
-        -pre $prefix \\
+        -pre ${prefix}${args_extension} \\
         -nt AUTO \\
         -safe \\
         -redo \\
         -m GTR+G4 \\
         -ntmax $task.cpus \\
         -mem $memory \\
+        \$bs \\
+        -seed 12345
+
+    # rename file for consistency
+    if [[ !{count}  < 5 ]]
+    then
+        mv *.treefile ${prefix}${args_extension}.nwk
+    else
+        mv *.contree ${prefix}${args_extension}.nwk
+    fi
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
