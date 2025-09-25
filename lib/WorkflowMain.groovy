@@ -1,5 +1,5 @@
 //
-// This file holds several functions specific to the main.nf workflow in the MI-Bioinformatics/process-bact-cluster-per-species pipeline
+// This file holds several functions specific to the main.nf workflow in the MI-Bioinformatics/poodle pipeline
 //
 
 class WorkflowMain {
@@ -8,7 +8,7 @@ class WorkflowMain {
     // Citation string for pipeline
     //
     public static String citation(workflow) {
-        return "If you use MI-Bioinformatics/process-bact-cluster-per-species for your analysis please cite:\n\n" +
+        return "If you use MI-Bioinformatics/poodle for your analysis please cite:\n\n" +
             // TODO nf-core: Add Zenodo DOI for pipeline after first release
             //"* The pipeline\n" +
             //"  https://doi.org/10.5281/zenodo.XXXXXXX\n\n" +
@@ -22,7 +22,7 @@ class WorkflowMain {
     // Generate help string
     //
     public static String help(workflow, params, log) {
-        def command = "nextflow run MI-Bioinformatics/process-bact-cluster-per-species --input manifest.csv --output ./results -profile docker"
+        def command = "nextflow run MI-Bioinformatics/poodle --input manifest.csv --output ./results -profile docker"
         def help_string = ''
         help_string += NfcoreTemplate.logo(workflow, params.monochrome_logs)
         help_string += NfcoreSchema.paramsHelp(workflow, params, command)

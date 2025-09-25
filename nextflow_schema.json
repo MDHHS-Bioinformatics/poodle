@@ -1,7 +1,7 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema",
     "$id": "https://github.com/MI-Bioinformatics/poodle/blob/master/nextflow_schema.json",
-    "title": "MI-Bioinformatics/process-bact-cluster-per-species",
+    "title": "MI-Bioinformatics/poodle",
     "description": "Bacterial cluster analysis",
     "type": "object",
     "definitions": {

@@ -7,7 +7,7 @@ on:
 jobs:
   run-tower:
     name: Run AWS tests
-    if: github.repository == 'MI-Bioinformatics/process-bact-cluster-per-species'
+    if: github.repository == 'MI-Bioinformatics/poodle'
     runs-on: ubuntu-latest
     steps:
       # Launch workflow using Tower CLI tool action
