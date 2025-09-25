@@ -1,4 +1,4 @@
-id: "nf-core-processclusterperspecies-methods-description"
+id: "nf-core-poodle-methods-description"
 description: "process-bact-cluster-per-species is a bioinformatics best-practice analysis pipeline for phylogenetic analysis of bacterial clusters. This pipleine includes Snippy run, Snippy core, Gubbins (optional), Panaroo and MashTree (optional)."
 section_name: "MI-Bioinformatics/process-bact-cluster-per-species Methods Description"
 section_href: "https://github.com/MI-Bioinformatics/poodle"

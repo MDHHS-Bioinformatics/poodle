@@ -52,7 +52,7 @@ These tests are run both with the latest available version of `Nextflow` and als
 
 ## Getting help
 
-For further information/help, please consult the [MI-Bioinformatics/process-bact-cluster-per-species documentation](https://nf-co.re/processclusterperspecies/usage) and don't hesitate to get in touch on the nf-core Slack [#processclusterperspecies](https://nfcore.slack.com/channels/processclusterperspecies) channel ([join our Slack here](https://nf-co.re/join/slack)).
+For further information/help, please consult the [MI-Bioinformatics/process-bact-cluster-per-species documentation](https://nf-co.re/poodle/usage) and don't hesitate to get in touch on the nf-core Slack [#poodle](https://nfcore.slack.com/channels/poodle) channel ([join our Slack here](https://nf-co.re/join/slack)).
 
 ## Pipeline contribution conventions
 

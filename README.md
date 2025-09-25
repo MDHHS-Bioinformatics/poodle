@@ -1,4 +1,4 @@
-# ![MI-Bioinformatics/PoODLE](docs/images/process_clusters_logo_light.png#gh-light-mode-only) ![nf-core/processclusterperspecies](docs/images/process_clusters_logo_dark.png#gh-dark-mode-only)
+# ![MI-Bioinformatics/PoODLE](docs/images/process_clusters_logo_light.png#gh-light-mode-only) ![nf-core/poodle](docs/images/process_clusters_logo_dark.png#gh-dark-mode-only)
 
 [![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A522.10.1-23aa62.svg)](https://www.nextflow.io/)
 [![run with conda](http://img.shields.io/badge/run%20with-conda-3EB049?labelColor=000000&logo=anaconda)](https://docs.conda.io/en/latest/)

@@ -7,7 +7,7 @@
 def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
 
 // Validate input parameters
-WorkflowProcessclusterperspecies.initialise(params, log)
+WorkflowPoodle.initialise(params, log)
 
 // Check input path parameters to see if they exist
 def checkPathParamList = [ params.input]
@@ -315,7 +315,7 @@ workflow PROCESSCLUSTERPERSPECIES {
     //
     // MODULE: MultiQC
     //
-    workflow_summary    = WorkflowProcessclusterperspecies.paramsSummaryMultiqc(workflow, summary_params)
+    workflow_summary    = WorkflowPoodle.paramsSummaryMultiqc(workflow, summary_params)
     ch_workflow_summary = Channel.value(workflow_summary)
 
 }

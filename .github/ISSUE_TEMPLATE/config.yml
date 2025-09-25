@@ -4,4 +4,4 @@ contact_links:
     about: Please join the nf-core community here
   - name: "Process clusters per species pipeline"
     url: https://github.com/MI-Bioinformatics/poodle
-    about: Discussion about the processclusterperspecies pipeline
+    about: Discussion about the poodle pipeline

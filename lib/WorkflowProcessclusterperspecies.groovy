@@ -1,10 +1,10 @@
 //
-// This file holds several functions specific to the workflow/processclusterperspecies.nf in the MI-Bioinformatics/process-bact-cluster-per-species pipeline
+// This file holds several functions specific to the workflow/poodle.nf in the MI-Bioinformatics/process-bact-cluster-per-species pipeline
 //
 
 import groovy.text.SimpleTemplateEngine
 
-class WorkflowProcessclusterperspecies {
+class WorkflowPoodle {
 
     //
     // Check and validate parameters
