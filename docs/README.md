@@ -1,6 +1,6 @@
-# MI-Bioinformatics/process-bact-cluster-per-species: Documentation
+# MI-Bioinformatics/poodle: Documentation
 
-The MI-Bioinformatics/process-bact-cluster-per-species documentation is split into the following pages:
+The MI-Bioinformatics/poodle documentation is split into the following pages:
 
 - [Usage](usage.md)
   - An overview of how the pipeline works, how to run it and a description of all of the different command-line flags.

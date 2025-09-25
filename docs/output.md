@@ -1,4 +1,4 @@
-# MI-Bioinformatics/process-bact-cluster-per-species: Output
+# MI-Bioinformatics/poodle: Output
 
 ## Introduction
 

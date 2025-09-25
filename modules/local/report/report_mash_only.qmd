@@ -3,7 +3,7 @@ title: PoODLE (Phylogenomic Overview for the Detection of Linkages for Epidemiol
 subtitle: |
   WGS Report<br>Developed by the Genomic Analysis Unit<br>Michigan Department of Health & Human Services (MDHHS)
 description: |
-  <p class="description">Repository: <a href="PoODLE GitHub" style="color: blue;">https://github.com/MI-Bioinformatics/process-bact-cluster-per-species</a></p>
+  <p class="description">Repository: <a href="PoODLE GitHub" style="color: blue;">https://github.com/MI-Bioinformatics/poodle</a></p>
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 format: 
   html:
@@ -101,7 +101,7 @@ samples <- fread(ref_eval) %>% rename(sample_id = sample) %>% filter(sample_id !
 snp_tree <- read.tree(snptree)
 snp_tree <- midpoint_root(snp_tree)
 snp_tree <- ladderize(snp_tree, right = F) 
-snp_tree_tip_order <- rev(snp_tree$tip.label) 
+snp_tree_tip_order <- snp_tree$tip.label
 
 #------------ MASH TREE ----------------------#
 mash_tree <- read.tree(mashtree)
@@ -205,7 +205,7 @@ phylocanvas(
       showscalebar = TRUE)
 ```
 
-***Figure 1.** Maximum-likelihood phylogenetic tree constructed from core single nucleotide polymorphisms (SNPs) identified using Snippy-core. Tree inference was performed with IQ-TREE under the GTR+G4 substitution model. Branch lengths represent the average number of nucleotide substitutions per site across the core genome alignment with constant sites included, incorporating site-specific rate variation modeled by a gamma distribution. As horizontal gene transfer (HGT) and recombination can obscure vertical inheritance, branch lengths should be interpreted with caution. The reference genome was excluded, and the tree was midpoint-rooted. Visualization was generated using Phylocanvas.*
+***Figure 1.** Maximum-likelihood phylogenetic tree constructed from core single nucleotide polymorphisms (SNPs) identified using Snippy-core. Tree inference was performed with IQ-TREE under the GTR+G4 substitution model. Branch lengths represent the average number of nucleotide substitutions per site across the core genome alignment with constant sites included, incorporating site-specific rate variation modeled by a gamma distribution. As horizontal gene transfer (HGT) and recombination can obscure vertical inheritance, branch lengths should be interpreted with caution. Very short or near-zero branches indicate unresolved relationships, often due to highly similar or identical samples. Such regions of the tree should be interpreted with caution, and complementary analyses (e.g., SNP distance matrices) may be needed to clarify fine-scale linkages. The reference genome was excluded, and the tree was midpoint-rooted. Visualization was generated using Phylocanvas.*
 
 
 
