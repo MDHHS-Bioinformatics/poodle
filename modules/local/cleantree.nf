@@ -18,6 +18,7 @@ process CLEAN_TREE {
     task.ext.when == null || task.ext.when
 
     script:
+    def args_extension = task.ext.args_extension ?: ''
     prefix = task.ext.prefix ?: "${meta.species}_${meta.cluster_id}"
     cluster_id = task.ext.prefix ?: "${meta.cluster_id}"
     species = task.ext.prefix ?: "${meta.species}"
@@ -27,7 +28,8 @@ process CLEAN_TREE {
     tree <- read.tree('${tree}'); \
     midpoint_tree <- midpoint.root(tree); \
     midpoint_tree <- drop.tip(midpoint_tree, 'Reference'); \
-    write.tree(midpoint_tree, file='${prefix}.tre')"
+    midpoint_tree <- ladderize(midpoint_tree, right = F); \
+    write.tree(midpoint_tree, file='${prefix}${args_extension}.tre')"
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
