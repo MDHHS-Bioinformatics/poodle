@@ -37,7 +37,3 @@ output:
           type: integer
           description: Value with the number of constant sites
           pattern: "*.{sites.txt}"
-authors:
-  - "@avantonder"
-maintainers:
-  - "@avantonder"
