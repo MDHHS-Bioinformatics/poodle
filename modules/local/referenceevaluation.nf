@@ -48,6 +48,6 @@ with open('$txt') as f:
 
         # Print the result for each sample
         print(f'{sample}\\t{genome_fraction:.2f}\\t{alignment_quality}')
-    " > reference_evaluation.tsv
+    " > ${species}_${cluster_id}_reference_evaluation.tsv
     """
 }
