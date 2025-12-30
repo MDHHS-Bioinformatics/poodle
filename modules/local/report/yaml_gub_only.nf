@@ -1,15 +1,18 @@
 process YAML_GUB_ONLY {
   tag "${meta.species}_${meta.cluster_id}"
   label 'process_single'
+
   input:
   tuple val(meta), path(ref_eval), path(snptree), path(snpmatrix),
         path(pan_summary), path(pan_roary), path(pan_rtab), path(pan_genedists),
         path(gubtree), path(gubmatrix)
+  
   output:
   tuple val(meta), path(ref_eval), path(snptree), path(snpmatrix),
         path(pan_summary), path(pan_roary), path(pan_rtab), path(pan_genedists),
         path(gubtree), path(gubmatrix), emit: files
   path("*.yaml"), emit: yaml
+  
   script:
   def prefix = "${meta.species}_${meta.cluster_id}"
   cluster_id = task.ext.prefix ?: "${meta.cluster_id}"

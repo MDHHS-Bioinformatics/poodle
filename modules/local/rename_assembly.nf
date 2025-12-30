@@ -8,7 +8,6 @@ process RENAME_ASSEMBLY {
         'quay.io/biocontainers/python:3.8.3' }"
 
     input:
-    //tuple val(meta), path(input_files), path(gff), path(reference)
     tuple val(meta), path(reads), path(assemblies), path(gff), path(reference)
 
     output:

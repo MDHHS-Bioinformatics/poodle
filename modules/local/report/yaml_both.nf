@@ -7,6 +7,7 @@ process YAML_BOTH {
         path(pan_summary), path(pan_roary), path(pan_rtab), path(pan_genedists),
         path(gubtree), path(gubmatrix),
         path(mashtree), path(mashmatrix)
+  
   output:
   tuple val(meta), path(ref_eval), path(snptree), path(snpmatrix),
         path(pan_summary), path(pan_roary), path(pan_rtab), path(pan_genedists),

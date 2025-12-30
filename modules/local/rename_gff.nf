@@ -19,18 +19,10 @@ process RENAME_GFF {
 
     script:
     def prefix = task.ext.prefix ?: "${meta.id}"
-    //determine if we need to rename an assembly or not
-    // def assembly_input
-    // if (meta.has_assembly){
-    //     assembly_input = "--assembly ${assemblies}"
-    // } else{
-    //     assembly_input = ""
-    // }
 
     """
     rename_inputs.py \\
         --prefix $prefix \\
         --gff $gff
-
     """
 }
