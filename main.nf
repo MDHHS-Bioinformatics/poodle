@@ -25,13 +25,6 @@ WorkflowMain.initialise(workflow, params, log)
 
 include { POODLE } from './workflows/poodle.nf'
 
-//
-// WORKFLOW: Run main poodle analysis pipeline
-//
-// workflow {
-//    POODLE ()
-//}
-
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     RUN ALL WORKFLOWS
