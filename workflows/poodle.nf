@@ -31,8 +31,8 @@ if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input sample
 include { CLEAN_TREE as SNIPPY_TREE   } from '../modules/local/cleantree'
 include { CLEAN_TREE as GUBBINS_TREE  } from '../modules/local/cleantree'
 include { GENEDISTS                   } from '../modules/local/genedists'
-include { SNIPPY_CORE                 } from '../modules/nf-core/snippy/core/main'
-include { SNIPPY_RUN                  } from '../modules/nf-core/snippy/run/main'
+include { LINKAGES as LINKAGES_SNIPPY } from '../modules/local/linkages.nf'
+include { LINKAGES as LINKAGES_GUBBINS} from '../modules/local/linkages.nf'
 include { CONSTANTSITES               } from '../modules/local/constantsites/main'
 include { REFERENCE_EVALUATION        } from '../modules/local/referenceevaluation.nf'
 include { YAML_BOTH                   } from '../modules/local/report/yaml_both.nf'
@@ -59,6 +59,8 @@ include { SNIPPY_CLUSTERS             } from '../subworkflows/local/snippycluste
 // MODULE: Installed directly from nf-core/modules
 //
 include { CUSTOM_DUMPSOFTWAREVERSIONS  } from '../modules/nf-core/custom/dumpsoftwareversions/main'
+include { SNIPPY_CORE                  } from '../modules/nf-core/snippy/core/main'
+include { SNIPPY_RUN                   } from '../modules/nf-core/snippy/run/main'
 include { SNPDISTS as SNPDISTS_SNIPPY  } from '../modules/nf-core/snpdists/main'
 include { SNPDISTS as SNPDISTS_GUBBINS } from '../modules/nf-core/snpdists/main'
 include { IQTREE as IQTREE_SNIPPY      } from '../modules/nf-core/iqtree/main'
@@ -106,6 +108,14 @@ workflow POODLE {
     ch_versions = ch_versions.mix(SNPDISTS_SNIPPY.out.versions.first())
 
     //
+    // MODULE: Core SNP Linkages
+    //
+    LINKAGES_SNIPPY(
+        SNPDISTS_SNIPPY.out.aln
+    )
+    ch_versions = ch_versions.mix(LINKAGES_SNIPPY.out.versions.first())
+
+    //
     // MODULE: Output count of constant sites (suitable for IQ-TREE -fconst)
     //
     CONSTANTSITES(
@@ -151,6 +161,12 @@ workflow POODLE {
         SNPDISTS_GUBBINS(SNPSITES.out.snp_fasta)
         ch_versions = ch_versions.mix(SNPDISTS_GUBBINS.out.versions)
         
+        // MODULE: Recombination filtered SNP Linkages
+        LINKAGES_GUBBINS(
+            SNPDISTS_GUBBINS.out.aln
+        )
+        ch_versions = ch_versions.mix(LINKAGES_GUBBINS.out.versions.first())
+
         // Join SNP aln with constant sites 
         ch_aln_sites_gub = SNPSITES.out.snp_fasta
         .join(const_ch, by: 0)
