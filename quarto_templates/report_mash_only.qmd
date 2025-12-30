@@ -1,7 +1,7 @@
 ---
 title: PoODLE (Phylogenomic Overview for the Detection of Linkages for Epidemiologists)
 subtitle: |
-  WGS Report<br>Developed by the Genomic Analysis Unit<br>Michigan Department of Health & Human Services (MDHHS)
+  Whole-Genome Sequencing Report
 description: |
   <p class="description">Repository: <a href="PoODLE GitHub" style="color: blue;">https://github.com/MI-Bioinformatics/poodle</a></p>
 date: "`r format(Sys.time(), '%B %d, %Y')`"
@@ -365,7 +365,7 @@ custom_plot_function(genes_heatmap_plot)
 
 ### SNP Analysis
 
-Reference-based SNP analysis was accomplished using Snippy v4.6.0^1^ within a species-specific clusters. Phylogenetic trees were generated using IQTREE2 v2.3.4^2^ and pairwise SNP distances were calculated using snp-dists v0.8.2^3^.
+Reference-based SNP analysis was accomplished using Snippy v4.6.0^1^ within a species-specific clusters. Phylogenetic trees were generated using IQTREE2 v2.4.0^2^ and pairwise SNP distances were calculated using snp-dists v0.8.2^3^.
 
 ### Pangenome Analysis
 
