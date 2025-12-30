@@ -2,10 +2,7 @@ process CLEAN_TREE {
     tag "${meta.species}_${meta.cluster_id}"
     label 'process_single'
 
-    conda "conda-forge::r-phytools=0.7_47"
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/r-phytools:0.6_99--r40h6115d3f_1' :
-        'quay.io/biocontainers/r-phytools:0.6_44' }"
+    container "quay.io/vascok/quarto-wgs-reporting:1.0.0"
 
     input:
     tuple val(meta), path(tree)

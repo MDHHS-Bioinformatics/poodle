@@ -1,9 +1,14 @@
 process QUARTO_BOTH {
   tag "${meta.species}_${meta.cluster_id}"
   label 'process_medium'
+
   errorStrategy 'ignore'
-  container "r-quarto-phylo.sif"
-  containerOptions = '--no-home --env USERID=$UID,XDG_CACHE_HOME=tmp/quarto_cache_home,XDG_DATA_HOME=tmp/quarto_data_home,QUARTO_PRINT_STACK=true'
+
+  container "quay.io/vascok/quarto-wgs-reporting:1.0.0"
+  containerOptions = workflow.containerEngine == 'singularity'
+    ? '--no-home --env USERID=$UID,XDG_CACHE_HOME=tmp/quarto_cache_home,XDG_DATA_HOME=tmp/quarto_data_home,QUARTO_PRINT_STACK=true'
+    : '--user $(id -u):$(id -g) -e XDG_CACHE_HOME=/tmp/quarto_cache_home -e XDG_DATA_HOME=/tmp/quarto_data_home -e QUARTO_PRINT_STACK=true'
+
   stageInMode = 'copy'
   afterScript = 'rm -rf tmp'
 
@@ -18,10 +23,7 @@ process QUARTO_BOTH {
 
   output:
   tuple val(meta), path("${meta.species}_${meta.cluster_id}.html"), emit: html
-  path "versions.yml", emit: versions
-
-      when:
-      task.ext.when == null || task.ext.when
+  path "versions.yml"                                             , emit: versions
 
   script:
   def prefix = task.ext.prefix ?: "${meta.species}_${meta.cluster_id}"
