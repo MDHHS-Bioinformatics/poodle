@@ -48,7 +48,7 @@ process GUBBINS {
         $msa
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        gubbins: \$(run_gubbins.py --version 2>&1)
+        gubbins: \$(run_gubbins.py --version 2>&1 | tail -n 1)
     END_VERSIONS
     """
 
