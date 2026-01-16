@@ -29,7 +29,7 @@ The following columns are **mandatory**:
 
 ### Full samplesheet
 
-The pipeline will auto-detect whether a sample is single- or paired-end using the information provided in the samplesheet. The samplesheet can have as many columns as you desire, however, there is a strict requirement for the first 3 columns to match those defined in the table below.
+The pipeline will auto-detect whether a sample is single- or paired-end using the information provided in the samplesheet. The samplesheet can have as many columns as you desire, however, there is a strict requirement for the first 8 columns to match those defined in the table below.
 
 A final samplesheet file consisting of either single-end, paired-end or assembly data may look something like the one below. This is for 7 samples, where two species and cluster_ids are included.
 
@@ -50,7 +50,7 @@ SAMPLE_7,,,/path/to/SAMPLE7.gff,/path/to/SAMPLE7.fasta,HC1-C1,Escherichia_coli,/
 | `fastq_1` | Full path to FastQ file for Illumina QC trimmed short reads 1. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                                                  |
 | `fastq_2` | Full path to FastQ file for Illumina QC trimmed short reads 2. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                                                  |
 | `gff`     | Full path to GFF file with annotated genomes. File should have the extension ".gff" or ".gff3".                                                                                        |
-| `assembly` | Full path to assembled genome file. File can be gzipped and have the extension ".fasta", ".fa", ".fna", ".fasta.gz", ".fa.gz" or ".fna.gz"                                            |
+| `assembly` | Full path to assembled genome file. File cannot be gzipped and shold have the extension ".fasta", ".fa", ".fna"                           |
 | `cluster_id` | Custom cluster id. This entry will be identical for multiple samples from the same cluster. Spaces in cluter ids are automatically converted to underscores (`_`).                  |
 | `species`  | Custom bacterial species name. This entry will be identical for multiple samples from the same species. Spaces in sample names are automatically converted to underscores (`_`).      |
 | `reference` | Full path to assembled reference genome file. This must be identical for multiple samples from the same cluster. File can be gzipped and have the extension ".fasta", ".fa", ".fna", ".fasta.gz", ".fa.gz" or ".fna.gz"                                 |

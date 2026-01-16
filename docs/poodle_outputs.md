@@ -51,8 +51,7 @@
 │           ├── 📁 linkages
 │           │   ├── 📄 <Species>_<cluster_id>_snippy_linkages.csv
 │           │   └── 📄 <Species>_<cluster_id>_gubbins_linkages.csv
-│           ├── 📄 <Species>_<cluster_id>.html
-│           └── 📄 <Species>_<cluster_id>_reference_evaluation.tsv
+│           └──  📄 <Species>_<cluster_id>.html
 └── 📁 pipeline_info
     ├── 📄 execution_report_<date_time>.html
     ├── 📄 execution_timeline_<date_time>.html

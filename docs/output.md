@@ -103,16 +103,54 @@ These files summarize the core genome alignment and phylogenetic analysis for ea
 
 ---
 
-### Reference Evaluation
-
+### **📘 Genomic linkages**
 <details markdown="1">
 <summary>Output files</summary>
 
-- `<Species>_<cluster_id>_reference_evaluation.tsv`: Summary of reference evaluation based on Snippy-core alignment results of genome fraction in tab-delimited format.
+**File:**
+`<Species>_<cluster_id>_<snippy|gubbins>_linkages.csv`
 
+| Column                  | Description          |
+| ----------------------- | -------------------- |
+| `sample`                | Sample ID            |
+| `species`               | Species              |
+| `cluster_id`            | Cluster              |
+| `ref_genome_fraction`   | % of reference covered |
+| `ref_alignment_qc`      | PASS, WARN or FAIL   |
+| `min_dist`              | Minimum SNP distance |
+| `strong_linkages`       | 0–10 SNPs            |
+| `intermediate_linkages` | 11–40 SNPs           |
+| `lineage_level`         | 41–150 SNPs          |
+
+ Reference alignment quality flag derived from `ref_genome_fraction`:
+
+  * **PASS**: ≥ 95%
+  * **WARN**: 90–94.9%
+  * **FAIL**: < 90%
+
+Reference-genome fraction < 90% may indicate:
+- the sample does not belong to the cluster
+- the reference is too distantly related
+- multiple lineages are being grouped together
+- the linkages may be inacurate due to core genome shrinkage
+
+>[!TIP]
+>If many samples show WARN or FAIL alignment QC, consider: changing the reference or splitting the cluster into sub-clusters. Using a **reference from within the cluster** is strongly recommended to avoid core genome shrinkage.
 </details>
+Classifies isolate pairs based on **SNP distance thresholds** commonly used in outbreak investigations.
 
-This file provides a detailed evaluation of the reference used based on Snippy-core alignment results of genome fraction in tab-delimited format.
+### **📗 HTML report**
+
+**File:**
+`<Species>_<cluster_id>.html`
+
+Includes:
+* Phylogenetic trees
+* SNP and gene distance matrices
+* Pangenome results and heatmap
+* Methods
+
+---
 
 ### MultiQC
 
@@ -200,8 +238,7 @@ Below is the structure of the output directory.
 │           ├── 📁 linkages
 │           │   ├── 📄 <Species>_<cluster_id>_snippy_linkages.csv
 │           │   └── 📄 <Species>_<cluster_id>_gubbins_linkages.csv
-│           ├── 📄 <Species>_<cluster_id>.html
-│           └── 📄 <Species>_<cluster_id>_reference_evaluation.tsv
+│           └──  📄 <Species>_<cluster_id>.html
 └── 📁 pipeline_info
     ├── 📄 execution_report_<date_time>.html
     ├── 📄 execution_timeline_<date_time>.html
