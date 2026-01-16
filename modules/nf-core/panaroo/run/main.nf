@@ -41,7 +41,7 @@ process PANAROO_RUN {
 
     # Rename with species prefix
     for f in panaroo/*; do
-        base=$(basename "\$f")
+        base=\$(basename "\$f")
         mv "\$f" "panaroo/${prefix}_\${base}"
     done
 
