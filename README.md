@@ -7,9 +7,41 @@
 [![run with singularity](https://img.shields.io/badge/run%20with-singularity-1d355c.svg?labelColor=000000)](https://sylabs.io/docs/)
 
 
-**PoODLE** (Phylogenomic Overview for the Detection of Linkages for Epidemiologists)  is a **Nextflow** pipeline designed for genomic analysis of bacterial clusters. This pipeline runs Snippy, Gubbins (optional), Panaroo, and MashTree (optional); identifies SNP-based linkages and generates a report with interactive plots to facilitate interpretations.
+**PoODLE** is a **Nextflow pipeline** designed for **genomic surveillance and outbreak investigation of bacterial pathogens**.
 
-Designed for surveillance purposes as it first identifies if Snippy-run results already exist for samples from the same cluster. If they exist it checks if the same reference was used, if a different reference is used it repeats the results for all the samples in the cluster. Snippy-run is the step that uses most of the computing resources and takes long time. In surveillace, clusters keep growing so not having to repeat the analysis for all the samples everytime that a single new sample is included it saves resources and time.
+It integrates SNP-based phylogenetics and pangenome analysis to identify **genetically linked isolates**
+and produce **easy-to-interpret reports** for epidemiologists and microbiologists.
+
+PoODLE is designed for **routine surveillance**, where clusters grow incrementally and analyses need to be **re-run efficiently** as new samples arrive.
+
+✔ Supports **multiple species**
+
+✔ Processes **multiple clusters in parallel**
+
+✔ Optimized to **reuse previous results**
+
+✔ Generates an **interactive HTML report**
+
+---
+
+## 🔎 Recommended upstream step: defining clusters with CorGe+
+<img src="docs/images/corge_poodle.png" alt="CorGe PoODLE" width="200" align="right"/>
+
+Before running PoODLE, we **strongly recommend** identifying clusters (genomic context groups) using [**CorGe+**](https://github.com/MI-Bioinformatics/CorGe). PoODLE is designed for **high-resolution analysis of *pre-defined* clusters**, not for initial large-scale clustering. Running PoODLE on poorly defined or overly broad groups can:
+
+* obscure true transmission signals
+* reduce core genome size
+* increase computational cost
+* complicate epidemiological interpretation
+
+[**CorGe+**](https://github.com/MI-Bioinformatics/CorGe) is optimized for **speed, scale, and screening**, while PoODLE provides **fine-grained, high-resolution analysis**.
+
+Together, they form a **two-stage surveillance workflow**:
+
+| Step | Tool       | Purpose                                             |
+| ---- | ---------- | --------------------------------------------------- |
+| 1    | **CorGe+** | Rapid screening and cluster detection               |
+| 2    | **PoODLE** | Detailed SNP, recombination, and pangenome analysis |
 
 
 ![Pipeline Workflow](./docs/images/poodle_flowchart.png)
@@ -30,14 +62,36 @@ Designed for surveillance purposes as it first identifies if Snippy-run results 
 
 ## 🧩 Pipeline summary
 
-1. Identify reference-based SNPs with [`Snippy`](https://github.com/tseemann/snippy)-run for each sample.
-2. Make a core genome alignment with [`Snippy`](https://github.com/tseemann/snippy)-core, generate a SNP tree with [`IQ-TREE`](https://www.iqtree.org/) and calculate SNP distances with [`snp-dists`](https://github.com/tseemann/snp-dists).
-3. Mask recombinant sites with [`Gubbins`](https://github.com/nickjcroucher/gubbins) (optional), extract ACGT positions with [`snp-sites`](https://sanger-pathogens.github.io/snp-sites/), generate a SNP tree with [`IQ-TREE`](https://www.iqtree.org/) and calculate SNP distances with [`snp-dists`](https://github.com/tseemann/snp-dists).
-4. Pangenome profile (gene presence-absence) with [`Panaroo`](https://github.com/gtonkinhill/panaroo) and calculate gene presence-absence distances.
-5. Make a tree with Mash distances using [`MashTree`](https://github.com/lskatz/mashtree) (optional).
-6. Summary report in HTML format including trees, pangenome profile and distance matrices.
 
-![Pipeline Workflow](./docs/images/poodle_flowchart.png)
+1. **Reference-based SNP calling (Snippy)**
+   * Runs [`Snippy`](https://github.com/tseemann/snippy)-run per sample within each cluster
+   * Automatically detects if results already exist
+   * **Reuses previous results** when the same reference was used
+     → *This is critical for surveillance workflows where clusters grow over time*
+
+2. **Core genome alignment & SNP distances**
+   * [`Snippy`](https://github.com/tseemann/snippy)-core builds the alignment
+   * [`IQ-TREE`](https://www.iqtree.org/) builds a phylogeny
+   *  [`snp-dists`](https://github.com/tseemann/snp-dists) calculates pairwise SNP distances
+
+3. **Recombination filtering (optional)**
+   * [`Gubbins`](https://github.com/nickjcroucher/gubbins) masks recombinant regions
+   * SNP-only alignment is rebuilt with [`snp-sites`](https://sanger-pathogens.github.io/snp-sites/)
+   * Phylogenetic tree and SNP distances are generated
+
+4. **Pangenome analysis**
+   * [`Panaroo`](https://github.com/gtonkinhill/panaroo) identifies gene presence/absence
+   * Gene-based distance matrix is calculated
+
+5. **Whole-genome distance tree (optional)**
+   * [`MashTree`](https://github.com/lskatz/mashtree) generates a fast, assembly-based tree
+
+6. **Reporting**
+   * A single **interactive HTML report** per cluster
+   * Includes trees, distance matrices, and pangenome plots
+
+
+![Pipeline Workflow](./docs/images/poodle_flow.png)
 
 ---
 
@@ -50,7 +104,7 @@ Designed for surveillance purposes as it first identifies if Snippy-run results 
 
 > [!NOTE]  
 > If using **Singularity** set `NXF_SINGULARITY_CACHEDIR` (or `singularity.cacheDir`) to reuse images later. For example: 
-> ```
+> ```bash
 > export NXF_SINGULARITY_CACHEDIR="/path/to/singularity_cache"
 > ``````
 
@@ -58,37 +112,48 @@ Designed for surveillance purposes as it first identifies if Snippy-run results 
 
 ### 2. Prepare your manifest file
 
-Create a CSV file containing absolute paths to the following: QC-trimmed FASTQ files, GFFs, assemblies, and reference. Snippy supports inputs in three formats: paired-end reads, single-end reads, or assemblies
+PoODLE uses a **CSV manifest file** to define samples, clusters, and references.
 
-- **Paired-end reads**: Include paths for both `fastq_1` and `fastq_2`.
-- **Single-end reads**: Leave the `fastq_2` column blank.
-- **Assemblies only**: Leave both `fastq_1` and `fastq_2` columns blank.
+Each row represents **one isolate**.
 
-The following columns are **mandatory**:
-- `sample`: unique ID (no spaces recommended)
-- `gff`: absolute path to GFF annotations for the sample (uncompressed GFF only; .gz or .zip not supported)
-- `assembly`: absolute path to FASTA assembly for the sample (uncompressed FASTA only; .gz or .zip not supported)
-- `cluster_id`: genomic context group identification (no spaces recommended)
-- `species`: species (no spaces recommended) 
-- `reference`: absolute path to FASTA assembly for the reference (uncompressed FASTA only; .gz or .zip not supported)
+### Required columns
 
-Make sure to provide values for these columns even if certain input types do not require `fastq` paths.
+| Column       | Description                                               |
+| ------------ | --------------------------------------------------------- |
+| `sample`     | Unique sample ID (no spaces)                              |
+| `fastq_1`    | Path to read 1 (leave empty if not available)             |
+| `fastq_2`    | Path to read 2 (leave empty for single-end or assemblies) |
+| `gff`        | GFF annotation file (uncompressed)                        |
+| `assembly`   | FASTA assembly (uncompressed)                             |
+| `cluster_id` | Cluster identifier (e.g. outbreak or surveillance group)  |
+| `species`    | Species name (no spaces recommended)                      |
+| `reference`  | Reference genome FASTA for SNP calling                    |
 
-```console
+### Supported input types
+
+* **Paired-end reads** → `fastq_1` + `fastq_2`
+* **Single-end reads** → `fastq_1` only
+* **Assemblies only** → leave both FASTQ columns empty
+
+> [!IMPORTANT]
+> Even if FASTQs are missing, **all columns must be present** in the CSV.
+
+
+### Example manifest
+
+```csv
 sample,fastq_1,fastq_2,gff,assembly,cluster_id,species,reference
-SAMPLE_1,/path/to/SAMPLE1_1.trim.fastq.gz,/path/to/SAMPLE1_2.trim.fastq.gz,/path/to/SAMPLE1.gff,/path/to/SAMPLE1.fasta,HC1-C1,Escherichia_coli,/path/to/reference1.fasta
-SAMPLE_2,/path/to/SAMPLE2_1.trim.fastq.gz,/path/to/SAMPLE2_2.trim.fastq.gz,/path/to/SAMPLE2.gff,/path/to/SAMPLE2.fasta,HC1-C1,Escherichia_coli,/path/to/reference1.fasta
-SAMPLE_3,/path/to/SAMPLE3_1.trim.fastq.gz,/path/to/SAMPLE3_2.trim.fastq.gz,/path/to/SAMPLE3.gff,/path/to/SAMPLE3.fasta,outbreak_facilityA,Pseudomonas aeruginosa,/path/to/reference2.fasta
-SAMPLE_4,/path/to/SAMPLE4.trim.fastq.gz,,/path/to/SAMPLE4.gff,/path/to/SAMPLE4.fasta,outbreak_facilityA,Pseudomonas aeruginosa,/path/to/reference2.fasta
-SAMPLE_5,,,/path/to/SAMPLE5.gff,/path/to/SAMPLE5.fasta,outbreak_facilityA,Pseudomonas aeruginosa,/path/to/reference2.fasta
-SAMPLE_6,,,/path/to/SAMPLE6.gff,/path/to/SAMPLE6.fasta,outbreak_facilityA,Pseudomonas aeruginosa,/path/to/reference2.fasta
-SAMPLE_7,,,/path/to/SAMPLE7.gff,/path/to/SAMPLE7.fasta,HC1-C1,Escherichia_coli,/path/to/reference1.fasta
+SAMPLE_1,/path/S1_R1.fastq.gz,/path/S1_R2.fastq.gz,/path/S1.gff,/path/S1.fasta,HC1-C1,Escherichia_coli,/path/ref1.fasta
+SAMPLE_2,/path/S2_R1.fastq.gz,/path/S2_R2.fastq.gz,/path/S2.gff,/path/S2.fasta,HC1-C1,Escherichia_coli,/path/ref1.fasta
+SAMPLE_3,/path/S3.fastq.gz,,/path/S3.gff,/path/S3.fasta,outbreak_A,Pseudomonas_aeruginosa,/path/ref2.fasta
+SAMPLE_4,,,/path/S4.gff,/path/S4.fasta,outbreak_A,Pseudomonas_aeruginosa,/path/ref2.fasta
 ```
 
-More details in [Usage](docs/usage.md)
+More details in [`docs/usage.md`](docs/usage.md)
 
-> [!NOTE]
-> While Snippy supports assemblies as input for SNP analysis, these results can be inflated/inaccurate. Always prefer using quality-trimmed reads when possible.
+> [!WARNING]
+> SNPs generated from assemblies may be **inflated or less accurate**.
+> **Quality-trimmed reads are strongly recommended** whenever possible.
 
 ### 4. Run your analyses
 
@@ -96,17 +161,32 @@ More details in [Usage](docs/usage.md)
 
 ```bash
 nextflow run MI-Bioinformatics/poodle \
+  -profile singularity \
   --input manifest.csv \
-  --outdir corge \
+  --outdir poodle 
+```
+
+### Advanced
+Requesting recombination filtering with Gubbins, MashTree, and custom configuration
+
+```bash
+nextflow run MI-Bioinformatics/poodle \
+  -profile singularity \
+  --input manifest.csv \
+  --outdir poodle_results \
   --gubbins \
   --mashtree \
-  -profile singularity
-```
+  --max_memory 50.GB \
+  --max_cpus 16 \
+  --max_time 8.h
+  ```
+
 >[!NOTE]
->This command clones (download) the repo to ~/.nextflow/assets/MI-Bioinformatics/poodle. You can download the pipeline in a different location using `git clone https://github.com/MI-Bioinformatics/poodle.git`. To run the pipeline, specify the path to the cloned repository (e.g. `nextflow run /path/to/poodle ...`). More details in [Usage](docs/usage.md)
+>This command downloads this pipeline to ~/.nextflow/assets/MI-Bioinformatics/poodle. You can download the pipeline in a different location using `git clone https://github.com/MI-Bioinformatics/poodle.git`. To run the pipeline, specify the path to the cloned repository (e.g. `nextflow run /path/to/poodle ...`). More details in [Usage](docs/usage.md)
+
 
 > [!TIP]
-> After the run has been successfully finished, you can safely remove the `work` directory located at `<outdir>/work`.
+> After a successful run, the `work/` directory inside the output folder can be safely deleted.
 
 ## Parameters
 
@@ -114,15 +194,14 @@ nextflow run MI-Bioinformatics/poodle \
 
 | Parameter          | Required | Default        | Description                                                                                                |
 | ------------------ | :------: | -------------- | ---------------------------------------------------------------------------------------------------------- |
-| `--input`          |     ✓    | –              | Manifest CSV (`sample,fastq_1,fastq_2,gff,assembly,cluster_id,species,reference`).                                                                  |
-| `--outdir`         |     ✓    | `$PWD/poodle`   | Output directory root.|
+| `--input`          |     ✓    | –              | Manifest CSV.                                                                  |
+| `--outdir`         |     ✓    | `./poodle`   | Output directory root.|
 | `--gubbins` |     –    | `false`              | Filter out recombinant sites with Gubbins |
 | `--mashtree` |     –    | `false`              | Analyze genomic distances and generate a Mashtree |
-| `--logo_report`           |     ✓    | `assets/DNA_logo.png`      | Logo in PNG format to include in the report header     |
+| `--logo_report`           |     –    | `assets/DNA_logo.png`      | Logo in PNG format to include in the report header     |
 | `--previous_results`     |     –    | –              | Path to previous results. By default, the pipeline looks for prior Snippy results for the same cluster in the outdir.                |
 | `--save_snippy_run`     |     –    | `true`              | Do not publish Snippy run results. By default, the pipeline saves the Snippy-run results per sample  |
 | `--email`     |     –    | –              | Email address for completion summary  |
-| `--multiqc_title`     |     –    | `true`              | MultiQC report title. Printed as a page header and used for the filename if not otherwise specified  |
 
 
 ### ⚙️ **Execution Configuration**
@@ -140,16 +219,22 @@ More NextFlow configuration options [`here`](https://www.nextflow.io/docs/latest
 
 ## 📊 Output overview
 
-Results are structured by **species** inside `<outdir>/<Species>/`.
-Each folder includes:
+Results are organized by **species** and **cluster**:
 
-* **Snippy** results
-* **Linkages** files
-* **Panaroo** files
-* **Gubbins** distance and cluster files
-* **MashTree** files
+```text
+📁 <outdir>/
+└── 📁 <Species>/
+    └── 📁 <cluster_id>/
+        ├── 📁 snippy_core/
+        ├── 📁 snippy_run/
+        ├── 📁 panaroo/
+        ├── 📁 gubbins/
+        ├── 📁 mashtree/
+        ├── 📁 linkages/
+        └── 📄<Species>_<cluster_id>.html
+```
 
-Details about outputs can be found in [`output.md`](docs/output.md) and the outputs tree in [`poodle_outputs.md`](docs/poodle_outputs.md).
+Details about outputs can be found in [`output.md`](docs/output.md) and the full output tree in [`poodle_outputs.md`](docs/poodle_outputs.md).
 
 ---
 
@@ -159,52 +244,66 @@ PoODLE generates several output files to support surveillance and linkage interp
 
 ### **📘 Genomic linkages**
 
-File: `<Species>_<cluster_id>_<snippy/gubbins>_linkages.csv`
+**File:**
+`<Species>_<cluster_id>_<snippy|gubbins>_linkages.csv`
 
-Identifies **strong** or **intermediate** linkages between samples based on **SNP distances**.
+Classifies isolate pairs based on **SNP distance thresholds** commonly used in outbreak investigations.
 
-**Columns:**
+| Column                  | Description          |
+| ----------------------- | -------------------- |
+| `sample`                | Sample ID            |
+| `species`               | Species              |
+| `cluster_id`            | Cluster              |
+| `ref_genome_fraction`   | % of reference covered |
+| `ref_alignment_qc`      | PASS, WARN or FAIL   |
+| `min_dist`              | Minimum SNP distance |
+| `strong_linkages`       | 0–10 SNPs            |
+| `intermediate_linkages` | 11–40 SNPs           |
+| `lineage_level`         | 41–150 SNPs          |
 
-* `sample`
-* `species`
-* `cluster_id`
-* `min_dist`  — Minimum SNP distance
-* `strong_linkages` — highly similar isolates (0-10)
-* `intermediate_linkage` — moderately similar isolates (11-40)
+ Reference alignment quality flag derived from `ref_genome_fraction`:
 
----
+  * **PASS**: ≥ 95%
+  * **WARN**: 90–94.9%
+  * **FAIL**: < 90%
 
-### **📗 Reference evaluation**
+Reference-genome fraction < 90% may indicate:
+- the sample does not belong to the cluster
+- the reference is too distantly related
+- multiple lineages are being grouped together
+- the linkages may be inacurate due to core genome shrinkage
 
-File: `<Species>_<cluster_id>_reference_evaluation.tsv`
-
-Aids to verify the reference selection for the samples in the cluster. A bad reference can result in core-genome shrinkage and obscure the genomic relationships. If a sample in the cluster differs too much from the reference it may show Fair or Poor alignment quality, in this case you can decide to either exclude the sample from the cluster or use a different reference; in other cases if most of the samples have low genome fraction, it'll be recommended to use a different reference.
-
-  **Columns:**
-
-  * `sample`
-  * `genome_fraction`  — Percentage of the reference genome length aligned
-  * `alignment_quality` — Excellent (>=98), Very Good (>= 95), Good (>= 85), Fair (>= 75), Poor (<75)
-
-> [!TIP]
-> Using an internal reference (one of the samples from the cluster) is a good practice and helps to avoid core-genome shrinkage.
+>[!TIP]
+>If many samples show WARN or FAIL alignment QC, consider: changing the reference or splitting the cluster into sub-clusters. Using a **reference from within the cluster** is strongly recommended to avoid core genome shrinkage.
 
 ### **📗 HTML report**
 
-File: `<Species>_<cluster_id>.html`
-This file provides a full overview of the results including interactive trees with phylocanvas, heatmap with pangenome profile, distance matrices (core SNPs, recombination-filtered SNPs, gene). These figures are interactive and allow easier interpretation of genomic relationships within the cluster.
+**File:**
+`<Species>_<cluster_id>.html`
+
+Includes:
+* Phylogenetic trees
+* SNP and gene distance matrices
+* Pangenome results and heatmap
+* Methods
 
 ---
 
-## 🧭 Best practices & caveats
+## 🧠 Best practices & caveats
 
 * **Use high-quality sequences:** Ideally, assemblies should have **<500 contigs ≥500 bp**, reads **≥30× Illumina coverage**, and **no contamination**. Pipelines like PHoeNIX, Bactopia and TheiaProk provide quality checks.
 
 * **Disk cleanup:** After the pipeline completes, you may safely remove the Nextflow `work/` directory to reclaim space.
 
+* Prefer **reads over assemblies** for SNP analysis
+* Use **internal references** whenever possible
+* Run with `--gubbins` for highly recombinant species
+* Interpret SNP thresholds **in epidemiological context**, not in isolation
+* A genomic cluster should contain > 4 closely related samples. We strongly recommend using PoODLE after [`CorGe+`](https://github.com/MI-Bioinformatics/CorGe), since CorGe+ identifies genomic context groups at different thresholds.
+
 ---
 
-## 💬 Citations
+## 📚 Citations
 
 If you use PoODLE, please cite:
 
