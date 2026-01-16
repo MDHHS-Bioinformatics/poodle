@@ -13,7 +13,7 @@ process QUARTO_BOTH {
   afterScript = 'rm -rf tmp'
 
   input:
-  tuple val(meta), path(ref_eval), path(snptree), path(snpmatrix),
+  tuple val(meta), path(linkages), path(snptree), path(snpmatrix),
         path(pan_summary), path(pan_roary), path(pan_rtab), path(pan_genedists),
         path(gubtree), path(gubmatrix),
         path(mashtree), path(mashmatrix)
@@ -30,7 +30,7 @@ process QUARTO_BOTH {
   cluster_id = task.ext.prefix ?: "${meta.cluster_id}"
   species = task.ext.prefix ?: "${meta.species}"
   """
-  cp -n ${ref_eval} ${snptree} ${snpmatrix} ${pan_summary} ${pan_roary} ${pan_rtab} ${pan_genedists} \\
+  cp -n ${linkages} ${snptree} ${snpmatrix} ${pan_summary} ${pan_roary} ${pan_rtab} ${pan_genedists} \\
         ${gubtree} ${gubmatrix} ${mashtree} ${mashmatrix} ${logo} .
   quarto render $qmd --execute-params $yaml --output "${prefix}.html"
 

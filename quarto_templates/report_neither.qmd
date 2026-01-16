@@ -16,7 +16,7 @@ format:
 params:
   species: "Acinetobacter_baumannii"
   cluster_id: "HC48-C9"
-  ref_eval: "poodle/Acinetobacter_baumannii/HC48-C9/reference_evaluation.tsv"
+  linkages: "poodle/Acinetobacter_baumannii/HC48-C9/linkages/Acinetobacter_baumannii_HC48-C9_snippy_linkages.csv"
   snptree: "poodle/Acinetobacter_baumannii/HC48-C9/snippy_core/Acinetobacter_baumannii_HC48-C9.tre"
   snpmatrix: "poodle/Acinetobacter_baumannii/HC48-C9/snippy_core/Acinetobacter_baumannii_HC48-C9_dist.tsv"
   pan_summary: "poodle/Acinetobacter_baumannii/HC48-C9/panaroo/summary_statistics.txt"
@@ -28,7 +28,7 @@ params:
 ```{r parse-arguments, include=FALSE}
 cluster_id <- params$cluster_id
 species <- params$species
-ref_eval <- params$ref_eval
+linkages <- params$linkages
 snptree <- params$snptree
 snpmatrix <- params$snpmatrix
 pan_summary <- params$pan_summary
@@ -88,7 +88,7 @@ options(bitmapType = 'cairo')
 ```
 
 ```{r import_files, include=FALSE}
-samples <- fread(ref_eval) %>% rename(sample_id = sample) %>% filter(sample_id != "Reference")
+samples <- fread(linkages) %>% rename(sample_id = sample)
 
 #----- CORE SNP TREE WRANGLING ------# 
 

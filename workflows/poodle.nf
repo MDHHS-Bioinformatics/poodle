@@ -34,7 +34,6 @@ include { GENEDISTS                   } from '../modules/local/genedists'
 include { LINKAGES as LINKAGES_SNIPPY } from '../modules/local/linkages.nf'
 include { LINKAGES as LINKAGES_GUBBINS} from '../modules/local/linkages.nf'
 include { CONSTANTSITES               } from '../modules/local/constantsites/main'
-include { REFERENCE_EVALUATION        } from '../modules/local/referenceevaluation.nf'
 include { YAML_BOTH                   } from '../modules/local/report/yaml_both.nf'
 include { YAML_GUB_ONLY               } from '../modules/local/report/yaml_gub_only.nf'
 include { YAML_MASH_ONLY              } from '../modules/local/report/yaml_mash_only.nf'
@@ -110,8 +109,11 @@ workflow POODLE {
     //
     // MODULE: Core SNP Linkages
     //
+    ch_snp_report_dists = SNPDISTS_SNIPPY.out.tsv
+    .join(SNIPPY_CLUSTERS.out.snippy_txt)
+
     LINKAGES_SNIPPY(
-        SNPDISTS_SNIPPY.out.aln
+        ch_snp_report_dists
     )
     ch_versions = ch_versions.mix(LINKAGES_SNIPPY.out.versions.first())
 
@@ -162,8 +164,11 @@ workflow POODLE {
         ch_versions = ch_versions.mix(SNPDISTS_GUBBINS.out.versions)
         
         // MODULE: Recombination filtered SNP Linkages
+        ch_gub_report_dists = SNPDISTS_GUBBINS.out.tsv
+        .join(SNIPPY_CLUSTERS.out.snippy_txt)
+
         LINKAGES_GUBBINS(
-            SNPDISTS_GUBBINS.out.aln
+            ch_gub_report_dists
         )
         ch_versions = ch_versions.mix(LINKAGES_GUBBINS.out.versions.first())
 
@@ -183,7 +188,7 @@ workflow POODLE {
     //
     // MODULE: Gene-presence abscence with Panaroo
     //
-    //Collect GFF files by species and cluster
+    // Collect GFF files by species and cluster
     INPUT_CHECK.out.final_input_files
     .map{meta, reads, assembly, gff, reference -> tuple([[species:meta.species,cluster_id:meta.cluster_id],gff])}
     .groupTuple(by:[0])
@@ -232,8 +237,8 @@ workflow POODLE {
 
     // BOTH
     if (params.gubbins && params.mashtree) {
-        ch_clusters_both = SNIPPY_CLUSTERS.out.ref_evaluation
-        .join(SNIPPY_TREE.out.tre,          by: 0)
+        ch_clusters_both = LINKAGES_SNIPPY.out.linkages
+        .join(SNIPPY_TREE.out.tre,         by: 0)
         .join(SNPDISTS_SNIPPY.out.tsv,     by: 0)
         .join(PANAROO_RUN.out.summary,     by: 0)
         .join(PANAROO_RUN.out.csv,         by: 0)
@@ -257,7 +262,7 @@ workflow POODLE {
 
     // GUBBINS ONLY
     if (params.gubbins && !params.mashtree) {
-        ch_clusters_gub = SNIPPY_CLUSTERS.out.ref_evaluation
+        ch_clusters_gub = LINKAGES_SNIPPY.out.linkages
         .join(SNIPPY_TREE.out.tre,          by: 0)
         .join(SNPDISTS_SNIPPY.out.tsv,     by: 0)
         .join(PANAROO_RUN.out.summary,     by: 0)
@@ -279,7 +284,7 @@ workflow POODLE {
 
     // MASH ONLY
     if (!params.gubbins && params.mashtree) {
-        ch_clusters_mash = SNIPPY_CLUSTERS.out.ref_evaluation
+        ch_clusters_mash = LINKAGES_SNIPPY.out.linkages
         .join(SNIPPY_TREE.out.tre,          by: 0)
         .join(SNPDISTS_SNIPPY.out.tsv,     by: 0)
         .join(PANAROO_RUN.out.summary,     by: 0)
@@ -303,7 +308,7 @@ workflow POODLE {
 
     // NEITHER
     if (!params.gubbins && !params.gubbins) {
-        ch_clusters_core = SNIPPY_CLUSTERS.out.ref_evaluation
+        ch_clusters_core = LINKAGES_SNIPPY.out.linkages
         .join(SNIPPY_TREE.out.tre,          by: 0)
         .join(SNPDISTS_SNIPPY.out.tsv,     by: 0)
         .join(PANAROO_RUN.out.summary,     by: 0)

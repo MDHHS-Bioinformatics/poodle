@@ -1,15 +1,18 @@
 process LINKAGES {
     tag "${meta.species}_${meta.cluster_id}"
     label 'process_single'
-
-    container "quay.io/vascok/quarto-wgs-reporting:1.0.0"
+    
+    conda "conda-forge::pandas=2.2.3"
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        'https://depot.galaxyproject.org/singularity/pandas:2.2.1' :
+        'quay.io/biocontainers/pandas:2.2.1' }"
 
     input:
-    tuple val(meta), path(core_dists), path(core_dists)
+    tuple val(meta), path(snp_dists), path(snp_report)
 
     output:
-    tuple val(meta), path('*.csv')       , emit: tre
-    path "versions.yml"                  , emit: versions
+    tuple val(meta), path("*.csv"), emit: linkages
+    path "versions.yml"           , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -19,17 +22,18 @@ process LINKAGES {
     prefix = task.ext.prefix ?: "${meta.species}_${meta.cluster_id}"
     cluster_id = task.ext.prefix ?: "${meta.cluster_id}"
     species = task.ext.prefix ?: "${meta.species}"
-
     """
-    linkages.R \
+    bacteria_linkage_snps.py \
         --species $species \
-        --cluster_id $cluster_id \
-        --dist $dist \
+        --cluster-id $cluster_id \
+        --snp-dists $snp_dists \
+        --snp-report $snp_report \
         --output ${prefix}${args_extension}.csv
-    
+
+
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        R: \$(R --version | sed -n 's/^R version \\([0-9.]*\\).*/\\1/p')
+        python: \$(python --version | sed 's/Python //g')
     END_VERSIONS
     """
 }
