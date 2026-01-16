@@ -22,12 +22,12 @@ process GENEDISTS {
 
     """
     # Calculate gene presence-absence Hamming distances
-    gene_dists.R ${rtab} gene_presence_absence_dist.tsv
+    gene_dists.R ${rtab} ${prefix}_gene_presence_absence_dist.tsv
 
     # Capture the R version for versions.yml
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        R: \$(R --version | head -n 1 | sed 's/R version //')
+        R: \$(R --version | sed -n 's/^R version \\([0-9.]*\\).*/\\1/p')
     END_VERSIONS
     """
 }
