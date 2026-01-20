@@ -96,7 +96,7 @@ workflow POODLE {
     SNIPPY_CLUSTERS(
         INPUT_CHECK.out.final_input_files
     )
-    //ch_versions = SNIPPY_CLUSTERS.out.versions
+    ch_versions = SNIPPY_CLUSTERS.out.versions
 
     //
     // MODULE: Core SNP Distances
