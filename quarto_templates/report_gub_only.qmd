@@ -370,7 +370,7 @@ The gene presence-absence profile was identified using the pangenome tool Panaro
 
 ### Recombination Analysis
 
-The identification and masking of loci containing elevated densities of base substitutions, which are marked as recombinations, was done with Gubbins v3.3.5^5^. Recombination-filtered SNPs were extracted with SNP-Sites v2.5.1^6^ followed by SNP-based phylogeny using IQTREE2 v2.4.0^2^.
+The identification and masking of loci containing elevated densities of base substitutions, which are marked as recombinations, was done with Gubbins v3.4.3^5^. Recombination-filtered SNPs were extracted with SNP-Sites v2.5.1^6^ followed by SNP-based phylogeny using IQTREE2 v2.4.0^2^.
 
 ## References
 

@@ -373,7 +373,7 @@ The gene presence-absence profile was identified using the pangenome tool Panaro
 
 ### Mash Analysis
 
-The determination of MinHash distances and Mash tree generation were done with MashTree v1.2.0^5^.
+The determination of MinHash distances and Mash tree generation were done with MashTree v1.4.6^5^.
 
 ## References
 
