@@ -288,8 +288,6 @@ Includes:
 * Pangenome results and heatmap
 * Methods
 
-![Demo](./assets/poodle_report_demo.gif)
-
 ---
 
 ## 🧠 Best practices & caveats
