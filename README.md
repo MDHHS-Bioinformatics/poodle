@@ -64,13 +64,13 @@ Together, they form a **two-stage surveillance workflow**:
 
 
 1. **Reference-based SNP calling (Snippy)**
-   * Runs [`Snippy`](https://github.com/tseemann/snippy)-run per sample within each cluster
+   * Runs [`Snippy`](https://github.com/tseemann/snippy) per sample within each cluster
    * Automatically detects if results already exist
    * **Reuses previous results** when the same reference was used
      → *This is critical for surveillance workflows where clusters grow over time*
 
 2. **Core genome alignment & SNP distances**
-   * [`Snippy`](https://github.com/tseemann/snippy)-core builds the alignment
+   * [`Snippy`](https://github.com/tseemann/snippy) builds the core genome alignment
    * [`IQ-TREE`](https://www.iqtree.org/) builds a phylogeny
    *  [`snp-dists`](https://github.com/tseemann/snp-dists) calculates pairwise SNP distances
 
@@ -89,6 +89,7 @@ Together, they form a **two-stage surveillance workflow**:
 6. **Reporting**
    * A single **interactive HTML report** per cluster
    * Includes trees, distance matrices, and pangenome plots
+   * Linkage tables per cluster with SNP alignment quality check, strong, intermediate and lineage level linkages.
 
 
 ![Pipeline Workflow](./docs/images/poodle_flow.png)
@@ -155,7 +156,7 @@ More details in [`docs/usage.md`](docs/usage.md)
 > SNPs generated from assemblies may be **inflated or less accurate**.
 > **Quality-trimmed reads are strongly recommended** whenever possible.
 
-### 4. Run your analyses
+### 3. Run your analyses
 
 ### Basic run
 
@@ -195,7 +196,7 @@ nextflow run MI-Bioinformatics/poodle \
 | Parameter          | Required | Default        | Description                                                                                                |
 | ------------------ | :------: | -------------- | ---------------------------------------------------------------------------------------------------------- |
 | `--input`          |     ✓    | –              | Manifest CSV.                                                                  |
-| `--outdir`         |     ✓    | `./poodle`   | Output directory root.|
+| `--outdir`         |     ✓    | `./poodle_results`   | Output directory root.|
 | `--gubbins` |     –    | `false`              | Filter out recombinant sites with Gubbins |
 | `--mashtree` |     –    | `false`              | Analyze genomic distances and generate a Mashtree |
 | `--logo_report`           |     –    | `assets/DNA_logo.png`      | Logo in PNG format to include in the report header     |
@@ -286,6 +287,8 @@ Includes:
 * SNP and gene distance matrices
 * Pangenome results and heatmap
 * Methods
+
+![Demo](./assets/poodle_report_demo.gif)
 
 ---
 
