@@ -138,6 +138,7 @@ Each row represents **one isolate**.
 
 > [!IMPORTANT]
 > Even if FASTQs are missing, **all columns must be present** in the CSV.
+> Use QC-trimmed FASTQs files not raw reads.
 
 
 ### Example manifest
@@ -272,7 +273,7 @@ Reference-genome fraction < 90% may indicate:
 - the sample does not belong to the cluster
 - the reference is too distantly related
 - multiple lineages are being grouped together
-- the linkages may be inacurate due to core genome shrinkage
+- the linkages may be inaccurate due to core genome shrinkage
 
 >[!TIP]
 >If many samples show WARN or FAIL alignment QC, consider: changing the reference or splitting the cluster into sub-clusters. Using a **reference from within the cluster** is strongly recommended to avoid core genome shrinkage.
