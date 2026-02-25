@@ -3,7 +3,7 @@ title: PoODLE (Phylogenomic Overview for the Detection of Linkages for Epidemiol
 subtitle: |
   Whole-Genome Sequencing Report
 description: |
-  <p class="description">Repository: <a href="PoODLE GitHub" style="color: blue;">https://github.com/MI-Bioinformatics/poodle</a></p>
+  <p class="description">Repository: <a href="PoODLE GitHub" style="color: blue;">https://github.com/MDHHS-Bioinformatics/poodle</a></p>
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 format: 
   html:

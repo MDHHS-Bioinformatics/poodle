@@ -1,5 +1,5 @@
 //
-// This file holds several functions specific to the workflow/poodle.nf in the MI-Bioinformatics/poodle pipeline
+// This file holds several functions specific to the workflow/poodle.nf in the MDHHS-Bioinformatics/poodle pipeline
 //
 
 import groovy.text.SimpleTemplateEngine

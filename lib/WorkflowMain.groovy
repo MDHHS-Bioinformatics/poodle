@@ -1,5 +1,5 @@
 //
-// This file holds several functions specific to the main.nf workflow in the MI-Bioinformatics/poodle pipeline
+// This file holds several functions specific to the main.nf workflow in the MDHHS-Bioinformatics/poodle pipeline
 //
 
 class WorkflowMain {
@@ -8,21 +8,21 @@ class WorkflowMain {
     // Citation string for pipeline
     //
     public static String citation(workflow) {
-        return "If you use MI-Bioinformatics/poodle for your analysis please cite:\n\n" +
+        return "If you use MDHHS-Bioinformatics/poodle for your analysis please cite:\n\n" +
             // TODO nf-core: Add Zenodo DOI for pipeline after first release
             //"* The pipeline\n" +
             //"  https://doi.org/10.5281/zenodo.XXXXXXX\n\n" +
             "* The nf-core framework\n" +
             "  https://doi.org/10.1038/s41587-020-0439-x\n\n" +
             "* Software dependencies\n" +
-            "  https://github.com/MI-Bioinformatics/poodle/blob/master/CITATIONS.md"
+            "  https://github.com/MDHHS-Bioinformatics/poodle/blob/master/CITATIONS.md"
     }
 
     //
     // Generate help string
     //
     public static String help(workflow, params, log) {
-        def command = "nextflow run MI-Bioinformatics/poodle --input manifest.csv --output ./results -profile docker"
+        def command = "nextflow run MDHHS-Bioinformatics/poodle --input manifest.csv --output ./results -profile docker"
         def help_string = ''
         help_string += NfcoreTemplate.logo(workflow, params.monochrome_logs)
         help_string += NfcoreSchema.paramsHelp(workflow, params, command)

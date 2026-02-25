@@ -1,6 +1,6 @@
 {
-    "name": "MI-Bioinformatics/poodle",
-    "homePage": "https://github.com/MI-Bioinformatics/poodle",
+    "name": "MDHHS-Bioinformatics/poodle",
+    "homePage": "https://github.com/MDHHS-Bioinformatics/poodle",
     "repos": {
         "https://github.com/nf-core/modules.git": {
             "modules": {

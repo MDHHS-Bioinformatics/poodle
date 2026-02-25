@@ -1,4 +1,4 @@
-# ![MI-Bioinformatics/PoODLE](docs/images/poodle_logo_light.png#gh-light-mode-only) ![nf-core/poodle](docs/images/poodle_logo_light.png#gh-dark-mode-only)
+# ![MDHHS-Bioinformatics/PoODLE](docs/images/poodle_logo_light.png#gh-light-mode-only) ![nf-core/poodle](docs/images/poodle_logo_light.png#gh-dark-mode-only)
 
 # PoODLE
 
@@ -22,14 +22,14 @@ PoODLE is designed for **routine surveillance**, where clusters grow incremental
 ## 🔎 Recommended upstream step: defining clusters with CorGe+
 <img src="docs/images/corge_poodle.png" alt="CorGe PoODLE" width="200" align="right"/>
 
-Before running PoODLE, we **strongly recommend** identifying clusters (genomic context groups) using [**CorGe+**](https://github.com/MI-Bioinformatics/CorGe). PoODLE is designed for **high-resolution analysis of *pre-defined* clusters**, not for initial large-scale clustering. Running PoODLE on poorly defined or overly broad groups can:
+Before running PoODLE, we **strongly recommend** identifying clusters (genomic context groups) using [**CorGe+**](https://github.com/MDHHS-Bioinformatics/corge). PoODLE is designed for **high-resolution analysis of *pre-defined* clusters**, not for initial large-scale clustering. Running PoODLE on poorly defined or overly broad groups can:
 
 * obscure true transmission signals
 * reduce core genome size
 * increase computational cost
 * complicate epidemiological interpretation
 
-[**CorGe+**](https://github.com/MI-Bioinformatics/CorGe) is optimized for **speed, scale, and screening**, while PoODLE provides **fine-grained, high-resolution analysis**.
+[**CorGe+**](https://github.com/MDHHS-Bioinformatics/corge) is optimized for **speed, scale, and screening**, while PoODLE provides **fine-grained, high-resolution analysis**.
 
 Together, they form a **two-stage surveillance workflow**:
 
@@ -158,7 +158,7 @@ More details in [`docs/usage.md`](docs/usage.md)
 By default only Snippy and Panaroo are run
 
 ```bash
-nextflow run MI-Bioinformatics/poodle \
+nextflow run MDHHS-Bioinformatics/poodle \
   -profile singularity \
   --input manifest.csv \
   --outdir poodle_results 
@@ -168,7 +168,7 @@ nextflow run MI-Bioinformatics/poodle \
 Requesting recombination filtering with Gubbins, MashTree, and custom configuration
 
 ```bash
-nextflow run MI-Bioinformatics/poodle \
+nextflow run MDHHS-Bioinformatics/poodle \
   -profile singularity \
   --input manifest.csv \
   --outdir poodle_results \
@@ -180,7 +180,7 @@ nextflow run MI-Bioinformatics/poodle \
   ```
 
 >[!NOTE]
->This command downloads this pipeline to ~/.nextflow/assets/MI-Bioinformatics/poodle. You can download the pipeline in a different location using `git clone https://github.com/MI-Bioinformatics/poodle.git`. To run the pipeline, specify the path to the cloned repository (e.g. `nextflow run /path/to/poodle ...`). More details in [Usage](docs/usage.md)
+>This command downloads this pipeline to ~/.nextflow/assets/MDHHS-Bioinformatics/poodle. You can download the pipeline in a different location using `git clone https://github.com/MDHHS-Bioinformatics/poodle.git`. To run the pipeline, specify the path to the cloned repository (e.g. `nextflow run /path/to/poodle ...`). More details in [Usage](docs/usage.md)
 
 
 > [!TIP]
@@ -302,7 +302,7 @@ Includes:
 * Use **internal references** whenever possible
 * Run with `--gubbins` for highly recombinant species
 * Interpret SNP thresholds **in epidemiological context**, not in isolation
-* A genomic cluster should contain > 4 closely related samples. We strongly recommend using PoODLE after [`CorGe+`](https://github.com/MI-Bioinformatics/CorGe), since CorGe+ identifies genomic context groups at different thresholds.
+* A genomic cluster should contain > 4 closely related samples. We strongly recommend using PoODLE after [`CorGe+`](https://github.com/MDHHS-Bioinformatics/corge), since CorGe+ identifies genomic context groups at different thresholds.
 
 ---
 

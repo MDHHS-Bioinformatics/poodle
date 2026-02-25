@@ -17,7 +17,7 @@ process SAMPLESHEET_CHECK {
     when:
     task.ext.when == null || task.ext.when
 
-    script: // This script is bundled with the pipeline, in MI-Bioinformatics/poodle/bin/
+    script: // This script is bundled with the pipeline, in MDHHS-Bioinformatics/poodle/bin/
     """
     check_samplesheet_clusters.py \\
         $samplesheet \\

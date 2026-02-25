@@ -1,4 +1,4 @@
-# MI-Bioinformatics/poodle: Output
+# MDHHS-Bioinformatics/poodle: Output
 
 ## Introduction
 

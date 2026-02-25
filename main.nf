@@ -3,7 +3,7 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     poodle
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Github : https://github.com/MI-Bioinformatics/poodle
+    Github : https://github.com/MDHHS-Bioinformatics/poodle
 ----------------------------------------------------------------------------------------
 */
 
@@ -33,7 +33,7 @@ include { POODLE } from './workflows/poodle.nf'
 
 //
 // WORKFLOW: Execute a single named workflow for the pipeline
-// See: https://github.com/MI-Bioinformatics/poodle
+// See: https://github.com/MDHHS-Bioinformatics/poodle
 //
 workflow {
     POODLE ()
