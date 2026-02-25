@@ -5,22 +5,17 @@
 [![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A522.10.1-23aa62.svg)](https://www.nextflow.io/)
 [![run with docker](https://img.shields.io/badge/run%20with-docker-0db7ed?labelColor=000000&logo=docker)](https://www.docker.com/)
 [![run with singularity](https://img.shields.io/badge/run%20with-singularity-1d355c.svg?labelColor=000000)](https://sylabs.io/docs/)
+[![run with apptainer](https://img.shields.io/badge/run%20with-apptainer-1d355c.svg?labelColor=000000)](https://apptainer.org/docs/user/latest/)
 
 
-**PoODLE** is a **Nextflow pipeline** designed for **genomic surveillance and outbreak investigation of bacterial pathogens**.
+**PoODLE** (Phylogenomic Overview for Detection of Linkages for Epidemiologists) is a Nextflow pipeline designed for genomic surveillance and outbreak investigation of bacterial pathogens, that integrates SNP-based phylogenetics and pangenome analysis to identify **genetically linked isolates** and produce **easy-to-interpret reports** for epidemiologists and microbiologists.
 
-It integrates SNP-based phylogenetics and pangenome analysis to identify **genetically linked isolates**
-and produce **easy-to-interpret reports** for epidemiologists and microbiologists.
+PoODLE is designed for **routine surveillance**, where clusters grow incrementally as new samples arrive.
 
-PoODLE is designed for **routine surveillance**, where clusters grow incrementally and analyses need to be **re-run efficiently** as new samples arrive.
-
-✔ Supports **multiple species**
-
-✔ Processes **multiple clusters in parallel**
-
-✔ Optimized to **reuse previous results**
-
-✔ Generates an **interactive HTML report**
+- Supports **multiple species**
+- Processes **multiple clusters in parallel**
+- Optimized to **reuse previous results**
+- Generates an **interactive HTML report**
 
 ---
 
@@ -41,7 +36,7 @@ Together, they form a **two-stage surveillance workflow**:
 | Step | Tool       | Purpose                                             |
 | ---- | ---------- | --------------------------------------------------- |
 | 1    | **CorGe+** | Rapid screening and cluster detection               |
-| 2    | **PoODLE** | Detailed SNP, recombination, and pangenome analysis |
+| 2    | **PoODLE** | Detailed SNP, recombination filtering, and pangenome analysis |
 
 
 ![Pipeline Workflow](./docs/images/poodle_flowchart.png)
@@ -101,10 +96,10 @@ Together, they form a **two-stage surveillance workflow**:
 ### 1. Install prerequisites
 
 1. Install [`Nextflow`](https://www.nextflow.io/docs/latest/getstarted.html#installation) (`>=22.10.1`)
-2. Install [`Docker`](https://docs.docker.com/engine/installation/) or [`Singularity`](https://www.sylabs.io/guides/3.0/user-guide/) for full pipeline reproducibility.
+2. Install [`Docker`](https://docs.docker.com/engine/installation/) (recommended for local runs) or [`Singularity`](https://www.sylabs.io/guides/3.0/user-guide/)/[`Apptainer`](https://apptainer.org/docs/user/latest/) (recommended for HPC clusters) for full pipeline reproducibility.
 
 > [!NOTE]  
-> If using **Singularity** set `NXF_SINGULARITY_CACHEDIR` (or `singularity.cacheDir`) to reuse images later. For example: 
+> If using **Singularity/Apptainer** set `NXF_SINGULARITY_CACHEDIR` (or `singularity.cacheDir`) to reuse images later. For example: 
 > ```bash
 > export NXF_SINGULARITY_CACHEDIR="/path/to/singularity_cache"
 > ``````
@@ -138,7 +133,7 @@ Each row represents **one isolate**.
 
 > [!IMPORTANT]
 > Even if FASTQs are missing, **all columns must be present** in the CSV.
-> Use QC-trimmed FASTQs files not raw reads.
+> Use QC-trimmed FASTQ files, not raw reads.
 
 
 ### Example manifest
@@ -160,12 +155,13 @@ More details in [`docs/usage.md`](docs/usage.md)
 ### 3. Run your analyses
 
 ### Basic run
+By default only Snippy and Panaroo are run
 
 ```bash
 nextflow run MI-Bioinformatics/poodle \
   -profile singularity \
   --input manifest.csv \
-  --outdir poodle 
+  --outdir poodle_results 
 ```
 
 ### Advanced
@@ -188,7 +184,7 @@ nextflow run MI-Bioinformatics/poodle \
 
 
 > [!TIP]
-> After a successful run, the `work/` directory inside the output folder can be safely deleted.
+> After a successful run, the `work/` folder inside the working directory can be safely deleted.
 
 ## Parameters
 
@@ -210,13 +206,13 @@ nextflow run MI-Bioinformatics/poodle \
 
 | Parameter      | Required | Default  | Description                                                                                                                      |
 | -------------- | :------: | -------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| `-profile`     |     ✓    | –        | Execution profile (`docker` or `singularity`).                                                             |
+| `-profile`     |     ✓    | –        | Execution profile (`docker` or `singularity` (singularity works also for apptainer)).                                                             |
 | `--max_memory` |     ✓    | `128.GB` | Maximum memory allocation.                                                                                                       |
 | `--max_cpus`   |     ✓    | `16`     | Maximum CPUs allowed.                                                                                                            |
 | `--max_time`   |     ✓    | `24.h`   | Maximum execution time.                                                                                                          |
 | `-resume`      |     –    | –        | Reuse cached results from previous runs when inputs and code haven't changed. Ideal for interrupted runs. |
 
-More NextFlow configuration options [`here`](https://www.nextflow.io/docs/latest/reference/config.html).
+More NextFlow configuration options in [`docs/usage.md`](docs/usage.md)
 
 
 ## 📊 Output overview
@@ -284,16 +280,21 @@ Reference-genome fraction < 90% may indicate:
 `<Species>_<cluster_id>.html`
 
 Includes:
-* Phylogenetic trees
-* SNP and gene distance matrices
-* Pangenome results and heatmap
+* Phylogenetic trees (phylocanvas)
+* SNP and gene distance matrices (plotly)
+* Pangenome results and heatmap (plotly)
 * Methods
+
+![report 1](./docs/images/poodle_report_1.png)
+![report 2](./docs/images/poodle_report_2.png)
+![report 3](./docs/images/poodle_report_3.png)
+![report 4](./docs/images/poodle_report_4.png)
 
 ---
 
 ## 🧠 Best practices & caveats
 
-* **Use high-quality sequences:** Ideally, assemblies should have **<500 contigs ≥500 bp**, reads **≥30× Illumina coverage**, and **no contamination**. Pipelines like PHoeNIX, Bactopia and TheiaProk provide quality checks.
+* **Use high-quality sequences:** Ideally, assemblies should have **<500 contigs ≥500 bp**, reads **≥30× Illumina coverage**, and **no contamination**. Pipelines like [`PHoeNIX`](https://github.com/CDCgov/phoenix), [`Bactopia`](https://bactopia.github.io/latest/) and [`TheiaProk`](https://public-health-bacterial-genomics-theiagen.readthedocs.io/en/latest/theiaprok.html) provide quality checks.
 
 * **Disk cleanup:** After the pipeline completes, you may safely remove the Nextflow `work/` directory to reclaim space.
 
@@ -309,29 +310,33 @@ Includes:
 
 If you use PoODLE, please cite:
 
-* Snippy — SNP calling
-* Panaroo — pangenome analysis
-* Mashtree — composition-based tree
-* Gubbins — genome recombination filtering
-* snp-dists —  SNP distance calculation
-* snp-sites —  AGTC position extractions
-* IQ-TREE —  phylogeny
-* nf-core — bioinformatics pipeline framework
-* NextFlow — computational workflow
+* [`Snippy`](https://github.com/tseemann/snippy) - SNP calling
+* [`Panaroo`](https://github.com/gtonkinhill/panaroo) - pangenome analysis
+* [`MashTree`](https://github.com/lskatz/mashtree) - composition-based tree
+* [`Gubbins`](https://github.com/nickjcroucher/gubbins) - genome recombination filtering
+* [`snp-dists`](https://github.com/tseemann/snp-dists) -  SNP distance calculation
+* [`snp-sites`](https://sanger-pathogens.github.io/snp-sites/) - AGTC position extractions
+* [`IQ-TREE`](https://www.iqtree.org/) - phylogeny
+* [`nf-core`](https://nf-co.re/) - bioinformatics pipeline framework
+* [`NextFlow`](https://www.nextflow.io/docs/latest/index.html) - computational workflow
 * Software packaging/containerization tools
 
 An extensive list of references for the tools used by the pipeline can be found in the [`CITATIONS.md`](CITATIONS.md) file.
 
----
 
 ## Credits & Community
 
-PoODLE was built and is maintained by the Genomics Analysis Unit at the Michigan Department of Health & Human Services (MDHHS). This pipeline was developed by [Karla Vasco](https://github.com/vascokarla) and [Douglas Maldonado-Torres](https://github.com/MTDouglas).
+PoODLE was built and is maintained by the Genomics Analysis Unit at the Michigan Department of Health & Human Services (MDHHS). This pipeline was developed by [Karla Vasco](https://github.com/vascokarla) and [Douglas Maldonado-Torres](https://github.com/MTDouglas). Contributions, issues, and pull requests are welcome!
 
-📢 Contributions, issues, and pull requests are welcome — help make bacterial surveillance reproducible and accessible for everyone!
 
----
+## Disclaimer
+This repository is not a source of government records but is intended to increase collaboration and collaborative potential on public health related projects. Materials and information in this repository are intended to share information and collaboratively develop analysis workflows. 
 
+The workflows and pipelines reflect the current understanding of the software and biological questions being answered and may be updated as needed and pursuant to further analysis and review. No warranty, expressed or implied, is made by Michigan Department of Health & Human Services (MDHHS) Bureau of Laboratories as to the functionality of the software and related material nor shall the fact of release constitute any such warranty. Furthermore, the software is released on condition that the MDHHS Bureau of Laboratories shall not be held liable for any damages resulting from its authorized or unauthorized use. 
+
+
+## Privacy Notice
+Use of this service is limited only to non-sensitive and publicly available data. Users must not use, share, or store any kind of sensitive data like health status, provision or payment of healthcare, Personally Identifiable Information (PII) and/or Protected Health Information (PHI), etc. under any circumstance.
 ## 📜 License
 
 This project is released under the [**MIT License**](LICENSE).

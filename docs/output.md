@@ -137,7 +137,7 @@ Reference-genome fraction < 90% may indicate:
 >[!TIP]
 >If many samples show WARN or FAIL alignment QC, consider: changing the reference or splitting the cluster into sub-clusters. Using a **reference from within the cluster** is strongly recommended to avoid core genome shrinkage.
 </details>
-Classifies isolate pairs based on **SNP distance thresholds** commonly used in outbreak investigations.
+Classifies isolate pairs based on SNP distance thresholds commonly used in outbreak investigations.
 
 ### **📗 HTML report**
 
