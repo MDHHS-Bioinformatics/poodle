@@ -14,6 +14,9 @@
 
 - [snp-dists](https://github.com/tseemann/snp-dists)
 
+- [SNP-sites](https://www.iqtree.org/)
+  > Andrew J. Page, Ben Taylor, Aidan J. Delaney, Jorge Soares, Torsten Seemann, Jacqueline A. Keane, Simon R. Harris. "SNP-sites: rapid efficient extraction of SNPs from multi-FASTA alignments", Microbial Genomics 2(4), (2016)
+
 - [IQ-TREE](https://www.iqtree.org/)
   > Minh, Bui Quang, Heiko A. Schmidt, Olga Chernomor, Dominik Schrempf, Michael D. Woodhams, Arndt Von Haeseler, and Robert Lanfear. "IQ-TREE 2: new models and efficient methods for phylogenetic inference in the genomic era." Molecular biology and evolution 37, no. 5 (2020): 1530-1534.
 

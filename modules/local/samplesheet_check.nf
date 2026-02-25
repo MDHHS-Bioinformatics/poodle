@@ -2,10 +2,10 @@ process SAMPLESHEET_CHECK {
     tag "$samplesheet"
     label 'process_single'
 
-    conda "conda-forge::python=3.8.3"
+    conda "conda-forge::pandas=2.2.3"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/python:3.8.3' :
-        'quay.io/biocontainers/python:3.8.3' }"
+        'https://depot.galaxyproject.org/singularity/pandas:2.2.1' :
+        'quay.io/biocontainers/pandas:2.2.1' }"
 
     input:
     path samplesheet
@@ -17,7 +17,7 @@ process SAMPLESHEET_CHECK {
     when:
     task.ext.when == null || task.ext.when
 
-    script: // This script is bundled with the pipeline, in MI-Bioinformatics/poodle/bin/
+    script: // This script is bundled with the pipeline, in MDHHS-Bioinformatics/poodle/bin/
     """
     check_samplesheet_clusters.py \\
         $samplesheet \\

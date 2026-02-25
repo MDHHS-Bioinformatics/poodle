@@ -6,8 +6,8 @@ process GUBBINS {
 
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/gubbins:3.3.5--py39pl5321he4a0461_0' :
-        'biocontainers/gubbins:3.3.5--py39pl5321he4a0461_0' }"
+        'https://depot.galaxyproject.org/singularity/gubbins:3.4.3--py39h746d604_0' :
+        'quay.io/biocontainers/gubbins:3.4.3--py39h746d604_0' }"
 
     input:
     tuple val(meta), path(msa), val(constant_sites)
@@ -48,7 +48,7 @@ process GUBBINS {
         $msa
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        gubbins: \$(run_gubbins.py --version 2>&1)
+        gubbins: \$(run_gubbins.py --version 2>&1 | tail -n 1)
     END_VERSIONS
     """
 

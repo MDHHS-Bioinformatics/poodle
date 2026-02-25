@@ -3,7 +3,7 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     poodle
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Github : https://github.com/MI-Bioinformatics/poodle
+    Github : https://github.com/MDHHS-Bioinformatics/poodle
 ----------------------------------------------------------------------------------------
 */
 
@@ -25,13 +25,6 @@ WorkflowMain.initialise(workflow, params, log)
 
 include { POODLE } from './workflows/poodle.nf'
 
-//
-// WORKFLOW: Run main poodle analysis pipeline
-//
-// workflow {
-//    POODLE ()
-//}
-
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     RUN ALL WORKFLOWS
@@ -40,7 +33,7 @@ include { POODLE } from './workflows/poodle.nf'
 
 //
 // WORKFLOW: Execute a single named workflow for the pipeline
-// See: https://github.com/MI-Bioinformatics/poodle
+// See: https://github.com/MDHHS-Bioinformatics/poodle
 //
 workflow {
     POODLE ()

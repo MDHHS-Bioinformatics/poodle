@@ -1,14 +1,19 @@
 process QUARTO_NEITHER {
   tag "${meta.species}_${meta.cluster_id}"
   label 'process_medium'
+
   errorStrategy 'ignore'
-  container "r-quarto-phylo.sif"
-  containerOptions = '--no-home --env USERID=$UID,XDG_CACHE_HOME=tmp/quarto_cache_home,XDG_DATA_HOME=tmp/quarto_data_home,QUARTO_PRINT_STACK=true'
+
+  container "quay.io/vascok/quarto-wgs-reporting:1.0.0"
+  containerOptions = workflow.containerEngine == 'singularity'
+    ? '--no-home --env USERID=$UID,XDG_CACHE_HOME=tmp/quarto_cache_home,XDG_DATA_HOME=tmp/quarto_data_home,QUARTO_PRINT_STACK=true'
+    : '--user $(id -u):$(id -g) -e XDG_CACHE_HOME=/tmp/quarto_cache_home -e XDG_DATA_HOME=/tmp/quarto_data_home -e QUARTO_PRINT_STACK=true'
+
   stageInMode = 'copy'
   afterScript = 'rm -rf tmp'
 
   input:
-  tuple val(meta), path(ref_eval), path(snptree), path(snpmatrix),
+  tuple val(meta), path(linkages), path(snptree), path(snpmatrix),
         path(pan_summary), path(pan_roary), path(pan_rtab), path(pan_genedists)
   path(yaml)
   path(qmd)
@@ -23,7 +28,7 @@ process QUARTO_NEITHER {
   cluster_id = task.ext.prefix ?: "${meta.cluster_id}"
   species = task.ext.prefix ?: "${meta.species}"
   """
-  cp -n ${ref_eval} ${snptree} ${snpmatrix} ${pan_summary} ${pan_roary} ${pan_rtab} ${pan_genedists} ${logo} .
+  cp -n ${linkages} ${snptree} ${snpmatrix} ${pan_summary} ${pan_roary} ${pan_rtab} ${pan_genedists} ${logo} .
   quarto render $qmd --execute-params $yaml --output "${prefix}.html"
   cat <<-END_VERSIONS > versions.yml
   "${task.process}":

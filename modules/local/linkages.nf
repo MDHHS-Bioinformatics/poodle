@@ -1,36 +1,39 @@
-process SNPDISTS {
+process LINKAGES {
     tag "${meta.species}_${meta.cluster_id}"
-    label 'process_low'
-
-    conda "${moduleDir}/environment.yml"
+    label 'process_single'
+    
+    conda "conda-forge::pandas=2.2.3"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/snp-dists:0.8.2--h5bf99c6_0' :
-        'quay.io/biocontainers/snp-dists:0.8.2--h5bf99c6_0' }"
+        'https://depot.galaxyproject.org/singularity/pandas:2.2.1' :
+        'quay.io/biocontainers/pandas:2.2.1' }"
 
     input:
-    tuple val(meta), path(alignment)
+    tuple val(meta), path(snp_dists), path(snp_report)
 
     output:
-    tuple val(meta), path("*.tsv"), emit: tsv
+    tuple val(meta), path("*.csv"), emit: linkages
     path "versions.yml"           , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
 
     script:
-    def args = task.ext.args ?: ''
     def args_extension = task.ext.args_extension ?: ''
     prefix = task.ext.prefix ?: "${meta.species}_${meta.cluster_id}"
     cluster_id = task.ext.prefix ?: "${meta.cluster_id}"
     species = task.ext.prefix ?: "${meta.species}"
     """
-    snp-dists \\
-        $args \\
-        $alignment > ${prefix}_${args_extension}dist.tsv
+    bacteria_linkage_snps.py \
+        --species $species \
+        --cluster-id $cluster_id \
+        --snp-dists $snp_dists \
+        --snp-report $snp_report \
+        --output ${prefix}${args_extension}.csv
+
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        snpdists: \$(snp-dists -v 2>&1 | sed 's/snp-dists //;')
+        python: \$(python --version | sed 's/Python //g')
     END_VERSIONS
     """
 }

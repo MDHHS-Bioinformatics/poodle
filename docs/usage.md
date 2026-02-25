@@ -1,4 +1,4 @@
-# MI-Bioinformatics/poodle: Usage
+# MDHHS-Bioinformatics/poodle: Usage
 
 > _Documentation of pipeline parameters is generated automatically from the pipeline schema and can no longer be found in markdown files._
 
@@ -29,18 +29,19 @@ The following columns are **mandatory**:
 
 ### Full samplesheet
 
-The pipeline will auto-detect whether a sample is single- or paired-end using the information provided in the samplesheet. The samplesheet can have as many columns as you desire, however, there is a strict requirement for the first 3 columns to match those defined in the table below.
+The pipeline will auto-detect whether a sample is single- or paired-end using the information provided in the samplesheet. The samplesheet can have as many columns as you desire, however, there is a strict requirement for the first 8 columns to match those defined in the table below.
 
 A final samplesheet file consisting of either single-end, paired-end or assembly data may look something like the one below. This is for 7 samples, where two species and cluster_ids are included.
 
 ```console
 sample,fastq_1,fastq_2,gff,assembly,cluster_id,species,reference
-SAMPLE_1_PAIRED_END,/path/to/qc/trimmed/fastq/files/SAMPLE1_1.trim.fastq.gz,/path/to/qc/trimmed/fastq/files/SAMPLE1_1.trim.fastq.gz,/path/to/gff/SAMPLE1.gff,/path/to/assembled/fasta/SAMPLE1.fasta,cluster_1,Escherichia_coli,/path/to/assembled/reference/reference1.fasta
-SAMPLE_2_PAIRED_END,/path/to/qc/trimmed/fastq/files/SAMPLE2_1.trim.fastq.gz,/path/to/qc/trimmed/fastq/files/SAMPLE2_1.trim.fastq.gz,/path/to/gff/SAMPLE2.gff,/path/to/assembled/fasta/SAMPLE2.fasta,cluster_1,Escherichia_coli,/path/to/assembled/reference/reference1.fasta
-SAMPLE_3_PAIRED_END,/path/to/qc/trimmed/fastq/files/SAMPLE3_1.trim.fastq.gz,/path/to/qc/trimmed/fastq/files/SAMPLE3_1.trim.fastq.gz,/path/to/gff/SAMPLE3.gff,/path/to/assembled/fasta/SAMPLE3.fasta,outbreak_facilityA,Pseudomonas aeruginosa,/path/to/assembled/reference/reference2.fasta
-SAMPLE_5_ASSEMBLED,,,/path/to/gff/SAMPLE4.gff,/path/to/assembled/fasta/SAMPLE4.fasta,outbreak_facilityA,Pseudomonas aeruginosa,/path/to/assembled/reference/reference2.fasta
-SAMPLE_6_ASSEMBLED,,,/path/to/gff/SAMPLE5.gff,/path/to/assembled/fasta/SAMPLE5.fasta,outbreak_facilityA,Pseudomonas aeruginosa,/path/to/assembled/reference/reference2.fasta
-SAMPLE_7_ASSEMBLED,,,/path/to/gff/SAMPLE6.gff,/path/to/assembled/fasta/SAMPLE6.fasta,cluster_1,Escherichia_coli,/path/to/assembled/reference/reference1.fasta
+SAMPLE_1,/path/to/SAMPLE1_1.trim.fastq.gz,/path/to/SAMPLE1_2.trim.fastq.gz,/path/to/SAMPLE1.gff,/path/to/SAMPLE1.fasta,HC1-C1,Escherichia_coli,/path/to/reference1.fasta
+SAMPLE_2,/path/to/SAMPLE2_1.trim.fastq.gz,/path/to/SAMPLE2_2.trim.fastq.gz,/path/to/SAMPLE2.gff,/path/to/SAMPLE2.fasta,HC1-C1,Escherichia_coli,/path/to/reference1.fasta
+SAMPLE_3,/path/to/SAMPLE3_1.trim.fastq.gz,/path/to/SAMPLE3_2.trim.fastq.gz,/path/to/SAMPLE3.gff,/path/to/SAMPLE3.fasta,outbreak_facilityA,Pseudomonas aeruginosa,/path/to/reference2.fasta
+SAMPLE_4,/path/to/SAMPLE4.trim.fastq.gz,,/path/to/SAMPLE4.gff,/path/to/SAMPLE4.fasta,outbreak_facilityA,Pseudomonas aeruginosa,/path/to/reference2.fasta
+SAMPLE_5,,,/path/to/SAMPLE5.gff,/path/to/SAMPLE5.fasta,outbreak_facilityA,Pseudomonas aeruginosa,/path/to/reference2.fasta
+SAMPLE_6,,,/path/to/SAMPLE6.gff,/path/to/SAMPLE6.fasta,outbreak_facilityA,Pseudomonas aeruginosa,/path/to/reference2.fasta
+SAMPLE_7,,,/path/to/SAMPLE7.gff,/path/to/SAMPLE7.fasta,HC1-C1,Escherichia_coli,/path/to/reference1.fasta
 ```
 
 | Column    | Description                                                                                                                                                                            |
@@ -49,7 +50,7 @@ SAMPLE_7_ASSEMBLED,,,/path/to/gff/SAMPLE6.gff,/path/to/assembled/fasta/SAMPLE6.f
 | `fastq_1` | Full path to FastQ file for Illumina QC trimmed short reads 1. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                                                  |
 | `fastq_2` | Full path to FastQ file for Illumina QC trimmed short reads 2. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                                                  |
 | `gff`     | Full path to GFF file with annotated genomes. File should have the extension ".gff" or ".gff3".                                                                                        |
-| `assembly` | Full path to assembled genome file. File can be gzipped and have the extension ".fasta", ".fa", ".fna", ".fasta.gz", ".fa.gz" or ".fna.gz"                                            |
+| `assembly` | Full path to assembled genome file. File cannot be gzipped and shold have the extension ".fasta", ".fa", ".fna"                           |
 | `cluster_id` | Custom cluster id. This entry will be identical for multiple samples from the same cluster. Spaces in cluter ids are automatically converted to underscores (`_`).                  |
 | `species`  | Custom bacterial species name. This entry will be identical for multiple samples from the same species. Spaces in sample names are automatically converted to underscores (`_`).      |
 | `reference` | Full path to assembled reference genome file. This must be identical for multiple samples from the same cluster. File can be gzipped and have the extension ".fasta", ".fa", ".fna", ".fasta.gz", ".fa.gz" or ".fna.gz"                                 |
@@ -61,7 +62,7 @@ An [example samplesheet](../assets/samplesheet.csv) has been provided with the p
 The typical command for running the pipeline is as follows:
 
 ```bash
-nextflow run MI-Bioinformatics/poodle --input samplesheet.csv --outdir <OUTDIR> --gubbins --mashtree -profile singularity
+nextflow run MDHHS-Bioinformatics/poodle --input samplesheet.csv --outdir <OUTDIR> --gubbins --mashtree -profile singularity
 ```
 
 This will launch the pipeline with the `singularity` configuration profile. See below for more information about profiles.
@@ -80,14 +81,14 @@ work                # Directory containing the nextflow working files
 When you run the above command, Nextflow automatically pulls the pipeline code from GitHub and stores it as a cached version. When running the pipeline after this, it will always use the cached version if available - even if the pipeline has been updated since. To make sure that you're running the latest version of the pipeline, make sure that you regularly update the cached version of the pipeline:
 
 ```bash
-nextflow pull MI-Bioinformatics/poodle
+nextflow pull MDHHS-Bioinformatics/poodle
 ```
 
 ### Reproducibility
 
 It is a good idea to specify a pipeline version when running the pipeline on your data. This ensures that a specific version of the pipeline code and software are used when you run your pipeline. If you keep using the same tag, you'll be running the same version of the pipeline, even if there have been changes to the code since.
 
-First, go to the [MI-Bioinformatics/poodle releases page](https://github.com/MI-Bioinformatics/poodle/releases) and find the latest pipeline version - numeric only (eg. `1.3.1`). Then specify this when running the pipeline with `-r` (one hyphen) - eg. `-r 1.3.1`. Of course, you can switch to another version by changing the number after the `-r` flag.
+First, go to the [MDHHS-Bioinformatics/poodle releases page](https://github.com/MDHHS-Bioinformatics/poodle/releases) and find the latest pipeline version - numeric only (eg. `1.3.1`). Then specify this when running the pipeline with `-r` (one hyphen) - eg. `-r 1.3.1`. Of course, you can switch to another version by changing the number after the `-r` flag.
 
 This version number will be logged in reports when you run the pipeline, so that you'll know what you used when you look back in the future. For example, at the bottom of the MultiQC reports.
 

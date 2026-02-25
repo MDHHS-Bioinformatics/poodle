@@ -1,9 +1,9 @@
 ---
 title: PoODLE (Phylogenomic Overview for the Detection of Linkages for Epidemiologists)
 subtitle: |
-  WGS Report<br>Developed by the Genomic Analysis Unit<br>Michigan Department of Health & Human Services (MDHHS)
+  Whole-Genome Sequencing Report
 description: |
-  <p class="description">Repository: <a href="PoODLE GitHub" style="color: blue;">https://github.com/MI-Bioinformatics/poodle</a></p>
+  <p class="description">Repository: <a href="PoODLE GitHub" style="color: blue;">https://github.com/MDHHS-Bioinformatics/poodle</a></p>
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 format: 
   html:
@@ -16,7 +16,7 @@ format:
 params:
   species: "Acinetobacter_baumannii"
   cluster_id: "HC48-C9"
-  ref_eval: "poodle/Acinetobacter_baumannii/HC48-C9/reference_evaluation.tsv"
+  linkages: "poodle/Acinetobacter_baumannii/HC48-C9/linkages/Acinetobacter_baumannii_HC48-C9_snippy_linkages.csv"
   snptree: "poodle/Acinetobacter_baumannii/HC48-C9/snippy_core/Acinetobacter_baumannii_HC48-C9.tre"
   snpmatrix: "poodle/Acinetobacter_baumannii/HC48-C9/snippy_core/Acinetobacter_baumannii_HC48-C9_dist.tsv"
   pan_summary: "poodle/Acinetobacter_baumannii/HC48-C9/panaroo/summary_statistics.txt"
@@ -25,13 +25,15 @@ params:
   pan_genedists: "poodle/Acinetobacter_baumannii/HC48-C9/panaroo/gene_presence_absence_dist.tsv"
   gubtree: "poodle/Acinetobacter_baumannii/HC48-C9/gubbins/Acinetobacter_baumannii_HC48-C9.node_labelled.final_tree.tre"
   gubmatrix: "poodle/Acinetobacter_baumannii/HC48-C9/gubbins/Acinetobacter_baumannii_HC48-C9_dist.tsv"
+  mashtree: "poodle/Acinetobacter_baumannii/HC48-C9/mashtree/Acinetobacter_baumannii_HC48-C9.dnd"
+  mashmatrix: "poodle/Acinetobacter_baumannii/HC48-C9/mashtree/Acinetobacter_baumannii_HC48-C9.tsv"
 
 ---
 
 ```{r parse-arguments, include=FALSE}
 cluster_id <- params$cluster_id
 species <- params$species
-ref_eval <- params$ref_eval
+linkages <- params$linkages
 snptree <- params$snptree
 snpmatrix <- params$snpmatrix
 pan_summary <- params$pan_summary
@@ -40,6 +42,8 @@ pan_rtab <- params$pan_rtab
 pan_genedists <- params$pan_genedists
 gubtree <- params$gubtree
 gubmatrix <- params$gubmatrix
+mashtree <- params$mashtree
+mashmatrix <- params$mashmatrix
 ```
 
 ```{css quarto-settings, echo=FALSE}
@@ -93,7 +97,7 @@ options(bitmapType = 'cairo')
 ```
 
 ```{r import_files, include=FALSE}
-samples <- fread(ref_eval) %>% rename(sample_id = sample) %>% filter(sample_id != "Reference")
+samples <- fread(linkages) %>% rename(sample_id = sample)
 
 #----- CORE SNP TREE WRANGLING ------# 
 
@@ -107,6 +111,13 @@ snp_tree_tip_order <- snp_tree$tip.label
 gub_tree <- read.tree(gubtree)
 gub_tree <- midpoint_root(gub_tree)
 gub_tree <- ladderize(gub_tree, right = F) 
+
+#------------ MASH TREE ----------------------#
+mash_tree <- read.tree(mashtree)
+if (!is.null(mash_tree$edge.length) && sum(mash_tree$edge.length) > 0) {
+  mash_tree <- midpoint_root(mash_tree)
+}
+mash_tree <- ladderize(mash_tree, right = F) 
 
 #----- DISTANCE MATRICES WRANGLING ------# 
 # Read and reorder SNP distance matrix
@@ -126,6 +137,18 @@ rownames(gub_snp_matrix) <- row_names
 colnames(gub_snp_matrix) <- row_names
 gub_snp_matrix <- gub_snp_matrix[snp_tree_tip_order, snp_tree_tip_order]
 gub_snp_matrix[upper.tri(gub_snp_matrix)] <- NA
+
+# Read and reorder Mash distance matrix
+mash_df <- fread(mashmatrix, data.table = FALSE) 
+row_names <- mash_df[[1]]
+mash_matrix <- as.matrix(mash_df[, -1])
+rownames(mash_matrix) <- row_names
+colnames(mash_matrix) <- row_names
+# Keep only those tree tip labels that are also present in the matrix
+common_labels <- snp_tree_tip_order[snp_tree_tip_order %in% rownames(mash_matrix)]
+# Reorder the matrix rows and columns accordingly
+mash_matrix <- mash_matrix[common_labels, common_labels]
+mash_matrix[upper.tri(mash_matrix)] <- NA
 
 #----- PANGENOME WRANGLING ------# 
 
@@ -215,6 +238,19 @@ phylocanvas(
 ***Figure 2.** Maximum-likelihood phylogenetic tree based on recombination-filtered core single nucleotide polymorphisms (SNPs), inferred using Gubbins and constructed with IQ-TREE under the GTR+G4 substitution model. The alignment includes both variable and invariant sites, allowing branch lengths to represent the average number of nucleotide substitutions per site across the core genome alignment. Very short or near-zero branches indicate unresolved relationships, often due to highly similar or identical samples. Such regions of the tree should be interpreted with caution, and complementary analyses (e.g., SNP distance matrices) may be needed to clarify fine-scale linkages. The reference genome was excluded, and the tree is midpoint-rooted. Visualization was generated using Phylocanvas.*
 
 
+### Mash Tree
+
+```{r mash-tree-plot}
+knitr::opts_chunk$set(cache.vars = TRUE)
+
+phylocanvas(
+      mash_tree,
+      treetype = "rectangular",
+      showscalebar = TRUE)
+```
+
+***Figure 3.**Tree constructed using MashTree based on pairwise genomic distances estimated by the MinHash algorithm (Mash). Distances were used to generate a dendrogram via the neighbor-joining (NJ) algorithm implemented in QuickTree. This tree reflects overall genomic similarity and does not represent a true phylogeny. Only samples with available genome assemblies were included in the Mash analysis. The reference genome was excluded, and the tree is midpoint-rooted. Visualization was created using Phylocanvas.*
+
 ### Pangenome profile
 
 The Pangenome summary statistics for cluster `r cluster_id` are as follows:
@@ -243,7 +279,7 @@ pangenome_plot <- ggplot(pangenome, aes(y = sample_id, x = Gene, fill = Value, t
 custom_plot_function(pangenome_plot)
 ```
 
-***Figure 3.** Gene presence–absence heatmap from a pangenome analysis performed with Panaroo. Blue indicates gene presence; white indicates absence. The x-axis represents individual genes, and the y-axis represents isolates. Sample order follows the core SNP-based phylogeny. Gene names and annotation can be interactively displayed when hovering the cursor over individual tiles. Visualization created using ggplot2 and plotly.*
+***Figure 4.** Gene presence–absence heatmap from a pangenome analysis performed with Panaroo. Blue indicates gene presence; white indicates absence. The x-axis represents individual genes, and the y-axis represents isolates. Sample order follows the core SNP-based phylogeny. Gene names and annotation can be interactively displayed when hovering the cursor over individual tiles. Visualization created using ggplot2 and plotly.*
 
 ### Core SNP distance matrix
 
@@ -281,7 +317,7 @@ snps_heatmap_plot <- ggplot(snp_df, aes(x = sample_id_col, y = sample_id_row, fi
 custom_plot_function(snps_heatmap_plot)
 ```
 
-***Figure 4.** Heatmap of core SNP distances among isolates. Values are shown for 0-40 SNPs. SNP distances were determined using the core-SNP alignment generated by Snippy, subsequently analyzed using snp-dists. Specific SNP differences can be displayed upon hovering over the heatmap cells. Sample order follows the core SNP-based phylogeny. Visualization created using ggplot2 and plotly.*
+***Figure 5.** Heatmap of core SNP distances among isolates. Values are shown for 0-40 SNPs. SNP distances were determined using the core-SNP alignment generated by Snippy, subsequently analyzed using snp-dists. Specific SNP differences can be displayed upon hovering over the heatmap cells. Sample order follows the core SNP-based phylogeny. Visualization created using ggplot2 and plotly.*
 
 ### Recombination filtered SNP distance matrix
 
@@ -319,7 +355,41 @@ gub_snps_heatmap_plot <- ggplot(gub_snp_df, aes(x = sample_id_col, y = sample_id
 custom_plot_function(gub_snps_heatmap_plot)
 ```
 
-***Figure 5.**  Heatmap of core SNP distances after recombination filtering. Pairwise distances were calculated from the alignment produced by Gubbins and analyzed with snp-sites and snp-dists. Values are shown for 0-40 SNPs. Exact SNP counts are displayed on hover. Sample order follows the core SNP-based phylogeny. Visualization created using ggplot2 and plotly.*
+***Figure 6.**  Heatmap of core SNP distances after recombination filtering. Pairwise distances were calculated from the alignment produced by Gubbins and analyzed with snp-sites and snp-dists. Values are shown for 0-40 SNPs. Exact SNP counts are displayed on hover. Sample order follows the core SNP-based phylogeny. Visualization created using ggplot2 and plotly.*
+
+### Mash distance matrix
+
+```{r mash-matrix}
+
+##---MASH distance MATRIX---###
+
+# Convert matrix to data frame
+mash_df <- as.data.frame(as.table(as.matrix(mash_matrix)))
+colnames(mash_df) <- c("sample_id_row", "sample_id_col", "value")
+mash_df <- mash_df %>% 
+  mutate(sample_id_row = factor(sample_id_row),
+         sample_id_col = factor(sample_id_col),
+         hovertext = paste0("Row: ", sample_id_row, "<br>",
+                           "Col: ", sample_id_col, "<br>",
+                           "Mash: ", value, "<br>"
+                           ))
+    
+# Create the heatmap
+mash_heatmap_plot <- ggplot(mash_df, aes(x = sample_id_col, y = sample_id_row, fill = value, text = hovertext)) +
+  geom_tile(color = "white", size = 0.2) +
+  #geom_text(aes(label = value), color = "black", size = 1, vjust = 0.5, hjust = 0.5) +
+  scale_fill_gradient(low = "orange3", high = "white") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 8),
+        axis.text.y = element_text(size = 8),
+        axis.title = element_blank()) +
+  labs(fill = "Mash")
+  
+# Convert to plotly object and add hover info from text by using tooltip
+custom_plot_function(mash_heatmap_plot)
+```
+
+***Figure 7.** Heatmap of pairwise Mash distances, calculated using MashTree. Distances reflect genome-wide similarity based on MinHash sketches. Specific distances can be displayed upon hovering over the heatmap cells. Sample order follows the core SNP-based phylogeny. Visualization created using ggplot2 and plotly.*
 
 ### Gene presence-absence distance matrix
 ```{r gene-matrix}
@@ -356,13 +426,13 @@ genes_heatmap_plot <- ggplot(genes_df, aes(x = sample_id_col, y = sample_id_row,
 custom_plot_function(genes_heatmap_plot)
 ```
 
-***Figure 6.** Heatmap of pairwise gene content distances based on a presence–absence matrix generated by Panaroo. Sample order follows the core SNP-based phylogeny. Values are shown for 0-40 genes of distance. Exact gene differences are displayed on hover. Visualization created using ggplot2 and plotly.*
+***Figure 8.** Heatmap of pairwise gene content distances based on a presence–absence matrix generated by Panaroo. Sample order follows the core SNP-based phylogeny. Values are shown for 0-40 genes of distance. Exact gene differences are displayed on hover. Visualization created using ggplot2 and plotly.*
 
 ## Methods
 
 ### SNP Analysis
 
-Reference-based SNP analysis was accomplished using Snippy v4.6.0^1^ within a species-specific clusters. Phylogenetic trees were generated using IQTREE2 v2.3.4^2^ and pairwise SNP distances were calculated using snp-dists v0.8.2^3^.
+Reference-based SNP analysis was accomplished using Snippy v4.6.0^1^ within a species-specific clusters. Phylogenetic trees were generated using IQTREE2 v2.4.0^2^ and pairwise SNP distances were calculated using snp-dists v0.8.2^3^.
 
 ### Pangenome Analysis
 
@@ -370,7 +440,11 @@ The gene presence-absence profile was identified using the pangenome tool Panaro
 
 ### Recombination Analysis
 
-The identification and masking of loci containing elevated densities of base substitutions, which are marked as recombinations, was done with Gubbins v3.3.5^5^. Recombination-filtered SNPs were extracted with SNP-Sites v2.5.1^6^ followed by SNP-based phylogeny using IQTREE2 v2.3.4^2^.
+The identification and masking of loci containing elevated densities of base substitutions, which are marked as recombinations, was done with Gubbins v3.4.3^5^. Recombination-filtered SNPs were extracted with SNP-Sites v2.5.1^6^ followed by SNP-based phylogeny using IQTREE2 v2.4.0^2^.
+
+### Mash Analysis
+
+The determination of MinHash distances and Mash tree generation were done with MashTree v1.4.6^7^.
 
 ## References
 
@@ -380,3 +454,4 @@ The identification and masking of loci containing elevated densities of base sub
 4. <https://github.com/gtonkinhill/panaroo>
 5. <https://github.com/nickjcroucher/gubbins>
 6. <https://sanger-pathogens.github.io/snp-sites>
+7. <https://github.com/lskatz/mashtree>

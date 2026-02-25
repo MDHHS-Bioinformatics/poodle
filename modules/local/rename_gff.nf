@@ -2,10 +2,10 @@ process RENAME_GFF {
     tag "$meta.id"
     label 'process_single'
 
-    conda "conda-forge::python=3.8.3"
+    conda "conda-forge::pandas=2.2.3"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/python:3.8.3' :
-        'quay.io/biocontainers/python:3.8.3' }"
+        'https://depot.galaxyproject.org/singularity/pandas:2.2.1' :
+        'quay.io/biocontainers/pandas:2.2.1' }"
 
     input:
     //tuple val(meta), path(input_files), path(gff), path(reference)
@@ -19,18 +19,10 @@ process RENAME_GFF {
 
     script:
     def prefix = task.ext.prefix ?: "${meta.id}"
-    //determine if we need to rename an assembly or not
-    // def assembly_input
-    // if (meta.has_assembly){
-    //     assembly_input = "--assembly ${assemblies}"
-    // } else{
-    //     assembly_input = ""
-    // }
 
     """
     rename_inputs.py \\
         --prefix $prefix \\
         --gff $gff
-
     """
 }

@@ -1,13 +1,16 @@
 process YAML_NEITHER {
   tag "${meta.species}_${meta.cluster_id}"
   label 'process_single'
+
   input:
-  tuple val(meta), path(ref_eval), path(snptree), path(snpmatrix),
+  tuple val(meta), path(linkages), path(snptree), path(snpmatrix),
         path(pan_summary), path(pan_roary), path(pan_rtab), path(pan_genedists)
+  
   output:
-  tuple val(meta), path(ref_eval), path(snptree), path(snpmatrix),
+  tuple val(meta), path(linkages), path(snptree), path(snpmatrix),
         path(pan_summary), path(pan_roary), path(pan_rtab), path(pan_genedists), emit: files
   path("*.yaml"), emit: yaml
+  
   script:
   def prefix = "${meta.species}_${meta.cluster_id}"
   cluster_id = task.ext.prefix ?: "${meta.cluster_id}"
@@ -15,7 +18,7 @@ process YAML_NEITHER {
   """
   echo "cluster_id: ${meta.cluster_id}"                  >  ${prefix}.yaml
   echo "species: ${meta.species}"                        >> ${prefix}.yaml
-  echo "ref_eval: \$(basename ${ref_eval})"              >> ${prefix}.yaml
+  echo "linkages: \$(basename ${linkages})"              >> ${prefix}.yaml
   echo "snptree: \$(basename ${snptree})"                >> ${prefix}.yaml
   echo "snpmatrix: \$(basename ${snpmatrix})"            >> ${prefix}.yaml
   echo "pan_summary: \$(basename ${pan_summary})"        >> ${prefix}.yaml

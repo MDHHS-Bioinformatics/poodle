@@ -2,10 +2,7 @@ process GENEDISTS {
     tag "${meta.species}_${meta.cluster_id}"
     label 'process_low'
     
-    conda "conda-forge::r-phytools=0.7_47"
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/r-phytools:0.6_99--r40h6115d3f_1' :
-        'quay.io/biocontainers/r-phytools:0.6_44' }"
+    container "quay.io/vascok/quarto-wgs-reporting:1.0.0"
 
     input:
     tuple val(meta), path(rtab)
@@ -17,7 +14,7 @@ process GENEDISTS {
     when:
     task.ext.when == null || task.ext.when
 
-    script: // This script is bundled with the pipeline, in MI-Bioinformatics/poodle/bin/
+    script: // This script is bundled with the pipeline, in MDHHS-Bioinformatics/poodle/bin/
     def args = task.ext.args ?: ''
     prefix = task.ext.prefix ?: "${meta.species}_${meta.cluster_id}"
     cluster_id = task.ext.prefix ?: "${meta.cluster_id}"
@@ -25,12 +22,12 @@ process GENEDISTS {
 
     """
     # Calculate gene presence-absence Hamming distances
-    gene_dists.R ${rtab} gene_presence_absence_dist.tsv
+    gene_dists.R ${rtab} ${prefix}_gene_presence_absence_dist.tsv
 
     # Capture the R version for versions.yml
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        R: \$(R --version | head -n 1 | sed 's/R version //')
+        R: \$(R --version | sed -n 's/^R version \\([0-9.]*\\).*/\\1/p')
     END_VERSIONS
     """
 }

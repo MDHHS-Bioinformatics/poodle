@@ -5,15 +5,15 @@ process PANAROO_RUN {
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/panaroo:1.5.2--pyhdfd78af_0':
-        'biocontainers/panaroo:1.5.2--pyhdfd78af_0' }"
+        'quay.io/biocontainers/panaroo:1.5.2--pyhdfd78af_0' }"
 
     input:
     tuple val(meta), path(gff)
 
     output:
-    tuple val(meta), path("panaroo/gene_presence_absence_roary.csv")            , emit: csv
-    tuple val(meta), path("panaroo/gene_presence_absence.Rtab")                 , emit: rtab
-    tuple val(meta), path("panaroo/summary_statistics.txt")                     , emit: summary
+    tuple val(meta), path("panaroo/${meta.species}_${meta.cluster_id}_gene_presence_absence_roary.csv")            , emit: csv
+    tuple val(meta), path("panaroo/${meta.species}_${meta.cluster_id}_gene_presence_absence.Rtab")                 , emit: rtab
+    tuple val(meta), path("panaroo/${meta.species}_${meta.cluster_id}_summary_statistics.txt")                     , emit: summary
     path "versions.yml"                                                         , emit: versions
 
 
@@ -28,7 +28,6 @@ process PANAROO_RUN {
     //Join the list of GFF files into a space-seperated string
     gff_files = gff.join(' ')
     """
-    ls
     panaroo \\
         $args \\
         -t $task.cpus \\
@@ -39,6 +38,13 @@ process PANAROO_RUN {
         --family_threshold 0.7 \\
         --core_threshold 0.99 \\
         -i $gff_files 
+
+    # Rename with species prefix
+    for f in panaroo/*; do
+        base=\$(basename "\$f")
+        mv "\$f" "panaroo/${prefix}_\${base}"
+    done
+
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
