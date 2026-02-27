@@ -2,7 +2,7 @@ process GENEDISTS {
     tag "${meta.species}_${meta.cluster_id}"
     label 'process_low'
     
-    container "quay.io/vascok/quarto-wgs-reporting:1.0.0"
+    container "quay.io/mdhhs_bioinformatics/quarto-wgs-reporting:1.0.0"
 
     input:
     tuple val(meta), path(rtab)
