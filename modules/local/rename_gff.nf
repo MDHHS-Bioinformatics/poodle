@@ -8,7 +8,6 @@ process RENAME_GFF {
         'quay.io/biocontainers/pandas:2.2.1' }"
 
     input:
-    //tuple val(meta), path(input_files), path(gff), path(reference)
     tuple val(meta), path(reads), path(assemblies), path(gff), path(reference)
 
     output:
