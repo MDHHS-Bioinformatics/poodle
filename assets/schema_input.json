@@ -48,7 +48,7 @@
                 "errorMessage": "Reference FASTA file must have extension '.fasta', '.fna', or '.fa', optionally compressed as '.gz', and cannot contain spaces"
             }
         },
-        "required": ["sample", "gff", "cluster_id", "species", "reference"],
+        "required": ["sample", "fastq_1", "fastq_2", "gff", "assembly", "cluster_id", "species", "reference"],
         "additionalProperties": false
     }
 }
