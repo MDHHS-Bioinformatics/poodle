@@ -52,5 +52,6 @@ output:
           pattern: "versions.yml"
 authors:
   - "@rpetit3"
+  - "@vascokarla"
 maintainers:
-  - "@rpetit3"
+  - "@vascokarla"
