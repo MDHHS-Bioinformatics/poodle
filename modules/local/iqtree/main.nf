@@ -37,7 +37,7 @@ process IQTREE {
         bs=""
     fi
 
-    iqtree \\
+    iqtree2 \\
         $args \\
         $alignment_arg \\
         -fconst $constant_sites \\
