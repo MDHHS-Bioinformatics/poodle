@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema",
-    "$id": "https://github.com/MDHHS-Bioinformatics/poodle/blob/master/nextflow_schema.json",
+    "$id": "https://github.com/MDHHS-Bioinformatics/poodle/blob/main/nextflow_schema.json",
     "title": "MDHHS-Bioinformatics/poodle",
     "description": "Bacterial cluster analysis",
     "type": "object",
@@ -19,7 +19,7 @@
                     "pattern": "^\\S+\\.csv$",
                     "schema": "assets/schema_input.json",
                     "description": "Path to comma-separated file containing information about the samples and reference in the analysis.",
-                    "help_text": "You will need to create a design file with information about the samples in your analysis before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 8 columns, and a header row. See [usage docs](https://github.com/MDHHS-Bioinformatics/poodle/blob/master/docs/usage.md#samplesheet-input).",
+                    "help_text": "You will need to create a design file with information about the samples in your analysis before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 8 columns, and a header row. See [usage docs](https://github.com/MDHHS-Bioinformatics/poodle/blob/main/docs/usage.md#samplesheet-input).",
                     "fa_icon": "fas fa-file-csv"
                 },
                 "outdir": {
