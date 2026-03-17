@@ -42,6 +42,14 @@ include { QUARTO_BOTH                 } from '../modules/local/report/quarto_bot
 include { QUARTO_GUB_ONLY             } from '../modules/local/report/quarto_gub_only.nf'
 include { QUARTO_MASH_ONLY            } from '../modules/local/report/quarto_mash_only.nf'
 include { QUARTO_NEITHER              } from '../modules/local/report/quarto_neither.nf'
+include { SNPDISTS as SNPDISTS_SNIPPY  } from '../modules/local/snpdists/main'
+include { SNPDISTS as SNPDISTS_GUBBINS } from '../modules/local/snpdists/main'
+include { IQTREE as IQTREE_SNIPPY      } from '../modules/local/iqtree/main'
+include { IQTREE as IQTREE_GUBBINS     } from '../modules/local/iqtree/main'
+include { GUBBINS                      } from '../modules/local/gubbins/main'
+include { SNPSITES                     } from '../modules/local/snpsites/main'
+include { PANAROO_RUN                  } from '../modules/local/panaroo/run/main'
+include { MASHTREE                     } from '../modules/local/mashtree/main'
 
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
@@ -58,16 +66,6 @@ include { SNIPPY_CLUSTERS             } from '../subworkflows/local/snippycluste
 // MODULE: Installed directly from nf-core/modules
 //
 include { CUSTOM_DUMPSOFTWAREVERSIONS  } from '../modules/nf-core/custom/dumpsoftwareversions/main'
-include { SNIPPY_CORE                  } from '../modules/nf-core/snippy/core/main'
-include { SNIPPY_RUN                   } from '../modules/nf-core/snippy/run/main'
-include { SNPDISTS as SNPDISTS_SNIPPY  } from '../modules/nf-core/snpdists/main'
-include { SNPDISTS as SNPDISTS_GUBBINS } from '../modules/nf-core/snpdists/main'
-include { IQTREE as IQTREE_SNIPPY      } from '../modules/nf-core/iqtree/main'
-include { IQTREE as IQTREE_GUBBINS     } from '../modules/nf-core/iqtree/main'
-include { GUBBINS                      } from '../modules/nf-core/gubbins/main'
-include { SNPSITES                     } from '../modules/nf-core/snpsites/main'
-include { PANAROO_RUN                  } from '../modules/nf-core/panaroo/run/main'
-include { MASHTREE                     } from '../modules/nf-core/mashtree/main'
 
 
 /*

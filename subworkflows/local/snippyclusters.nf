@@ -2,9 +2,13 @@
 // Perform Snippy analysis by species per clsuter
 //
 
-//Modules
-include { SNIPPY_CORE                   } from '../../modules/nf-core/snippy/core/main'
-include { SNIPPY_RUN                    } from '../../modules/nf-core/snippy/run/main'
+/*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    IMPORT LOCAL MODULES
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*/
+include { SNIPPY_CORE                  } from '../../modules/local/snippy/core/main'
+include { SNIPPY_RUN                   } from '../../modules/local/snippy/run/main'
 
 /*
 =============================================================================================================================
@@ -57,6 +61,12 @@ def read_aligned_fa(species,cluster_id,sample_id) {
     return snippy_aligned_fa_path
 }
 
+/*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    RUN MAIN SUBWORKFLOW
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*/
+
 workflow SNIPPY_CLUSTERS {
 
     take:
@@ -84,11 +94,6 @@ workflow SNIPPY_CLUSTERS {
         rerun_snippy: it[5][0] == false
     }
     .set{previous_vcf}
-
-
-    //
-    // Module: Run Snippy on the files
-    //
 
     //First create an empty channel to store the samples that need snippy run on them
     ch_snippy_to_run = Channel.empty()
@@ -169,3 +174,8 @@ workflow SNIPPY_CLUSTERS {
     snippy_txt      = SNIPPY_CORE.out.txt             // channel: [ val(meta), txt]
 }
 
+/*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    THE END
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*/
