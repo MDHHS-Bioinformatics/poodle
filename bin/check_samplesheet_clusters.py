@@ -30,14 +30,23 @@ class RowChecker:
     )
 
     VALID_ASSEMBLY_FORMATS = (
-        ".fasta", ".fasta.gz",
-        ".fna", ".fna.gz",
-        ".fa", ".fa.gz"
+        ".fasta",
+        ".fna",
+        ".fa",
     )
 
     VALID_GFF_FORMATS = (
         ".gff",
         ".gff3",
+    )
+
+    VALID_REFERENCE_FORMATS = (
+        ".fasta",
+        ".fna",
+        ".fa",
+        ".fasta.gz",
+        ".fa.gz", 
+        ".fna.gz"
     )
 
     def __init__(
@@ -50,7 +59,6 @@ class RowChecker:
         fifth_col='reference',
         sixth_col='cluster_id',
         seventh_col='species',
-        single_col="single_end",
         **kwargs,
     ):
         """
@@ -68,9 +76,6 @@ class RowChecker:
             fifth_col (str): The name of the columnn that contains the reference file paths
             sixth_col (str): The name of the column that contains the cluster_id for the sample
             seventh_col (str): The name of the column that contains the species for the sample
-            single_col (str): The name of the new column that will be inserted and
-                records whether the sample contains single- or paired-end sequencing
-                reads (default "single_end").
 
         """
         super().__init__(**kwargs)
@@ -82,7 +87,6 @@ class RowChecker:
         self._fifth_col = fifth_col
         self._sixth_col = sixth_col
         self._seventh_col = seventh_col
-        self._single_col = single_col
         self._seen = set()
         self.modified = []
 
@@ -97,7 +101,9 @@ class RowChecker:
         """
         self._validate_sample(row)
         self._validate_fastq_and_assembly(row)
-        self._validate_gff(row)  # Validate GFF
+        self._validate_gff(row)
+        self._validate_cluster(row)
+        self._validate_species(row)
         self._validate_reference(row)
         self._validate_pair(row)
         self._seen.add((row[self._sample_col], row[self._first_col]))
@@ -110,6 +116,7 @@ class RowChecker:
         # Sanitize samples slightly.
         row[self._sample_col] = row[self._sample_col].replace(" ", "_")
 
+    
     def _validate_fastq_and_assembly(self, row):
         """
         Validate that either fastq_1 and fastq_2 or the assembly column is filled correctly.
@@ -142,25 +149,36 @@ class RowChecker:
                 f"The GFF file has an unrecognized extension: {gff}\n"
                 f"It should be one of: {', '.join(self.VALID_GFF_FORMATS)}"
             )
+    def _validate_cluster(self, row):
+        """Assert that the cluster id exists and convert spaces to underscores."""
+        if len(row[self._sixth_col]) <= 0:
+            raise AssertionError("Cluster id is required.")
+        # Sanitize cluster id slightly.
+        row[self._sixth_col] = row[self._sixth_col].replace(" ", "_")
+
+    def _validate_species(self, row):
+        """Assert that the Species name exists and convert spaces to underscores."""
+        if len(row[self._seventh_col]) <= 0:
+            raise AssertionError("Species name is required.")
+        # Sanitize species slightly.
+        row[self._seventh_col] = row[self._seventh_col].replace(" ", "_")
+
     def _validate_reference(self,row):
         """Assert that the Reference file has the correct format if it exists"""
         reference = row.get(self._fifth_col, "")
-        if reference and not any(reference.endswith(extension) for extension in self.VALID_ASSEMBLY_FORMATS):
+        if reference and not any(reference.endswith(extension) for extension in self.VALID_REFERENCE_FORMATS):
             raise AssertionError(
                 f"The Reference file has an unrecognized extension: {reference}\n"
-                f"It should be one of: {', '.join(self.VALID_ASSEMBLY_FORMATS)}"
+                f"It should be one of: {', '.join(self.VALID_REFERENCE_FORMATS)}"
             )
 
     def _validate_pair(self, row):
         """Assert that read pairs have the same file extension. Report pair status."""
         if row[self._first_col] and row[self._second_col]:
-            row[self._single_col] = False
             first_col_suffix = Path(row[self._first_col]).suffixes[-2:]
             second_col_suffix = Path(row[self._second_col]).suffixes[-2:]
             if first_col_suffix != second_col_suffix:
                 raise AssertionError("FASTQ pairs must have the same file extensions.")
-        else:
-            row[self._single_col] = True
 
     def _validate_fastq_format(self, filename):
         """Assert that a given filename has one of the expected FASTQ extensions."""
@@ -287,7 +305,6 @@ def check_samplesheet(file_in, file_out):
                 sys.exit(1)
         #checker.validate_unique_samples()
     header = list(reader.fieldnames)
-    header.insert(1, "single_end")
     # See https://docs.python.org/3.9/library/csv.html#id3 to read up on `newline=""`.
     with file_out.open(mode="w", newline="") as out_handle:
         writer = csv.DictWriter(out_handle, header, delimiter=",")
