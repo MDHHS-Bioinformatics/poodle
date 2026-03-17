@@ -315,7 +315,7 @@ class NfcoreTemplate {
     }
 
     //
-    // nf-core logo
+    // PoODLE logo
     //
     public static String logo(workflow, monochrome_logs) {
         Map colors = logColours(monochrome_logs)
@@ -323,12 +323,16 @@ class NfcoreTemplate {
         String.format(
             """\n
             ${dashedLine(monochrome_logs)}
-                                                    ${colors.green},--.${colors.black}/${colors.green},-.${colors.reset}
-            ${colors.blue}        ___     __   __   __   ___     ${colors.green}/,-._.--~\'${colors.reset}
-            ${colors.blue}  |\\ | |__  __ /  ` /  \\ |__) |__         ${colors.yellow}}  {${colors.reset}
-            ${colors.blue}  | \\| |       \\__, \\__/ |  \\ |___     ${colors.green}\\`-._,-`-,${colors.reset}
-                                                    ${colors.green}`._,._,\'${colors.reset}
-            ${colors.purple}  ${workflow.manifest.name} ${workflow_version}${colors.reset}
+            ${colors.bired}                                            ${colors.reset}
+            ${colors.bired}   ____        ____  _____   _      _____   ${colors.reset}
+            ${colors.bired}  |  _ \\ ___  / __ \\|  __ \\ | |    | ____|  ${colors.reset}
+            ${colors.bired}  | |_) / _ \\| |  | | |  | || |    |  _|    ${colors.reset}
+            ${colors.bired}  |  __/ (_) | |__| | |__| || |___ | |___   ${colors.reset}
+            ${colors.bired}  |_|   \\___/ \\____/|_____/ |_____||_____|  ${colors.reset}
+            ${colors.bired}                                            ${colors.reset}
+            ${colors.bired}       Built by the MDHHS BOL         ${colors.reset}
+            ${colors.bired}                                            ${colors.reset}
+            ${colors.bicyan}  ${workflow.manifest.name} v${workflow.manifest.version}${colors.reset}
             ${dashedLine(monochrome_logs)}
             """.stripIndent()
         )
