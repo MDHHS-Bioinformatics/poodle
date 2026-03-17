@@ -4,7 +4,7 @@ process QUARTO_GUB_ONLY {
   
   errorStrategy 'ignore'
 
-  container "quay.io/vascok/quarto-wgs-reporting:1.0.0"
+  container "quay.io/mdhhs_bioinformatics/quarto-wgs-reporting:1.0.0"
   containerOptions = workflow.containerEngine == 'singularity'
     ? '--no-home --env USERID=$UID,XDG_CACHE_HOME=tmp/quarto_cache_home,XDG_DATA_HOME=tmp/quarto_data_home,QUARTO_PRINT_STACK=true'
     : '--user $(id -u):$(id -g) -e XDG_CACHE_HOME=/tmp/quarto_cache_home -e XDG_DATA_HOME=/tmp/quarto_data_home -e QUARTO_PRINT_STACK=true'
