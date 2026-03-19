@@ -22,7 +22,7 @@ These parameters are required for most pipeline runs.
 | Parameter  | Type   | Required | Default     | Description                                                            |
 | ---------- | ------ | -------- | ----------- | ---------------------------------------------------------------------- |
 | `--input`  | string | ✓        | –           | Path to the input samplesheet (CSV) describing the samples to process. |
-| `--outdir` | string | ✓        | `./results` | Directory where pipeline results will be written.                      |
+| `--outdir` | string | ✓        | `./poodle_results` | Directory where pipeline results will be written.                      |
 | `--email`  | string | –        | –           | Email address to receive pipeline completion notifications.            |
 
 ---
@@ -34,7 +34,7 @@ These parameters enable optional analysis steps.
 | Parameter            | Type    | Default | Description                                                        |
 | -------------------- | ------- | ------- | ------------------------------------------------------------------ |
 | `--gubbins`          | boolean | `false` | Perform recombination filtering using Gubbins.                     |
-| `--mashtree`         | boolean | `false` | Generate an assembly-based tree using MashTree.                    |
+| `--mashtree`         | boolean | `false` | Generate an genomic composition tree using MashTree.                    |
 | `--previous_results` | string  | –       | Path to previous pipeline results used to reuse existing analyses. By default, the pipeline looks for prior Snippy results for the same cluster in the outdir. |
 | `--save_snippy_run`  | boolean | `true`  | Save Snippy run outputs for each sample.                           |
 | `--logo_report`  | string | `assets/DNA_logo.png`  | Logo in PNG format to include in the report header                           |

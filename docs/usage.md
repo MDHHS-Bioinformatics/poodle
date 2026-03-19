@@ -5,10 +5,16 @@ This page describes how to run **PoODLE** and prepare the required input files.
 Detailed descriptions of pipeline parameters can be found in
 ➡ **[`parameters.md`](parameters.md)**
 
-The PoODLE pipeline is designed for genomic surveillance and outbreak investigation of bacterial pathogens, that integrates SNP-based phylogenetics and pangenome analysis to identify **genetically linked isolates** and produce **easy-to-interpret reports** for epidemiologists and microbiologists.
-
-PoODLE is designed for **routine surveillance**, where clusters grow incrementally as new samples arrive.
-
+## Table of contents
+- [Recommended upstream step](#-recommended-upstream-step-defining-clusters-with-corge)
+- [Quick start](#-quick-start)
+  1. [Requirements](#1%EF%B8%8F%E2%83%A3-requirements)
+  2. [Prepare the samplesheet](#2%EF%B8%8F%E2%83%A3-prepare-the-samplesheet)
+  3. [Running the Pipeline](#-running-the-pipeline)
+- [Pipeline Outputs](#-pipeline-outputs)
+- [Best practices & caveats](#-best-practices--caveats)
+- [Reproducibility](#-reproducibility)
+- [Updating the Pipeline](#-updating-the-pipeline)
 
 ---
 
@@ -70,7 +76,7 @@ Each row corresponds to **one isolate/sample**.
 
 ---
 
-# 📥 Samplesheet Specification
+### 📥 Samplesheet Specification
 
 The samplesheet must contain **8 columns** with the following headers.
 
@@ -123,7 +129,7 @@ An example samplesheet is available in [`assets/samplesheet.csv`](../assets/samp
 ## Basic run
 
 ```bash
-nextflow run MDHHS-Bioinformatics/PIPELINE_NAME \
+nextflow run MDHHS-Bioinformatics/poodle \
   -profile singularity \
   --input samplesheet.csv \
   --outdir results
@@ -141,7 +147,7 @@ This will execute the core analysis workflow which include variant calling and p
 Example enabling optional analyses (recombination filtering with Gubbins and MashTree) and adjusting resources:
 
 ```bash
-nextflow run MDHHS-Bioinformatics/PIPELINE_NAME \
+nextflow run MDHHS-Bioinformatics/poodle \
   -profile singularity \
   --input samplesheet.csv \
   --outdir results \
@@ -167,7 +173,7 @@ results/       # Final pipeline outputs
 The `work/` directory contains intermediate files and may be deleted after successful completion.
 
 
-For more details about the output files and reports, please refer to the [`Output documentation`](docs/output.md)
+For more details about the output files and reports, please refer to the [`Output documentation`](output.md)
 
 ---
 

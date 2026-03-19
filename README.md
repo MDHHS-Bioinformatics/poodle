@@ -79,9 +79,9 @@ SAMPLE_4,,,/path/S4.gff,/path/S4.fasta,outbreak_A,Pseudomonas_aeruginosa,/path/r
 * **Assemblies only** → leave both FASTQ columns empty
 
 > [!IMPORTANT]
-> Even if FASTQs are missing, **all columns must be present** in the CSV.
-> Use QC-trimmed FASTQ files, not raw reads.
-> All samples from the same cluster should share the same reference file.
+> - Even if FASTQs are missing, **all columns must be present** in the CSV.
+> - Use QC-trimmed FASTQ files, not raw reads.
+> - All samples from the same cluster should share the same species, cluster_id and reference file.
 
 
 > [!WARNING]
