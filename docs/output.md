@@ -284,7 +284,7 @@ mashtree/
 
 | File                         | Description                  |
 | ---------------------------- | ---------------------------- |
-| `<Species>_<cluster_id>.dnd` | Mash-based phylogenetic tree |
+| `<Species>_<cluster_id>.dnd` | Mash-based distance tree |
 | `<Species>_<cluster_id>.tsv` | Mash distance matrix         |
 
 </details>
