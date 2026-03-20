@@ -12,7 +12,7 @@ class WorkflowMain {
             "* The pipeline\n" +
             //"  https://doi.org/10.5281/zenodo.XXXXXXX\n\n" +
             "* Software dependencies\n" +
-            "  https://github.com/MDHHS-Bioinformatics/poodle/blob/master/CITATIONS.md"
+            "  https://github.com/MDHHS-Bioinformatics/poodle/blob/main/CITATIONS.md"
     }
 
     //

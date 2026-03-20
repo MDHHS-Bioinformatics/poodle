@@ -330,7 +330,7 @@ class NfcoreTemplate {
             ${colors.bired}  |  __/ (_) | |__| | |__| || |___ | |___   ${colors.reset}
             ${colors.bired}  |_|   \\___/ \\____/|_____/ |_____||_____|  ${colors.reset}
             ${colors.bired}                                            ${colors.reset}
-            ${colors.bired}       Built by the MDHHS BOL         ${colors.reset}
+            ${colors.biwhite}       Built by the MDHHS BOL         ${colors.reset}
             ${colors.bired}                                            ${colors.reset}
             ${colors.bicyan}  ${workflow.manifest.name} v${workflow.manifest.version}${colors.reset}
             ${dashedLine(monochrome_logs)}
