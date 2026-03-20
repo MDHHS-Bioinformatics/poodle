@@ -3,9 +3,7 @@ process PANAROO_RUN {
     label 'process_medium'
 
     conda "${moduleDir}/environment.yml"
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/panaroo:1.6.0--pyhdfd78af_0':
-        'quay.io/biocontainers/panaroo:1.6.0--pyhdfd78af_0' }"
+    container 'quay.io/biocontainers/panaroo:1.6.0--pyhdfd78af_0'
 
     input:
     tuple val(meta), path(gff)

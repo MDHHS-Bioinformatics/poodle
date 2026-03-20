@@ -3,9 +3,7 @@ process CONSTANTSITES {
     label 'process_medium'
 
     conda "${moduleDir}/environment.yml"
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/snp-sites:2.5.1--hed695b0_0' :
-        'quay.io/biocontainers/snp-sites:2.5.1--h577a1d6_7' }"
+    container 'quay.io/biocontainers/snp-sites:2.5.1--h577a1d6_7'
 
     input:
     tuple val(meta), path(msa)

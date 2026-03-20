@@ -3,9 +3,7 @@ process SNIPPY_CORE {
     label 'process_medium'
 
     conda "${moduleDir}/environment.yml"
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/snippy:4.6.0--hdfd78af_2':
-        'quay.io/biocontainers/snippy:4.6.0--hdfd78af_6' }"
+    container 'quay.io/biocontainers/snippy:4.6.0--hdfd78af_6'
 
     input:
     tuple val(meta), path(vcf), path(aligned_fa), path(reference)
