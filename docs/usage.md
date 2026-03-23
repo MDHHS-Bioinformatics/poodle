@@ -53,12 +53,16 @@ Install the following software:
   * [`Singularity`](https://www.sylabs.io/guides/3.0/user-guide/)
   * [`Apptainer`](https://apptainer.org/docs/user/latest/) (recommended for HPC)
 
-> [!NOTE]
-> When using Singularity/Apptainer, set a cache directory to reuse container images:
->
+> [!NOTE]  
+> If using **Singularity** set `NXF_SINGULARITY_CACHEDIR` (or `singularity.cacheDir`) to reuse images later. For example: 
 > ```bash
 > export NXF_SINGULARITY_CACHEDIR="/path/to/singularity_cache"
-> ```
+> ``````
+>
+> If using **Apptainer** set `NXF_APPTAINER_CACHEDIR` (or `apptainer.cacheDir`) to reuse images later. For example: 
+> ```bash
+> export NXF_APPTAINER_CACHEDIR="/path/to/apptainer_cache"
+> ``````
 
 ---
 
@@ -132,7 +136,7 @@ An example samplesheet is available in [`assets/samplesheet.csv`](../assets/samp
 nextflow run MDHHS-Bioinformatics/poodle \
   -profile singularity \
   --input samplesheet.csv \
-  --outdir results
+  --outdir poodle_results
 ```
 
 This will execute the core analysis workflow which include variant calling and pangenome analysis.
@@ -150,7 +154,7 @@ Example enabling optional analyses (recombination filtering with Gubbins and Mas
 nextflow run MDHHS-Bioinformatics/poodle \
   -profile singularity \
   --input samplesheet.csv \
-  --outdir results \
+  --outdir poodle_results \
   --gubbins \
   --mashtree \
   --max_memory 50.GB \

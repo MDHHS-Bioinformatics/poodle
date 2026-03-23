@@ -90,7 +90,7 @@ Available profiles typically include:
 | ------------- | ----------------------------------- |
 | `docker`      | Run using Docker containers         |
 | `singularity` | Run using Singularity containers    |
-| `conda`       | Run using Conda environments        |
+| `apptainer`   | Run using Apptainer containers      |
 | `test`        | Run pipeline with bundled test data |
 
 Multiple profiles can be combined:
@@ -109,7 +109,7 @@ Specify the **pipeline version or Git revision** to run.
 Example:
 
 ```bash
-nextflow run MDHHS-Bioinformatics/PIPELINE_NAME -r v1.0.0
+nextflow run MDHHS-Bioinformatics/poodle -r v1.0.0
 ```
 
 This ensures that the **exact same pipeline version** is used for analysis.
@@ -181,7 +181,7 @@ process {
 Run with:
 
 ```bash
-nextflow run PIPELINE_NAME -c custom.config
+nextflow run poodle -c custom.config
 ```
 
 ---

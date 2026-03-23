@@ -40,13 +40,10 @@ For full workflow details check [`Worflow documentation`](docs/workflow.md)
 ### 1️⃣ Requirements
 
 * [`Nextflow`](https://www.nextflow.io/docs/latest/getstarted.html#installation) (`>=22.10.1`)
-* [`Docker`](https://docs.docker.com/engine/installation/) (recommended for local runs) or [`Singularity`](https://www.sylabs.io/guides/3.0/user-guide/)/[`Apptainer`](https://apptainer.org/docs/user/latest/) (recommended for HPC clusters) for full pipeline reproducibility
-
-> [!NOTE]  
-> If using **Singularity/Apptainer** set `NXF_SINGULARITY_CACHEDIR` (or `singularity.cacheDir`) to reuse images later. For example: 
-> ```bash
-> export NXF_SINGULARITY_CACHEDIR="/path/to/singularity_cache"
-> ``````
+* One container runtime:
+  * [`Docker`](https://docs.docker.com/engine/installation/) (recommended for local runs)
+  * [`Singularity`](https://www.sylabs.io/guides/3.0/user-guide/)
+  * [`Apptainer`](https://apptainer.org/docs/user/latest/) (recommended for HPC)
 
 ### 2️⃣ Prepare samplesheet
 Prepare a samplesheet (CSV) to define sample files, clusters, and references:
@@ -131,7 +128,7 @@ For more details about the output files and reports, please refer to the [`Outpu
 
 ## 👥 Credits
 
-PoODLE was built and is maintained by the Genomics Analysis Unit at the Michigan Department of Health & Human Services (MDHHS) Bureau of Laboratories. This pipeline was developed by [Karla Vasco](https://github.com/vascokarla) and [Douglas Maldonado-Torres](https://github.com/MTDouglas) using the nf-core template.
+PoODLE was built and is maintained by the Genomics Analysis Unit at the Michigan Department of Health & Human Services (MDHHS) Bureau of Laboratories. This pipeline was developed by [Douglas Maldonado-Torres](https://github.com/MTDouglas) and [Karla Vasco](https://github.com/vascokarla) using the nf-core template.
 
 
 ## 🤝 Contributions
