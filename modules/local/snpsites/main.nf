@@ -3,7 +3,7 @@ process SNPSITES {
     label 'process_medium'
 
     conda "${moduleDir}/environment.yml"
-    container 'quay.io/biocontainers/snp-sites:2.5.1--hed695b0_0'
+    container 'quay.io/biocontainers/snp-sites:2.5.1--h577a1d6_7'
 
     input:
     tuple val(meta), path(msa)
