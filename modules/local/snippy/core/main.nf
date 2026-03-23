@@ -3,7 +3,7 @@ process SNIPPY_CORE {
     label 'process_medium'
 
     conda "${moduleDir}/environment.yml"
-    container 'quay.io/biocontainers/snippy:4.6.0--hdfd78af_6'
+    container 'quay.io/biocontainers/snippy:4.6.0--hdfd78af_5'
 
     input:
     tuple val(meta), path(vcf), path(aligned_fa), path(reference)
