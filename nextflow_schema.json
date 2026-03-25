@@ -81,6 +81,12 @@
                     "type": "string",
                     "description": "MultiQC report title. Printed as page header, used for filename if not otherwise specified.",
                     "fa_icon": "fas fa-file-signature"
+                },
+                "annotation_format": {
+                    "type": "string",
+                    "format": "directory-path",
+                    "description": "Format of the annotation files used for pangenome analysis. Options: 'gff' (standard GFF3 with embedded FASTA by tools such as Prokka or Bakta), 'split_gff' (for annotations lacking embedded FASTA sequences, e.g. RefSeq-style), or 'genbank' (.gbk, .gb, .gbff). All samples in a run must use the same format.",
+                    "fa_icon": "fas fa-folder-open"
                 }
             }
         },
