@@ -22,10 +22,10 @@
                 "pattern": "^\\S+\\.f(ast)?q\\.gz$",
                 "errorMessage": "FastQ file for reads 2 must have extension '.fq.gz' or '.fastq.gz' and cannot contain spaces"
             },
-            "gff": {
+            "annotation": {
                 "type": "string",
                 "pattern": "^\\S+\\.gff3?$",
-                "errorMessage": "GFF file must have extension '.gff' or '.gff3' and cannot contain spaces"
+                "errorMessage": "Annotation file must have extension '.gff', '.gff3', '.gb', '.gbk', '.gbff' and cannot contain spaces"
             },
             "assembly": {
                 "type": ["string", "null"],
@@ -48,7 +48,7 @@
                 "errorMessage": "Reference FASTA file must have extension '.fasta', '.fna', or '.fa', optionally compressed as '.gz', and cannot contain spaces"
             }
         },
-        "required": ["sample", "fastq_1", "fastq_2", "gff", "assembly", "cluster_id", "species", "reference"],
+        "required": ["sample", "fastq_1", "fastq_2", "annotation", "assembly", "cluster_id", "species", "reference"],
         "additionalProperties": false
     }
 }

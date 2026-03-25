@@ -87,19 +87,19 @@ The samplesheet must contain **8 columns** with the following headers.
 | Column    | Description                                                                                                                                                                            |
 | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `sample`  | Unique sample identifier. Spaces in sample names are automatically converted to underscores (`_`). |
-| `fastq_1` | Full path to FastQ file for Illumina QC trimmed short reads 1. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                                                  |
-| `fastq_2` | Full path to FastQ file for Illumina QC trimmed short reads 2. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                                                  |
-| `gff`     | Full path to GFF file with annotated genomes. File should have the extension ".gff" or ".gff3".                                                                                        |
-| `assembly` | Full path to assembled genome file. File cannot be gzipped and should have the extension ".fasta", ".fa", ".fna"                           |
+| `fastq_1` | Full path to FastQ file for Illumina QC trimmed short reads 1. File has to be gzipped and have the extension `.fastq.gz` or `.fq.gz`.                                                  |
+| `fastq_2` | Full path to FastQ file for Illumina QC trimmed short reads 2. File has to be gzipped and have the extension `.fastq.gz` or `.fq.gz`.                                                  |
+| `annotation`     | Full path to file with annotated genomes. File should have the extension `.gff`, `.gff3`,`.gbk`, `.gb`, `.gbff`.                                                                                        |
+| `assembly` | Full path to assembled genome file. File can be gzipped and have the extension `.fasta`, `.fa`, `.fna`, `.fasta.gz`, `.fa.gz` or .`fna.gz`|
 | `cluster_id` | Custom cluster id. This entry will be identical for multiple samples from the same cluster. Spaces in cluter ids are automatically converted to underscores (`_`).                  |
 | `species`  | Custom bacterial species name. This entry will be identical for multiple samples from the same species. Spaces in sample names are automatically converted to underscores (`_`).      |
-| `reference` | Full path to assembled reference genome file. This must be identical for multiple samples from the same cluster. File can be gzipped and have the extension ".fasta", ".fa", ".fna", ".fasta.gz", ".fa.gz" or ".fna.gz"                                 |
+| `reference` | Full path to assembled reference genome file. This must be identical for multiple samples from the same cluster. File can be gzipped and have the extension `.fasta`, `.fa`, `.fna`, `.fasta.gz`, `.fa.gz` or .`fna.gz`                                |
 
 ---
 
 ## Supported input types
 
-The pipeline supports three types of input data:
+The pipeline supports three types of input data for variant calling:
 
 | Input type       | Required columns     |
 | ---------------- | -------------------- |
@@ -112,12 +112,25 @@ If FASTQ files are not available, leave the columns blank.
 > [!IMPORTANT]
 > All columns must still be present in the CSV file.
 
----
+Different annotation formats are supported by `Panaroo` for pangenome analysis.
+If your annotations are not standard GFF3 files with embedded FASTA sequences, use the `--annotation_format` parameter to specify the correct format.
+
+| Annotation file type             | Description                                                                              | `--annotation_format` |
+| -------------------------------- | ---------------------------------------------------------------------------------------- | --------------------- |
+| GFF3                             | GFF3 file with embedded FASTA (e.g. Prokka/Bakta output)                                 | `gff` (default)       |
+| GFF3 + FASTA                     | GFF3 file without embedded FASTA, with a separate assembly FASTA file (e.g. NCBI RefSeq) | `split_gff`           |
+| GenBank (`.gb`, `.gbk`, `.gbff`) | GenBank flat file containing both annotation and sequence                                | `genbank`             |
+
+
+> ⚠️ All samples within a run must use the same annotation format.
+
+> 💡 Tip: If you downloaded annotations from NCBI, you likely need `--annotation_format split_gff` or `genbank`.
+
 
 ## Example samplesheet
 
 ```csv
-sample,fastq_1,fastq_2,gff,assembly,cluster_id,species,reference
+sample,fastq_1,fastq_2,annotation,assembly,cluster_id,species,reference
 SAMPLE_1,/path/S1_R1.fastq.gz,/path/S1_R2.fastq.gz,/path/S1.gff,/path/S1.fasta,HC1-C1,Escherichia_coli,/path/ref1.fasta
 SAMPLE_2,/path/S2_R1.fastq.gz,/path/S2_R2.fastq.gz,/path/S2.gff,/path/S2.fasta,HC1-C1,Escherichia_coli,/path/ref1.fasta
 SAMPLE_3,/path/S3.fastq.gz,,/path/S3.gff,/path/S3.fasta,outbreak_A,Pseudomonas_aeruginosa,/path/ref2.fasta

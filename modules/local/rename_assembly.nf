@@ -6,10 +6,10 @@ process RENAME_ASSEMBLY {
     container 'quay.io/biocontainers/pandas:2.2.1'
 
     input:
-    tuple val(meta), path(reads), path(assemblies), path(gff), path(reference)
+    tuple val(meta), path(reads), path(assemblies), path(annotation), path(reference)
 
     output:
-    tuple val(meta), path(reads), path("renamed_files/*"), path(gff), path(reference), emit: renamed_files
+    tuple val(meta), path(reads), path("renamed_files/*"), path(annotation), path(reference), emit: renamed_files
 
     when:
     task.ext.when == null || task.ext.when

@@ -11,7 +11,7 @@
 ![Last Commit](https://img.shields.io/github/last-commit/MDHHS-Bioinformatics/poodle)
 [![DOI](https://zenodo.org/badge/DOI/xxxxx.svg)](...)
 
-**PoODLE** (Phylogenomic Overview for Detection of Linkages for Epidemiologists) is a bioinformatics pipeline that can be used to analyze DNA sequencing data obtained from bacteria for cluster analyses. It takes a samplesheet with reads (FASTQ), annotation (GFF), and assembly (FASTA) files of multiple isolates from the same cluster as input; performs variant calling, pangenome analysis, recombination filtering, mash analysis, and phylogeny and produces linkage tables and a comprehensive report per cluster. 
+**PoODLE** (Phylogenomic Overview for Detection of Linkages for Epidemiologists) is a bioinformatics pipeline that can be used to analyze DNA sequencing data obtained from bacteria for cluster analyses. It takes a samplesheet with reads (FASTQ), annotation (GFF/GBK), and assembly (FASTA) files of multiple isolates from the same cluster as input; performs variant calling, pangenome analysis, recombination filtering, mash analysis, and phylogeny and produces linkage tables and a comprehensive report per cluster. 
 
 ## 🌟 Highlights
 - Processes **multiple species and clusters in parallel**
@@ -49,7 +49,7 @@ For full workflow details check [`Worflow documentation`](docs/workflow.md)
 Prepare a samplesheet (CSV) to define sample files, clusters, and references:
 
 ```csv
-sample,fastq_1,fastq_2,gff,assembly,cluster_id,species,reference
+sample,fastq_1,fastq_2,annotation,assembly,cluster_id,species,reference
 SAMPLE_1,/path/S1_R1.fastq.gz,/path/S1_R2.fastq.gz,/path/S1.gff,/path/S1.fasta,HC1-C1,Escherichia_coli,/path/ref1.fasta
 SAMPLE_2,/path/S2_R1.fastq.gz,/path/S2_R2.fastq.gz,/path/S2.gff,/path/S2.fasta,HC1-C1,Escherichia_coli,/path/ref1.fasta
 SAMPLE_3,/path/S3.fastq.gz,,/path/S3.gff,/path/S3.fasta,outbreak_A,Pseudomonas_aeruginosa,/path/ref2.fasta
@@ -63,10 +63,10 @@ SAMPLE_4,,,/path/S4.gff,/path/S4.fasta,outbreak_A,Pseudomonas_aeruginosa,/path/r
 | `sample`     | Unique sample ID                              |
 | `fastq_1`    | Path to read 1 (leave empty if not available)             |
 | `fastq_2`    | Path to read 2 (leave empty for single-end or assemblies) |
-| `gff`        | GFF annotation file (uncompressed)                        |
-| `assembly`   | FASTA assembly (uncompressed)                             |
+| `annotation` | Annotation file (GFF or Genbank format)                   |
+| `assembly`   | FASTA assembly                                            |
 | `cluster_id` | Cluster identifier (e.g. outbreak or surveillance group)  |
-| `species`    | Species name                      |
+| `species`    | Species name                                              |
 | `reference`  | Reference genome FASTA for SNP calling                    |
 
 ### Supported input types
