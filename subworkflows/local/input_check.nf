@@ -11,7 +11,7 @@
 include { SAMPLESHEET_CHECK as SAMPLESHEET_CHECK_FILES         } from '../../modules/local/samplesheet_check'
 include { SAMPLESHEET_CHECK as SAMPLESHEET_CHECK_ASSEMBLIES    } from '../../modules/local/samplesheet_check'
 include { RENAME_REFERENCE                                     } from '../../modules/local/renamereference.nf'
-include { RENAME_GFF                                           } from '../../modules/local/rename_gff.nf'
+include { RENAME_ANNOTATION                                    } from '../../modules/local/rename_annotation.nf'
 include { RENAME_ASSEMBLY                                      } from '../../modules/local/rename_assembly.nf'
 
 /*
@@ -20,7 +20,7 @@ include { RENAME_ASSEMBLY                                      } from '../../mod
 =============================================================================================================================
 */
 
-// Function to get list of [ meta, [ fastq_1, fastq_2 ] or [ assembly ], [ assembly ] or [], gff, reference ]
+// Function to get list of [ meta, [ fastq_1, fastq_2 ] or [ assembly ], [ assembly ] or [], annotation, reference ]
 def create_fastq_channel(LinkedHashMap row) {
     // Create meta map
     def meta = [:]
@@ -67,8 +67,8 @@ def create_fastq_channel(LinkedHashMap row) {
         exit 1, "ERROR: Sample ${row.sample} does not have valid reads or assembly!"
     }
 
-    // Return structure: [ meta, reads_files, assembly_files, gff, reference ]
-    def input_meta = [ meta, reads_files, assembly_files, file(row.gff), file(row.reference) ]
+    // Return structure: [ meta, reads_files, assembly_files, annotation, reference ]
+    def input_meta = [ meta, reads_files, assembly_files, file(row.annotation), file(row.reference) ]
 
     return input_meta
 }
@@ -118,7 +118,7 @@ workflow INPUT_CHECK {
     //
     RENAME_REFERENCE(
         input_files.map{
-            meta, reads, assemblies, gff, reference -> tuple(meta,reference)
+            meta, reads, assemblies, annotation, reference -> tuple(meta,reference)
         }
     )
     //
@@ -126,23 +126,23 @@ workflow INPUT_CHECK {
     //
     ch_renamed_refs = RENAME_REFERENCE.out.renamed_files.join(input_files)
     ch_renamed_refs
-        .map{meta, new_reference, reads, assemblies, gff, old_reference -> tuple(meta, reads, assemblies, gff, new_reference)}
+        .map{meta, new_reference, reads, assemblies, annotation, old_reference -> tuple(meta, reads, assemblies, annotation, new_reference)}
         .set{new_input_files}
     //
     // MODULE: Rename the files if desired
     //
     final_input_files = Channel.empty()
     if (params.rename_files){
-        //Rename the GFF files
-        RENAME_GFF(new_input_files)
+        //Rename the annotation files
+        RENAME_ANNOTATION(new_input_files)
 
         //Branch out if we need to rename assemblies or not
-        RENAME_GFF.out.renamed_files
-            .branch{ meta, reads, assemblies, gff, reference ->
+        RENAME_ANNOTATION.out.renamed_files
+            .branch{ meta, reads, assemblies, annotation, reference ->
             has_assembly: meta.has_assembly == true
-                return [ meta, reads, assemblies, gff, reference ]
+                return [ meta, reads, assemblies, annotation, reference ]
             no_assembly: meta.has_assembly == false
-                return [meta, reads, assemblies, gff, reference ]
+                return [meta, reads, assemblies, annotation, reference ]
             }
             .set{initial_renaming}
 
@@ -160,7 +160,7 @@ workflow INPUT_CHECK {
     }
 
     emit:
-    final_input_files                                 // channel: [ val(meta), [reads/assemblies], gff, reference ]
+    final_input_files                                 // channel: [ val(meta), [reads/assemblies], annotation, reference ]
     versions = SAMPLESHEET_CHECK_FILES.out.versions   // channel: [ versions.yml ]
 }
 
