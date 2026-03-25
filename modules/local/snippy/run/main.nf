@@ -3,11 +3,10 @@ process SNIPPY_RUN {
     label 'process_low'
 
     conda "${moduleDir}/environment.yml"
-    container 'quay.io/biocontainers/snippy:4.6.0--hdfd78af_5'
+    container 'quay.io/staphb/snippy:4.6.0-SC2'
 
     input:
-    //tuple val(meta), path(input_files), path(gff), path(reference)
-    tuple val(meta), path(reads), path(assemblies), path(gff), path(reference)
+    tuple val(meta), path(reads), path(assemblies), path(annotation), path(reference)
 
     output:
     tuple val(meta), path("${prefix}/${prefix}.tab")              , emit: tab
@@ -45,13 +44,13 @@ process SNIPPY_RUN {
     }
 
     """
-    snippy \\
-        $args \\
-        --cpus $task.cpus \\
-        --ram $task.memory \\
-        --outdir $prefix \\
-        --reference $reference \\
-        --prefix $prefix \\
+    snippy \
+        $args \
+        --cpus $task.cpus \
+        --ram $task.memory \
+        --outdir $prefix \
+        --reference $reference \
+        --prefix $prefix \
         $input_command
 
     cat <<-END_VERSIONS > versions.yml
