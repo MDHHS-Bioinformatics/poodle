@@ -33,11 +33,17 @@ class RowChecker:
         ".fasta",
         ".fna",
         ".fa",
+        ".fasta.gz",
+        ".fa.gz", 
+        ".fna.gz"
     )
 
-    VALID_GFF_FORMATS = (
+    VALID_ANNOTATION_FORMATS = (
         ".gff",
         ".gff3",
+        ".gbk",
+        ".gb",
+        ".gbff"
     )
 
     VALID_REFERENCE_FORMATS = (
@@ -54,7 +60,7 @@ class RowChecker:
         sample_col="sample",
         first_col="fastq_1",
         second_col="fastq_2",
-        third_col="gff",  # GFF column
+        third_col="annotation",  # annotation column
         fourth_col='assembly',  # Assembly column, # values will have to be NA or '' if not being used
         fifth_col='reference',
         sixth_col='cluster_id',
@@ -71,7 +77,7 @@ class RowChecker:
                 FASTQ file path (default "fastq_1").
             second_col (str): The name of the column that contains the second (if any)
                 FASTQ file path (default "fastq_2").
-            third_col (str): The name of the column that contains the GFF file path (default "gff").
+            third_col (str): The name of the column that contains the annotation file path (default "annotation").
             fourth_col (str): The name of the column that contains the assembly file paths, if not being used, values must be NA or ''
             fifth_col (str): The name of the columnn that contains the reference file paths
             sixth_col (str): The name of the column that contains the cluster_id for the sample
@@ -101,7 +107,7 @@ class RowChecker:
         """
         self._validate_sample(row)
         self._validate_fastq_and_assembly(row)
-        self._validate_gff(row)
+        self._validate_annotation(row)
         self._validate_cluster(row)
         self._validate_species(row)
         self._validate_reference(row)
@@ -141,13 +147,13 @@ class RowChecker:
             if fastq_2:
                 self._validate_fastq_format(fastq_2)
 
-    def _validate_gff(self, row):
-        """Assert that the GFF file has the correct format if it exists."""
-        gff = row.get(self._third_col, "")
-        if gff and not any(gff.endswith(extension) for extension in self.VALID_GFF_FORMATS):
+    def _validate_annotation(self, row):
+        """Assert that the annotation file has the correct format if it exists."""
+        annotation = row.get(self._third_col, "")
+        if annotation and not any(annotation.endswith(extension) for extension in self.VALID_ANNOTATION_FORMATS):
             raise AssertionError(
-                f"The GFF file has an unrecognized extension: {gff}\n"
-                f"It should be one of: {', '.join(self.VALID_GFF_FORMATS)}"
+                f"The annotation file has an unrecognized extension: {annotation}\n"
+                f"It should be one of: {', '.join(self.VALID_ANNOTATION_FORMATS)}"
             )
     def _validate_cluster(self, row):
         """Assert that the cluster id exists and convert spaces to underscores."""
@@ -275,7 +281,7 @@ def check_samplesheet(file_in, file_out):
         This function checks that the samplesheet follows the following structure,
         see also the `viral recon samplesheet`_::
 
-            sample,fastq_1,fastq_2,gff,assembly,cluster_id,species,reference
+            sample,fastq_1,fastq_2,annotation,assembly,cluster_id,species,reference
             SAMPLE_PE,SAMPLE_PE_RUN1_1.fastq.gz,SAMPLE_PE_RUN1_2.fastq.gz,SAMPLE_PE.gff,SAMPLE_PE.fna,cluster_name,Genus_species,reference.fasta
             SAMPLE_PE,SAMPLE_PE_RUN2_1.fastq.gz,SAMPLE_PE_RUN2_2.fastq.gz,SAMPLE_PE.gff,SAMPLE_PE.fna,cluster_name,Genus_species,reference.fasta
             SAMPLE_SE,SAMPLE_SE_RUN1_1.fastq.gz,,SAMPLE_SE.gff,SAMPLE_PE.fna,cluster_name,Genus_species,reference.fasta
@@ -285,7 +291,7 @@ def check_samplesheet(file_in, file_out):
         https://raw.githubusercontent.com/nf-core/test-datasets/viralrecon/samplesheet/samplesheet_test_illumina_amplicon.csv
 
     """
-    required_columns = {"sample", "fastq_1", "fastq_2", "gff", "assembly", "reference", "cluster_id", "species"}  #
+    required_columns = {"sample", "fastq_1", "fastq_2", "annotation", "assembly", "reference", "cluster_id", "species"}  #
     # See https://docs.python.org/3.9/library/csv.html#id3 to read up on `newline=""`.
     with file_in.open(newline="") as in_handle:
         reader = csv.DictReader(in_handle, dialect=sniff_format(in_handle))
