@@ -3,18 +3,16 @@ process PANAROO_RUN {
     label 'process_medium'
 
     conda "${moduleDir}/environment.yml"
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/panaroo:1.5.2--pyhdfd78af_0':
-        'quay.io/biocontainers/panaroo:1.5.2--pyhdfd78af_0' }"
+    container 'quay.io/biocontainers/panaroo:1.6.0--pyhdfd78af_0'
 
     input:
-    tuple val(meta), path(gff)
+    tuple val(meta), path(annotation_files), val(input_lines)
 
     output:
     tuple val(meta), path("panaroo/${meta.species}_${meta.cluster_id}_gene_presence_absence_roary.csv")            , emit: csv
     tuple val(meta), path("panaroo/${meta.species}_${meta.cluster_id}_gene_presence_absence.Rtab")                 , emit: rtab
     tuple val(meta), path("panaroo/${meta.species}_${meta.cluster_id}_summary_statistics.txt")                     , emit: summary
-    path "versions.yml"                                                         , emit: versions
+    path "versions.yml"                                                                                            , emit: versions
 
 
     when:
@@ -22,12 +20,13 @@ process PANAROO_RUN {
 
     script:
     def args = task.ext.args ?: ''
+    def quoted_lines = input_lines.collect { "\"${it}\"" }.join(' ')
     prefix = task.ext.prefix ?: "${meta.species}_${meta.cluster_id}"
     cluster_id = task.ext.prefix ?: "${meta.cluster_id}"
     species = task.ext.prefix ?: "${meta.species}"
-    //Join the list of GFF files into a space-seperated string
-    gff_files = gff.join(' ')
     """
+    printf "%s\\n" ${quoted_lines} > panaroo_inputs.txt
+    
     panaroo \\
         $args \\
         -t $task.cpus \\
@@ -37,9 +36,9 @@ process PANAROO_RUN {
         --threshold 0.98 \\
         --family_threshold 0.7 \\
         --core_threshold 0.99 \\
-        -i $gff_files 
+        -i panaroo_inputs.txt
 
-    # Rename with species prefix
+    # Rename with species and cluster prefix
     for f in panaroo/*; do
         base=\$(basename "\$f")
         mv "\$f" "panaroo/${prefix}_\${base}"

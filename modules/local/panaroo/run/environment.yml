@@ -2,4 +2,4 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - bioconda::panaroo=1.5.2
+  - bioconda::panaroo=1.6.0

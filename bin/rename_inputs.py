@@ -1,60 +1,102 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-import os
-import shutil
-from pathlib import Path
 import argparse
+import shutil
+import sys
+from pathlib import Path
 
 
-#rename the assemblies
 def rename_assembly(path, prefix, renamed_dir):
-    #copy the file using the prefix as the basename but the extension of whatever the path is
-    new_name = f"{prefix}{Path(path).suffix}"
-    #create the new file in the renamed_dir directory
+    old_path = Path(path)
+    new_name = f"{prefix}{old_path.suffix}"
     new_path = renamed_dir / new_name
     shutil.copy(path, new_path)
     print(f"Renamed assembly {path} to {new_path}")
+    return new_path
 
-#rename the gff files
-def rename_gff(path, prefix, renamed_dir):
-    # Determine the new file name
-    new_name = f"{prefix}.gff"
-    old_base_name = Path(path).name
+
+def rename_annotation(path, prefix, renamed_dir, annotation_format):
+    old_path = Path(path)
+    suffix = old_path.suffix.lower()
+
+    if annotation_format in ["gff", "split_gff"]:
+        valid_suffixes = [".gff", ".gff3"]
+    elif annotation_format == "genbank":
+        valid_suffixes = [".gbk", ".gb", ".gbff"]
+    else:
+        raise ValueError(
+            f"Unsupported annotation_format '{annotation_format}'. "
+            "Expected one of: gff, split_gff, genbank"
+        )
+
+    if suffix not in valid_suffixes:
+        print(
+            f"WARNING: Annotation file '{path}' has unexpected suffix '{suffix}' "
+            f"for format '{annotation_format}'",
+            file=sys.stderr,
+        )
+
+    new_name = f"{prefix}{suffix}"
     new_path = renamed_dir / new_name
     shutil.copy(path, new_path)
-    print(f"Renamed gff {path} to {new_path}")
+    print(f"Renamed annotation {path} to {new_path}")
+    return new_path
 
 
 def main():
-    #set up the parser
-    parser = argparse.ArgumentParser(description="Rename the necessary files")
-    parser.add_argument('--prefix', type=str, required=True, help="Sample name to use as the prefix for the renamed files")
-    parser.add_argument('--assembly', type=str, required=False, help="Assembly file to rename")
-    parser.add_argument('--gff', type=str, required=False, help="GFF file to rename")
+    parser = argparse.ArgumentParser(description="Rename assembly and annotation files")
+    parser.add_argument(
+        "--prefix",
+        type=str,
+        required=True,
+        help="Sample name to use as the prefix for the renamed files",
+    )
+    parser.add_argument(
+        "--assembly",
+        type=str,
+        required=False,
+        help="Assembly file to rename",
+    )
+    parser.add_argument(
+        "--annotation",
+        type=str,
+        required=False,
+        help="Annotation file to rename",
+    )
+    parser.add_argument(
+        "--annotation_format",
+        type=str,
+        required=False,
+        default="gff",
+        choices=["gff", "split_gff", "genbank"],
+        help="Annotation format: gff, split_gff, or genbank",
+    )
     args = parser.parse_args()
 
-    #make a directory called renamed_files if it doesn't exist
     renamed_dir = Path.cwd() / "renamed_files"
     renamed_dir.mkdir(exist_ok=True)
 
-    # Rename the assembly file if provided
+    renamed_any = False
+
     if args.assembly:
-        if not os.path.exists(args.assembly):
-            print(f"Error: Assembly file {args.assembly} does not exist.")
-            return
-        rename_assembly(args.assembly, args.prefix, renamed_dir)
+        assembly_path = Path(args.assembly)
+        if not assembly_path.exists():
+            sys.exit(f"Error: Assembly file {args.assembly} does not exist.")
+        rename_assembly(assembly_path, args.prefix, renamed_dir)
+        renamed_any = True
 
-    # Rename the gff file if provided
-    if args.gff:
-        if not os.path.exists(args.gff):
-            print(f"Error: GFF file {args.gff} does not exist.")
-            return
-        rename_gff(args.gff, args.prefix, renamed_dir)
+    if args.annotation:
+        annotation_path = Path(args.annotation)
+        if not annotation_path.exists():
+            sys.exit(f"Error: Annotation file {args.annotation} does not exist.")
+        rename_annotation(annotation_path, args.prefix, renamed_dir, args.annotation_format)
+        renamed_any = True
 
-    if not args.assembly and not args.gff:
-        print("No assembly or GFF file provided. Nothing to rename.")
+    if not renamed_any:
+        print("No assembly or annotation file provided. Nothing to rename.")
     else:
         print("Renaming complete.")
+
 
 if __name__ == "__main__":
     main()

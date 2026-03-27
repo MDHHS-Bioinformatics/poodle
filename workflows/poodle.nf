@@ -16,6 +16,11 @@ for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true
 // Check mandatory parameters
 if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input samplesheet not specified!' }
 
+def valid_annotation_formats = ['gff', 'split_gff', 'genbank']
+if (!(params.annotation_format in valid_annotation_formats)) {
+    exit 1, "ERROR: --annotation_format must be one of: ${valid_annotation_formats.join(', ')}"
+}
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     CONFIG FILES
@@ -42,6 +47,14 @@ include { QUARTO_BOTH                 } from '../modules/local/report/quarto_bot
 include { QUARTO_GUB_ONLY             } from '../modules/local/report/quarto_gub_only.nf'
 include { QUARTO_MASH_ONLY            } from '../modules/local/report/quarto_mash_only.nf'
 include { QUARTO_NEITHER              } from '../modules/local/report/quarto_neither.nf'
+include { SNPDISTS as SNPDISTS_SNIPPY  } from '../modules/local/snpdists/main'
+include { SNPDISTS as SNPDISTS_GUBBINS } from '../modules/local/snpdists/main'
+include { IQTREE as IQTREE_SNIPPY      } from '../modules/local/iqtree/main'
+include { IQTREE as IQTREE_GUBBINS     } from '../modules/local/iqtree/main'
+include { GUBBINS                      } from '../modules/local/gubbins/main'
+include { SNPSITES                     } from '../modules/local/snpsites/main'
+include { PANAROO_RUN                  } from '../modules/local/panaroo/run/main'
+include { MASHTREE                     } from '../modules/local/mashtree/main'
 
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
@@ -58,16 +71,6 @@ include { SNIPPY_CLUSTERS             } from '../subworkflows/local/snippycluste
 // MODULE: Installed directly from nf-core/modules
 //
 include { CUSTOM_DUMPSOFTWAREVERSIONS  } from '../modules/nf-core/custom/dumpsoftwareversions/main'
-include { SNIPPY_CORE                  } from '../modules/nf-core/snippy/core/main'
-include { SNIPPY_RUN                   } from '../modules/nf-core/snippy/run/main'
-include { SNPDISTS as SNPDISTS_SNIPPY  } from '../modules/nf-core/snpdists/main'
-include { SNPDISTS as SNPDISTS_GUBBINS } from '../modules/nf-core/snpdists/main'
-include { IQTREE as IQTREE_SNIPPY      } from '../modules/nf-core/iqtree/main'
-include { IQTREE as IQTREE_GUBBINS     } from '../modules/nf-core/iqtree/main'
-include { GUBBINS                      } from '../modules/nf-core/gubbins/main'
-include { SNPSITES                     } from '../modules/nf-core/snpsites/main'
-include { PANAROO_RUN                  } from '../modules/nf-core/panaroo/run/main'
-include { MASHTREE                     } from '../modules/nf-core/mashtree/main'
 
 
 /*
@@ -188,14 +191,54 @@ workflow POODLE {
     //
     // MODULE: Gene-presence abscence with Panaroo
     //
-    // Collect GFF files by species and cluster
+    // Collect annotation files by species and cluster and add assembly if the annotations are split gffs
     INPUT_CHECK.out.final_input_files
-    .map{meta, reads, assembly, gff, reference -> tuple([[species:meta.species,cluster_id:meta.cluster_id],gff])}
-    .groupTuple(by:[0])
-    .set{ch_collected_gffs}
-    //
+        .map { meta, reads, assembly, annotation, reference ->
+
+            def panaroo_files
+            def panaroo_line
+
+            switch (params.annotation_format) {
+                case 'gff':
+                    panaroo_files = [ annotation ]
+                    panaroo_line  = annotation.getName()
+                    break
+
+                case 'split_gff':
+                    if (!assembly || assembly.isEmpty()) {
+                        exit 1, "ERROR: No assembly found for sample '${meta.id}' but --annotation_format=split_gff"
+                    }
+
+                    def assembly_file = assembly instanceof List ? assembly[0] : assembly
+                    def annotation_file = annotation instanceof List ? annotation[0] : annotation
+
+                    panaroo_files = [ annotation_file, assembly_file ]
+                    panaroo_line  = "${annotation_file.getName()} ${assembly_file.getName()}"
+                    break
+
+                case 'genbank':
+                    panaroo_files = [ annotation ]
+                    panaroo_line  = annotation.getName()
+                    break
+
+                default:
+                    exit 1, "ERROR: Unsupported annotation_format: ${params.annotation_format}"
+            }
+
+            tuple(
+                [species: meta.species, cluster_id: meta.cluster_id],
+                panaroo_files,
+                panaroo_line
+            )
+        }
+        .groupTuple(by: 0)
+        .map { meta, annotation_files, input_lines ->
+            tuple(meta, annotation_files.flatten(), input_lines)
+        }
+        .set { ch_panaroo_inputs }
+    
     PANAROO_RUN(
-        ch_collected_gffs
+        ch_panaroo_inputs
     )
     ch_versions = ch_versions.mix(PANAROO_RUN.out.versions)
 
@@ -214,8 +257,8 @@ workflow POODLE {
         //INPUT_CHECK.out.final_input_files.view()
         // Get only assemblies from the input and place in a channel per species and cluster
         INPUT_CHECK.out.final_input_files
-        .filter{meta, reads, assembly, gff, reference -> meta.has_assembly == true}
-        .map{ meta, reads, assembly, gff, reference -> tuple([[species:meta.species, cluster_id:meta.cluster_id], assembly]) }
+        .filter{meta, reads, assembly, annotation, reference -> meta.has_assembly == true}
+        .map{ meta, reads, assembly, annotation, reference -> tuple([[species:meta.species, cluster_id:meta.cluster_id], assembly]) }
         .groupTuple(by: [0])
         .set{ ch_assemblies }
 

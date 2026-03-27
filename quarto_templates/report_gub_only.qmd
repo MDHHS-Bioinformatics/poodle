@@ -366,7 +366,7 @@ Reference-based SNP analysis was accomplished using Snippy v4.6.0^1^ within a sp
 
 ### Pangenome Analysis
 
-The gene presence-absence profile was identified using the pangenome tool Panaroo v1.5.2^4^ with a strict mode, using 95% sequence identity for clustering and a 70% protein family sequence identity threshold.
+The gene presence-absence profile was identified using the pangenome tool Panaroo v1.6.0^4^ with a strict mode, using 95% sequence identity for clustering and a 70% protein family sequence identity threshold.
 
 ### Recombination Analysis
 

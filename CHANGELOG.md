@@ -1,16 +1,16 @@
-# nf-core/poodle: Changelog
+# MDHHS-Bioinformatics/poodle: Changelog
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project follows [Semantic Versioning](https://semver.org/).
 
-## v1.0dev - [date]
+## v1.0.0 - [date]
 
-Initial release of process-cluster-per-species, created with the [nf-core](https://nf-co.re/) template.
+### Added
+- Initial release of PoODLE.
+- Core workflow implemented.
+- Documentation for usage, workflow, parameters, and outputs.
+- Containerized execution using Docker/Singularity.
+- Example samplesheet provided in `assets/`.
 
-### `Added`
+### Notes
+- First stable release of the pipeline.
 
-### `Fixed`
-
-### `Dependencies`
-
-### `Deprecated`

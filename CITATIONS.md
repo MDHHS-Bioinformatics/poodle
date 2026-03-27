@@ -1,4 +1,4 @@
-# process-bact-clusters: Citations
+# PoODLE: Citations
 
 ## [nf-core](https://pubmed.ncbi.nlm.nih.gov/32055031/)
 
@@ -14,7 +14,7 @@
 
 - [snp-dists](https://github.com/tseemann/snp-dists)
 
-- [SNP-sites](https://www.iqtree.org/)
+- [SNP-sites](https://sanger-pathogens.github.io/snp-sites/)
   > Andrew J. Page, Ben Taylor, Aidan J. Delaney, Jorge Soares, Torsten Seemann, Jacqueline A. Keane, Simon R. Harris. "SNP-sites: rapid efficient extraction of SNPs from multi-FASTA alignments", Microbial Genomics 2(4), (2016)
 
 - [IQ-TREE](https://www.iqtree.org/)
@@ -34,14 +34,6 @@
 
 
 ## Software packaging/containerisation tools
-
-- [Anaconda](https://anaconda.com)
-
-  > Anaconda Software Distribution. Computer software. Vers. 2-2.4.0. Anaconda, Nov. 2016. Web.
-
-- [Bioconda](https://pubmed.ncbi.nlm.nih.gov/29967506/)
-
-  > Grüning B, Dale R, Sjödin A, Chapman BA, Rowe J, Tomkins-Tinch CH, Valieris R, Köster J; Bioconda Team. Bioconda: sustainable and comprehensive software distribution for the life sciences. Nat Methods. 2018 Jul;15(7):475-476. doi: 10.1038/s41592-018-0046-7. PubMed PMID: 29967506.
 
 - [BioContainers](https://pubmed.ncbi.nlm.nih.gov/28379341/)
 

@@ -3,9 +3,7 @@ process SNIPPY_CORE {
     label 'process_medium'
 
     conda "${moduleDir}/environment.yml"
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/snippy:4.6.0--hdfd78af_2':
-        'quay.io/biocontainers/snippy:4.6.0--hdfd78af_6' }"
+    container 'quay.io/staphb/snippy:4.6.0-SC2'
 
     input:
     tuple val(meta), path(vcf), path(aligned_fa), path(reference)
@@ -41,10 +39,10 @@ process SNIPPY_CORE {
     find . -name "*.aligned.fa" | sed 's/\\.aligned.fa\$//' | xargs -I {} bash -c 'cp -L {}.aligned.fa samples/{}/{}.aligned.fa'
 
     # Run snippy-core
-    snippy-core \\
-        $args \\
-        --ref $reference_name \\
-        --prefix $prefix \\
+    snippy-core \
+        $args \
+        --ref $reference_name \
+        --prefix $prefix \
         samples/*
     # Cleanup the alignment
     snippy-clean_full_aln ${prefix}.full.aln > ${prefix}_clean.full.aln

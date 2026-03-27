@@ -3,15 +3,13 @@ process RENAME_ASSEMBLY {
     label 'process_single'
 
     conda "conda-forge::pandas=2.2.3"
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/pandas:2.2.1' :
-        'quay.io/biocontainers/pandas:2.2.1' }"
+    container 'quay.io/biocontainers/pandas:2.2.1'
 
     input:
-    tuple val(meta), path(reads), path(assemblies), path(gff), path(reference)
+    tuple val(meta), path(reads), path(assemblies), path(annotation), path(reference)
 
     output:
-    tuple val(meta), path(reads), path("renamed_files/*"), path(gff), path(reference), emit: renamed_files
+    tuple val(meta), path(reads), path("renamed_files/*"), path(annotation), path(reference), emit: renamed_files
 
     when:
     task.ext.when == null || task.ext.when
