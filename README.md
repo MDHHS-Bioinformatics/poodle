@@ -71,6 +71,7 @@ SAMPLE_4,,,/path/S4.gff,/path/S4.fasta,outbreak_A,Pseudomonas_aeruginosa,/path/r
 
 _Supported input types for variant calling_
 
+[`Snippy`](https://github.com/tseemann/snippy) supports the following inputs:
 * **Paired-end reads** → `fastq_1` + `fastq_2`
 * **Single-end reads** → `fastq_1` only
 * **Assemblies only** → leave both FASTQ columns empty
@@ -86,9 +87,11 @@ _Supported input types for variant calling_
 > **Quality-trimmed reads are strongly recommended** whenever possible.
 
 _Supported annotation types for pangenome profiling_
-* **GFF3** from Prokka or Bakta (with embeded FASTA) → use `--annotation_format gff` (default)
-* **GFF3** without embeded FASTA (e.g., from RefSeq) → use `--annotation_format split_gff`
-* **Genbank files** (.gb, .gbk, .gbff)  → use `--annotation_format genbank`
+
+[`Panaroo`](https://github.com/gtonkinhill/panaroo) supports the following annotation formats:
+* **GFF3** (from Prokka or Bakta, with embedded FASTA) → use `--annotation_format gff` _(default)_
+* **GFF3 without embedded FASTA** (e.g., from RefSeq) → use `--annotation_format split_gff`
+* **GenBank files** (.gb, .gbk, .gbff)  → use `--annotation_format genbank`
 
 > [!NOTE]
 > All samples within a run must use the same annotation format.
