@@ -31,7 +31,7 @@ High-level steps:
 7. Whole-genome distance tree with [`MashTree`](https://github.com/lskatz/mashtree) (optional) 
 8. Report generation including trees, distance matrices, and pangenome plots
 
-For full workflow details check [`Worflow documentation`](docs/workflow.md)
+For full workflow details check [`Workflow documentation`](docs/workflow.md)
 
 ---
 
@@ -69,7 +69,7 @@ SAMPLE_4,,,/path/S4.gff,/path/S4.fasta,outbreak_A,Pseudomonas_aeruginosa,/path/r
 | `species`    | Species name                                              |
 | `reference`  | Reference genome FASTA for SNP calling                    |
 
-### Supported input types
+_Supported input types for variant calling_
 
 * **Paired-end reads** → `fastq_1` + `fastq_2`
 * **Single-end reads** → `fastq_1` only
@@ -84,6 +84,14 @@ SAMPLE_4,,,/path/S4.gff,/path/S4.fasta,outbreak_A,Pseudomonas_aeruginosa,/path/r
 > [!WARNING]
 > SNPs generated from assemblies may be **inflated or less accurate**.
 > **Quality-trimmed reads are strongly recommended** whenever possible.
+
+_Supported annotation types for pangenome profiling_
+* **GFF3** from Prokka or Bakta (with embeded FASTA) → use `--annotation_format gff` (default)
+* **GFF3** without embeded FASTA (e.g., from RefSeq) → use `--annotation_format split_gff`
+* **Genbank files** (.gb, .gbk, .gbff)  → use `--annotation_format genbank`
+
+> [!NOTE]
+> All samples within a run must use the same annotation format.
 
 
 ### 3️⃣ Run

@@ -40,7 +40,7 @@ Together, they form a **two-stage surveillance workflow**:
 
 ---
 
-# ⚡ Quick Start
+# PoODLE usage
 
 ## 1️⃣ Requirements
 
@@ -99,6 +99,8 @@ The samplesheet must contain **8 columns** with the following headers.
 
 ## Supported input types
 
+_Supported input types for variant calling_
+
 The pipeline supports three types of input data for variant calling:
 
 | Input type       | Required columns     |
@@ -112,6 +114,7 @@ If FASTQ files are not available, leave the columns blank.
 > [!IMPORTANT]
 > All columns must still be present in the CSV file.
 
+_Supported annotation types for pangenome profiling_
 Different annotation formats are supported by `Panaroo` for pangenome analysis.
 If your annotations are not standard GFF3 files with embedded FASTA sequences, use the `--annotation_format` parameter to specify the correct format.
 
@@ -121,10 +124,11 @@ If your annotations are not standard GFF3 files with embedded FASTA sequences, u
 | GFF3 + FASTA                     | GFF3 file without embedded FASTA, with a separate assembly FASTA file (e.g. NCBI RefSeq) | `split_gff`           |
 | GenBank (`.gb`, `.gbk`, `.gbff`) | GenBank flat file containing both annotation and sequence                                | `genbank`             |
 
+> [!IMPORTANT]
+> All samples within a run must use the same annotation format.
 
-> ⚠️ All samples within a run must use the same annotation format.
-
-> 💡 Tip: If you downloaded annotations from NCBI, you likely need `--annotation_format split_gff` or `genbank`.
+> [!TIP]
+> If you downloaded annotations from NCBI, you likely need `--annotation_format split_gff` or `genbank`.
 
 
 ## Example samplesheet
@@ -155,7 +159,7 @@ nextflow run MDHHS-Bioinformatics/poodle \
 This will execute the core analysis workflow which include variant calling and pangenome analysis.
 
 >[!NOTE]
->This command downloads this pipeline to ~/.nextflow/assets/MDHHS-Bioinformatics/poodle. You can download the pipeline in a different location using `git clone https://github.com/MDHHS-Bioinformatics/poodle.git`. To run the pipeline, specify the path to the cloned repository (e.g. `nextflow run /path/to/poodle ...`).
+>This command downloads this pipeline to `~/.nextflow/assets/MDHHS-Bioinformatics/poodle`. You can download the pipeline in a different location using `git clone https://github.com/MDHHS-Bioinformatics/poodle.git`. To run the pipeline, specify the path to the cloned repository (e.g. `nextflow run /path/to/poodle ...`).
 
 ---
 
