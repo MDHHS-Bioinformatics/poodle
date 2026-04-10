@@ -291,12 +291,13 @@ def check_samplesheet(file_in, file_out):
         https://raw.githubusercontent.com/nf-core/test-datasets/viralrecon/samplesheet/samplesheet_test_illumina_amplicon.csv
 
     """
-    required_columns = {"sample", "fastq_1", "fastq_2", "annotation", "assembly", "reference", "cluster_id", "species"}  #
+    required_columns = ["sample", "fastq_1", "fastq_2", "annotation", "assembly", "reference", "cluster_id", "species"]  #
     # See https://docs.python.org/3.9/library/csv.html#id3 to read up on `newline=""`.
     with file_in.open(newline="") as in_handle:
         reader = csv.DictReader(in_handle, dialect=sniff_format(in_handle))
         # Validate the existence of the expected header columns.
-        if not required_columns.issubset(reader.fieldnames):
+        required_set = set(required_columns)
+        if not required_set.issubset(reader.fieldnames):
             req_cols = ", ".join(required_columns)
             logger.critical(f"The sample sheet **must** contain these column headers: {req_cols}.")
             sys.exit(1)
