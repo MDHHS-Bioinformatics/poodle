@@ -1,4 +1,4 @@
 sample,fastq_1,fastq_2,annotation,assembly,cluster_id,species,reference
-sample 1,,,test/sample_1.gff,test/sample_1.fasta,cluster 1,Escherichia coli,test/sample_1.fasta
-sample_2,,,test/sample_2.gff,test/sample_2.fasta,cluster_1,Escherichia_coli,test/sample_1.fasta
-sample_3,,,test/sample_3.gff,test/sample_3.fasta,cluster_1,Escherichia_coli,test/sample_1.fasta
+sample 1,,,test/sample_1.gff.gz,test/sample_1.fasta.gz,cluster 1,Escherichia coli,test/sample_1.fasta.gz
+sample_2,,,test/sample_2.gff.gz,test/sample_2.fasta.gz,cluster_1,Escherichia_coli,test/sample_1.fasta.gz
+sample_3,,,test/sample_3.gff.gz,test/sample_3.fasta.gz,cluster_1,Escherichia_coli,test/sample_1.fasta.gz
