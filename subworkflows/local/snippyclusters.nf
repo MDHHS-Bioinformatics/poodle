@@ -19,9 +19,9 @@ include { SNIPPY_RUN                   } from '../../modules/local/snippy/run/ma
 //Function for determinging if prior snippy results exists for a sample/species/cluster combination
 def verify_previous_snippy_run (species, cluster_id, sample_id) {
     //create the path to what would be the Snippy vcf
-    snippy_vcf_path = file(params.outdir).resolve(species).resolve(cluster_id).resolve('snippy_run').resolve(sample_id).resolve("${sample_id}.vcf")
+    def snippy_vcf_path = file(params.outdir).resolve(species).resolve(cluster_id).resolve('snippy_run').resolve(sample_id).resolve("${sample_id}.vcf")
     //Check if the snippy_path exists
-    vcf_path_exists = snippy_vcf_path.exists() ? true : false
+    def vcf_path_exists = snippy_vcf_path.exists() ? true : false
     //println " ${snippy_vcf_path} exists? ${vcf_path_exists}" // This prints the path for debugging
     return vcf_path_exists
 }
@@ -70,7 +70,7 @@ def read_aligned_fa(species,cluster_id,sample_id) {
 workflow SNIPPY_CLUSTERS {
 
     take:
-    ch_input_files // channel: [ val(meta), [ files ], annotation, ref ]
+    ch_input_files // channel: [ val(meta), [ reads ], assembly, annotation, ref ]
 
     main:
 
@@ -136,9 +136,9 @@ workflow SNIPPY_CLUSTERS {
     previous_vcf.vcf_match
         .map{meta, reads, assembly, annotation, ref, vcf_info ->
         tuple(meta, read_aligned_fa(meta.species, meta.cluster_id, meta.id))}
-        .set{previous_aliged_fa}
+        .set{previous_aligned_fa}
     //Add previous aligned fasta to channel
-    ch_snippy_aligned_fas = ch_snippy_aligned_fas.mix(previous_aliged_fa)
+    ch_snippy_aligned_fas = ch_snippy_aligned_fas.mix(previous_aligned_fa)
     //Add new snippy results
     ch_snippy_aligned_fas = ch_snippy_aligned_fas.mix(SNIPPY_RUN.out.aligned_fa)
     //Group Aligned fasta by species and by cluster
@@ -148,9 +148,9 @@ workflow SNIPPY_CLUSTERS {
         .set {ch_collected_aligned_fa}
     //Get the unique reference per species per cluster
     ch_input_files
-    .map{ meta, reads, assembly, annotation, reference -> tuple([[species:meta.species, cluster_id:meta.cluster_id], reference])}
-    .distinct{ file(it[1]).name } // Use distinct to keep only unique reference values
-    .set{ ch_ref_per_species_per_cluster }
+        .map{ meta, reads, assembly, annotation, reference -> tuple([[species:meta.species, cluster_id:meta.cluster_id], reference])}
+        .distinct{ file(it[1]).name } // Use distinct to keep only unique reference values
+        .set{ ch_ref_per_species_per_cluster }
 
     //Join the vcfs with aligned fa channel
     ch_collected_vcfs.join(ch_collected_aligned_fa)
