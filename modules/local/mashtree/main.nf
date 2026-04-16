@@ -18,7 +18,6 @@ process MASHTREE {
 
     script:
     def args = task.ext.args ?: ''
-    //prefix = task.ext.prefix ?: "${meta.id}"
     cluster_id = task.ext.prefix ?: "${meta.cluster_id}"
     species = task.ext.prefix ?: "${meta.species}"
     """
@@ -28,21 +27,6 @@ process MASHTREE {
         --outmatrix ${species}_${cluster_id}.tsv \\
         --outtree ${species}_${cluster_id}.dnd \\
         $seqs
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        mashtree: \$( echo \$( mashtree --version 2>&1 ) | sed 's/^.*Mashtree //' )
-    END_VERSIONS
-    """
-
-    stub:
-    //prefix = task.ext.prefix ?: "${meta.id}"
-    cluster_id = task.ext.prefix ?: "${meta.cluster_id}"
-    species = task.ext.prefix ?: "${meta.species}"
-    """
-    touch ${species}_${cluster_id}.dnd
-    touch ${species}_${cluster_id}.tsv
-
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
