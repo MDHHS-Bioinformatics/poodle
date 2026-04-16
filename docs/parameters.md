@@ -23,7 +23,6 @@ These parameters are required for most pipeline runs.
 | ---------- | ------ | -------- | ----------- | ---------------------------------------------------------------------- |
 | `--input`  | string | ✓        | –           | Path to the input samplesheet (CSV) describing the samples to process. |
 | `--outdir` | string | ✓        | `./poodle_results` | Directory where pipeline results will be written.               |
-| `--email`  | string | –        | –           | Email address to receive pipeline completion notifications.            |
 | `--annotation_format`  | string | ✓        | `gff`     | Format of the annotation files used for pangenome analysis. Options: `gff` (standard GFF3 with embedded FASTA by tools such as Prokka or Bakta), `split_gff` (for annotations lacking embedded FASTA sequences, e.g. RefSeq-style), or `genbank` (`.gbk`, `.gb`, `.gbff`). All samples in a run must use the same format.|
 
 ---
