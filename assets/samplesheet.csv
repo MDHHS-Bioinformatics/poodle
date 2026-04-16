@@ -1,7 +1,7 @@
 sample,fastq_1,fastq_2,annotation,assembly,cluster_id,species,reference
 SAMPLE_1_PAIRED_END,/path/to/qc/trimmed/fastq/files/SAMPLE1_1.trim.fastq.gz,/path/to/qc/trimmed/fastq/files/SAMPLE1_1.trim.fastq.gz,/path/to/gff/SAMPLE1.gff,/path/to/assembled/fasta/SAMPLE1.fasta,cluster_1,Escherichia_coli,/path/to/assembled/reference/reference1.fasta
 SAMPLE_2_PAIRED_END,/path/to/qc/trimmed/fastq/files/SAMPLE2_1.trim.fastq.gz,/path/to/qc/trimmed/fastq/files/SAMPLE2_1.trim.fastq.gz,/path/to/gff/SAMPLE2.gff,/path/to/assembled/fasta/SAMPLE2.fasta,cluster_1,Escherichia_coli,/path/to/assembled/reference/reference1.fasta
-SAMPLE_3_PAIRED_END,/path/to/qc/trimmed/fastq/files/SAMPLE3_1.trim.fastq.gz,/path/to/qc/trimmed/fastq/files/SAMPLE3_1.trim.fastq.gz,/path/to/gff/SAMPLE3.gff,/path/to/assembled/fasta/SAMPLE3.fasta,outbreak_facilityA,Pseudomonas aeruginosa,/path/to/assembled/reference/reference2.fasta
+SAMPLE_3_SINGLE_END,/path/to/qc/trimmed/fastq/files/SAMPLE3.trim.fastq.gz,,/path/to/gff/SAMPLE3.gff,/path/to/assembled/fasta/SAMPLE3.fasta,outbreak_facilityA,Pseudomonas aeruginosa,/path/to/assembled/reference/reference2.fasta
 SAMPLE_5_ASSEMBLED,,,/path/to/gff/SAMPLE4.gff,/path/to/assembled/fasta/SAMPLE4.fasta,outbreak_facilityA,Pseudomonas aeruginosa,/path/to/assembled/reference/reference2.fasta
 SAMPLE_6_ASSEMBLED,,,/path/to/gff/SAMPLE5.gff,/path/to/assembled/fasta/SAMPLE5.fasta,outbreak_facilityA,Pseudomonas aeruginosa,/path/to/assembled/reference/reference2.fasta
 SAMPLE_7_ASSEMBLED,,,/path/to/gff/SAMPLE6.gff,/path/to/assembled/fasta/SAMPLE6.fasta,cluster_1,Escherichia_coli,/path/to/assembled/reference/reference1.fasta
