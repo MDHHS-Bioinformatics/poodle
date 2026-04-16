@@ -13,6 +13,17 @@
 
 **PoODLE** (Phylogenomic Overview for Detection of Linkages for Epidemiologists) is a bioinformatics pipeline that can be used to analyze DNA sequencing data obtained from bacteria for cluster analyses. It takes a samplesheet with reads (FASTQ), annotation (GFF/GBK), and assembly (FASTA) files of multiple isolates from the same cluster as input; performs variant calling, pangenome analysis, recombination filtering, mash analysis, and phylogeny and produces linkage tables and a comprehensive report per cluster. 
 
+### Suggested workflow
+
+Genomes analyzed with sequencing pipelines (e.g., PHoeNIx, Bactopia, TheiaProk, or custom workflows) or obtained from public repositories (e.g., AllTheBacteria, NCBI) can be analyzed with [`CorGe+`](https://github.com/MDHHS-Bioinformatics/corge) to identify preliminary genetic groupings and prioritize related samples.
+
+These grouped isolates can then be analyzed with **PoODLE** which enables detailed within-group investigation through SNP-based approaches and pangenome analysis, supporting fine-scale discrimination of closely related isolates. This workflow enables downstream interpretation, providing the resolution needed for routine surveillance, cluster validation, and outbreak investigation.
+
+<p align="center">
+<img src="docs/images/poodle_suggested_workflow.png" width="500">
+</p>
+
+
 ## 🌟 Highlights
 - Processes **multiple species and clusters in parallel**
 - Optimized to **reuse previous variant calling results** (useful in routine surveillance, where clusters grow incrementally)
@@ -48,6 +59,19 @@ For full workflow details check [`Workflow documentation`](docs/workflow.md)
 ### 2️⃣ Prepare samplesheet
 Prepare a samplesheet (CSV) to define sample files, clusters, and references:
 
+**Input format description**
+
+| Column       | Description                                               |
+| ------------ | --------------------------------------------------------- |
+| `sample`     | Unique sample ID                                          |
+| `fastq_1`    | Path to read 1 (leave empty if not available)             |
+| `fastq_2`    | Path to read 2 (leave empty for single-end or assemblies) |
+| `annotation` | Annotation file (GFF or Genbank format, can be gzipped)   |
+| `assembly`   | FASTA assembly (can be gzipped)                           |
+| `cluster_id` | Cluster identifier (e.g. outbreak or surveillance group)  |
+| `species`    | Species name                                              |
+| `reference`  | Reference genome FASTA for SNP calling (can be gzipped)   |
+
 ```csv
 sample,fastq_1,fastq_2,annotation,assembly,cluster_id,species,reference
 SAMPLE_1,/path/S1_R1.fastq.gz,/path/S1_R2.fastq.gz,/path/S1.gff,/path/S1.fasta,HC1-C1,Escherichia_coli,/path/ref1.fasta
@@ -55,19 +79,6 @@ SAMPLE_2,/path/S2_R1.fastq.gz,/path/S2_R2.fastq.gz,/path/S2.gff,/path/S2.fasta,H
 SAMPLE_3,/path/S3.fastq.gz,,/path/S3.gff,/path/S3.fasta,outbreak_A,Pseudomonas_aeruginosa,/path/ref2.fasta
 SAMPLE_4,,,/path/S4.gff,/path/S4.fasta,outbreak_A,Pseudomonas_aeruginosa,/path/ref2.fasta
 ```
-
-**Input format description**
-
-| Column       | Description                                               |
-| ------------ | --------------------------------------------------------- |
-| `sample`     | Unique sample ID                              |
-| `fastq_1`    | Path to read 1 (leave empty if not available)             |
-| `fastq_2`    | Path to read 2 (leave empty for single-end or assemblies) |
-| `annotation` | Annotation file (GFF or Genbank format)                   |
-| `assembly`   | FASTA assembly                                            |
-| `cluster_id` | Cluster identifier (e.g. outbreak or surveillance group)  |
-| `species`    | Species name                                              |
-| `reference`  | Reference genome FASTA for SNP calling                    |
 
 _Supported input types for variant calling_
 
@@ -108,6 +119,9 @@ nextflow run MDHHS-Bioinformatics/poodle \
   --gubbins \
   --mashtree
 ```
+
+This will execute the core analysis workflow which include variant calling and pangenome analysis. Optional analyses (recombination filtering with Gubbins and Mash analysis) are enabled with `--gubbins` and `--mashtree`.
+
 
 For more details and further functionality, please refer to [`Usage documentation`](docs/usage.md) and the [`Parameter documentation`](docs/parameters.md)
 
