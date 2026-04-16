@@ -43,15 +43,22 @@ class RowChecker:
         ".gff3",
         ".gbk",
         ".gb",
-        ".gbff"
+        ".gbff",
+        ".gff.gz",
+        ".gff3.gz",
+        ".gbk.gz",
+        ".gb.gz",
+        ".gbff.gz"
     )
 
     VALID_REFERENCE_FORMATS = (
         ".fasta",
         ".fna",
         ".fa",
+        ".fas",
         ".fasta.gz",
-        ".fa.gz", 
+        ".fa.gz",
+        ".fas.gz",
         ".fna.gz"
     )
 
