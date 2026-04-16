@@ -104,6 +104,13 @@ This file classifies isolate pairs based on SNP distance thresholds commonly use
 | `intermediate_linkages` | 11–40 SNPs                             |
 | `lineage_level`         | 41–150 SNPs                            |
 
+```csv
+sample,species,cluster_id,ref_genome_fraction,ref_alignment_qc,min_dist,strong_linkages,intermediate_linkages,lineage_level
+sample_1,Escherichia_coli,cluster_1,0.9918869199461934,PASS,8,sample_2 (8),sample_3 (11),None
+sample_2,Escherichia_coli,cluster_1,0.9872359975132442,PASS,8,sample_1 (8),sample_3 (11),None
+sample_3,Escherichia_coli,cluster_1,0.9636578173863068,PASS,11,None,"sample_1 (11), sample_2 (11)",None
+```
+
 Alignment QC thresholds:
 
 | Status | Reference coverage |
