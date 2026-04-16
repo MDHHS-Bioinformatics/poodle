@@ -9,8 +9,7 @@
 */
 
 include { SAMPLESHEET_CHECK as SAMPLESHEET_CHECK_FILES         } from '../../modules/local/samplesheet_check'
-include { SAMPLESHEET_CHECK as SAMPLESHEET_CHECK_ASSEMBLIES    } from '../../modules/local/samplesheet_check'
-include { RENAME_REFERENCE                                     } from '../../modules/local/renamereference.nf'
+include { RENAME_REFERENCE                                     } from '../../modules/local/rename_reference.nf'
 include { RENAME_ANNOTATION                                    } from '../../modules/local/rename_annotation.nf'
 include { RENAME_ASSEMBLY                                      } from '../../modules/local/rename_assembly.nf'
 
@@ -20,81 +19,57 @@ include { RENAME_ASSEMBLY                                      } from '../../mod
 =============================================================================================================================
 */
 
-// Function to get list of [ meta, [ fastq_1, fastq_2 ] or [ assembly ], [ assembly ] or [], annotation, reference ]
-def create_fastq_channel(LinkedHashMap row) {
-    // Create meta map
+def create_sample_input(LinkedHashMap row) {
     def meta = [:]
-    meta.id          = row.sample
-    meta.single_end  = row.single_end ? row.single_end.toBoolean() : false
-    meta.has_reads   = row.fastq_1 && row.fastq_1 != ""  // Check if reads are available
-    meta.has_assembly = row.assembly && row.assembly != ""  // Check if an assembly is available
-    meta.cluster_id = row.cluster_id
-    meta.species = row.species
+    meta.id           = row.sample
+    meta.has_reads    = !!(row.fastq_1 && row.fastq_1.trim())
+    meta.has_assembly = !!(row.assembly && row.assembly.trim())
+    meta.single_end   = meta.has_reads && !(row.fastq_2 && row.fastq_2.trim())
+    meta.cluster_id   = row.cluster_id
+    meta.species      = row.species
 
-    // Initialize arrays for reads and assembly
-    def reads_files = []
-    def assembly_files = []
+    def reads = []
+    def assembly = null
 
-    // Handle reads if available
     if (meta.has_reads) {
-        // Validate reads
-        if (!file(row.fastq_1).exists()) {
+        def read1 = file(row.fastq_1)
+        if (!read1.exists()) {
             exit 1, "ERROR: Please check input samplesheet -> Read 1 FastQ file does not exist!\n${row.fastq_1}"
         }
+
         if (meta.single_end) {
-            // Single-end reads
-            reads_files = [ file(row.fastq_1) ]
+            reads = [read1]
         } else {
-            if (!file(row.fastq_2).exists()) {
+            def read2 = file(row.fastq_2)
+            if (!read2.exists()) {
                 exit 1, "ERROR: Please check input samplesheet -> Read 2 FastQ file does not exist!\n${row.fastq_2}"
             }
-            // Paired-end reads
-            reads_files = [ file(row.fastq_1), file(row.fastq_2) ]
+            reads = [read1, read2]
         }
     }
 
-    // Handle assembly if available
     if (meta.has_assembly) {
-        // Validate assembly
-        if (!file(row.assembly).exists()) {
+        assembly = file(row.assembly)
+        if (!assembly.exists()) {
             exit 1, "ERROR: Please check input samplesheet -> Assembly file does not exist!\n${row.assembly}"
         }
-        assembly_files = [file(row.assembly)]
     }
 
-    // Validate that at least one input type is available
     if (!meta.has_reads && !meta.has_assembly) {
         exit 1, "ERROR: Sample ${row.sample} does not have valid reads or assembly!"
     }
 
-    // Return structure: [ meta, reads_files, assembly_files, annotation, reference ]
-    def input_meta = [ meta, reads_files, assembly_files, file(row.annotation), file(row.reference) ]
-
-    return input_meta
-}
-
-def create_assembly_channel(LinkedHashMap row) {
-    // Create meta map
-    def meta = [:]
-    meta.id           = row.sample
-    meta.single_end   = row.single_end?.toBoolean() ?: false
-    meta.has_reads    = row.fastq_1 && row.fastq_1.trim()
-    meta.has_assembly = row.assembly && row.assembly.trim()
-    meta.cluster_id   = row.cluster_id
-    meta.species      = row.species
-
-    // Return null if no assembly – this will be filtered out in a map/filter
-    if (!meta.has_assembly) {
-        return null
+    def annotation = file(row.annotation)
+    if (!annotation.exists()) {
+        exit 1, "ERROR: Please check input samplesheet -> Annotation file does not exist!\n${row.annotation}"
     }
 
-    // Validate file exists
-    def assembly_file = file(row.assembly)
-    if (!assembly_file.exists()) {
-        exit 1, "ERROR: Assembly file does not exist for sample '${row.sample}': ${row.assembly}"
+    def reference = file(row.reference)
+    if (!reference.exists()) {
+        exit 1, "ERROR: Please check input samplesheet -> Reference file does not exist!\n${row.reference}"
     }
 
-    return [meta, assembly_file]
+    return [meta, reads, assembly, annotation, reference]
 }
 
 /*
@@ -111,42 +86,42 @@ workflow INPUT_CHECK {
     SAMPLESHEET_CHECK_FILES ( samplesheet )
         .csv
         .splitCsv ( header:true, sep:',' )
-        .map { create_fastq_channel(it) }
+        .map { create_sample_input(it) }
         .set { input_files }
     //
     // MODULE: Rename the reference file for all samples
     //
     RENAME_REFERENCE(
         input_files.map{
-            meta, reads, assemblies, annotation, reference -> tuple(meta,reference)
+            meta, reads, assembly, annotation, reference -> tuple(meta,reference)
         }
     )
     //
-    // Recreate the full channel with all the information we need
+    // Recreate the full channel with renamed reference
     //
-    ch_renamed_refs = RENAME_REFERENCE.out.renamed_files.join(input_files)
+    ch_renamed_refs = RENAME_REFERENCE.out.renamed_reference.join(input_files)
     ch_renamed_refs
-        .map{meta, new_reference, reads, assemblies, annotation, old_reference -> tuple(meta, reads, assemblies, annotation, new_reference)}
+        .map{meta, renamed_reference, reads, assembly, annotation, reference -> tuple(meta, reads, assembly, annotation, renamed_reference)}
         .set{new_input_files}
     //
-    // MODULE: Rename the files if desired
+    // MODULE: Rename assemblies and annotations if desired
     //
     final_input_files = Channel.empty()
     if (params.rename_files){
         //Rename the annotation files
         RENAME_ANNOTATION(new_input_files)
 
-        //Branch out if we need to rename assemblies or not
+        //Branch out if we need to rename assembly or not
         RENAME_ANNOTATION.out.renamed_files
-            .branch{ meta, reads, assemblies, annotation, reference ->
+            .branch{ meta, reads, assembly, annotation, reference ->
             has_assembly: meta.has_assembly == true
-                return [ meta, reads, assemblies, annotation, reference ]
+                return [ meta, reads, assembly, annotation, reference ]
             no_assembly: meta.has_assembly == false
-                return [meta, reads, assemblies, annotation, reference ]
+                return [meta, reads, assembly, annotation, reference ]
             }
             .set{initial_renaming}
 
-        //Rename the assembly files for channels with assemblies
+        //Rename the assembly files for channels with assembly
         RENAME_ASSEMBLY(initial_renaming.has_assembly)
 
         //Recombine everything again
@@ -158,9 +133,9 @@ workflow INPUT_CHECK {
         final_input_files = final_input_files.mix(new_input_files)
 
     }
-
+    
     emit:
-    final_input_files                                 // channel: [ val(meta), [reads/assemblies], annotation, reference ]
+    final_input_files                                 // channel: [ val(meta), [reads], assembly, annotation, reference ]
     versions = SAMPLESHEET_CHECK_FILES.out.versions   // channel: [ versions.yml ]
 }
 
