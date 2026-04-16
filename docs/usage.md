@@ -7,7 +7,7 @@ Detailed descriptions of pipeline parameters can be found in
 
 ## Table of contents
 - [Recommended upstream step](#-recommended-upstream-step-defining-clusters-with-corge)
-- [PoODLE Usage](#-poodle-usage)
+- [PoODLE Usage](#poodle-usage)
   1. [Requirements](#1%EF%B8%8F%E2%83%A3-requirements)
   2. [Prepare the samplesheet](#2%EF%B8%8F%E2%83%A3-prepare-the-samplesheet)
   3. [Running the Pipeline](#-running-the-pipeline)
