@@ -24,8 +24,8 @@
             },
             "annotation": {
                 "type": "string",
-                "pattern": "^\\S+\\.gff3?$",
-                "errorMessage": "Annotation file must have extension '.gff', '.gff3', '.gb', '.gbk', '.gbff' and cannot contain spaces"
+                "pattern": "^(NA|\\s*|\\S+\\.(gff|gff3|gb|gbk|gbff)(\\.gz)?)$",
+                "errorMessage": "Annotation file must have extension '.gff', '.gff3', '.gb', '.gbk' or '.gbff', optionally compressed as '.gz', and cannot contain spaces"
             },
             "assembly": {
                 "type": ["string", "null"],
