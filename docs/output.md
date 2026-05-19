@@ -119,15 +119,34 @@ Alignment QC thresholds:
 | WARN   | 90–94.9%           |
 | FAIL   | < 90%              |
 
-> ⚠ Low reference coverage may indicate:
+> [!WARNING]
+> Low reference coverage may indicate:
 >
-> * incorrect reference genome
+> * an incorrect or poorly matched reference genome
 > * mis-clustered samples
-> * distant lineage relationships
-> * low sequencing depth of coverage
+> * distantly related isolates
+> * low sequencing depth or poor assembly quality
 
->[!TIP]
->If many samples show WARN or FAIL alignment QC, consider: changing the reference or splitting the cluster into sub-clusters. Using a **reference from within the cluster** is strongly recommended to avoid core genome shrinkage.
+> [!IMPORTANT]
+> Samples with `FAIL` alignment QC should be removed from the cluster before rerunning the analysis. To do this:
+>
+> 1. Remove the sample from the input sample sheet (e.g. `manifest.csv`)
+> 2. Remove the sample snippy-results directory:
+>
+>    ```bash
+>    rm -rf <outdir>/<species>/<cluster_id>/snippy_run/<failed_sample>
+>    ```
+>
+> 3. Re-run PoODLE
+
+
+> [!TIP]
+> If many samples show `WARN` or `FAIL` alignment QC, consider:
+>
+> * selecting a different reference genome
+> * splitting the cluster into smaller sub-clusters
+>
+> Using a reference genome from within the cluster is strongly recommended, as it helps maximize core genome size and improves SNP comparability.
 
 ---
 
