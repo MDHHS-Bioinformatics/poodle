@@ -3,8 +3,9 @@ process SNIPPY_RUN {
     label 'process_low'
 
     conda "${moduleDir}/environment.yml"
-    container 'quay.io/staphb/snippy:4.6.0-SC2'
-
+    container 'quay.io/staphb/snippy@sha256:011bb8ece52183719d2a188ff18f056a2e43367abf32a99f334da10736e0b79c'
+    // 'quay.io/staphb/snippy:4.6.0-SC2'
+    
     input:
     tuple val(meta), path(reads), path(assembly), path(annotation), path(reference)
 

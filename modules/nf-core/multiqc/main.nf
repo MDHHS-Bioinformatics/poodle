@@ -1,10 +1,9 @@
 process MULTIQC {
     label 'process_single'
 
-    conda "bioconda::multiqc=1.13"
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/multiqc:1.13--pyhdfd78af_0' :
-        'quay.io/biocontainers/multiqc:1.13--pyhdfd78af_0' }"
+    conda "bioconda::multiqc=1.35"
+    container 'quay.io/biocontainers/multiqc@sha256:0fae3fc02ac26ac0ca18475bd363504d2d39db4ff4391c5899648b8490abceee'
+    // 'quay.io/biocontainers/multiqc:1.35--pyhdfd78af_0'
 
     input:
     path  multiqc_files, stageAs: "?/*"

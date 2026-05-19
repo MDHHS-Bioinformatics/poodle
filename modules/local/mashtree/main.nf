@@ -3,7 +3,8 @@ process MASHTREE {
     label 'process_medium'
 
     conda "${moduleDir}/environment.yml"
-    container 'quay.io/biocontainers/mashtree:1.4.6--pl5321h7b50bb2_3'
+    container 'quay.io/biocontainers/mashtree@sha256:eb96b6f479f0dc4fd5e655c27ba2ce55e94e63ca36e52132e84f76c6de047cdd'
+    // 'quay.io/biocontainers/mashtree:1.4.6--pl5321h87e0c26_4'
         
     input:
     tuple val(meta), path(seqs)

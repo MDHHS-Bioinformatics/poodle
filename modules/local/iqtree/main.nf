@@ -3,8 +3,9 @@ process IQTREE {
     label 'process_medium'
 
     conda "${moduleDir}/environment.yml"
-    container 'quay.io/biocontainers/iqtree:2.4.0--h503566f_0'
-
+    container 'quay.io/biocontainers/iqtree@sha256:604552032e25a7a8d30c8d2f6cbc72b576f2f8159b4d5a0bc17c28dfd9e55511'
+    // 'quay.io/biocontainers/iqtree:2.4.0--h503566f_0'
+    
     input:
     tuple val(meta), path(alignment), val(constant_sites)
 

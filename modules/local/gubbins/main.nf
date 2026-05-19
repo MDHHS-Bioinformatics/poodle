@@ -5,7 +5,8 @@ process GUBBINS {
     errorStrategy 'ignore'
 
     conda "${moduleDir}/environment.yml"
-    container 'quay.io/biocontainers/gubbins:3.4.3--py39h746d604_0'
+    container 'quay.io/biocontainers/gubbins@sha256:8e36a93ce43f63fe466617addd0490641edee0c3030c511166d8171622c8c90c'
+    // quay.io/biocontainers/gubbins:3.4.3--py310hfc0ef84_1
 
     input:
     tuple val(meta), path(msa), val(constant_sites)

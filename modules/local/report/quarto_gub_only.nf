@@ -4,7 +4,8 @@ process QUARTO_GUB_ONLY {
   
   errorStrategy 'ignore'
 
-  container "quay.io/mdhhs_bioinformatics/quarto-wgs-reporting:1.0.0"
+  container 'quay.io/mdhhs_bioinformatics/quarto-wgs-reporting@sha256:2a3c9d9a87796ff612cce94e7638d906a04aec850ca0358446a3d5415526b326'
+  // 'quay.io/mdhhs_bioinformatics/quarto-wgs-reporting:1.0.0'
   
   containerOptions(
     ['singularity', 'apptainer'].contains(workflow.containerEngine)

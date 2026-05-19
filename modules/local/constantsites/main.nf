@@ -3,7 +3,8 @@ process CONSTANTSITES {
     label 'process_medium'
 
     conda "${moduleDir}/environment.yml"
-    container 'quay.io/biocontainers/snp-sites:2.5.1--h577a1d6_7'
+    container 'quay.io/biocontainers/snp-sites@sha256:d19b090d52dc1d29b6f862e30cfc38f10fad8cb6954d76ef37298002e1a89213'
+    // 'quay.io/biocontainers/snp-sites:2.5.1--h577a1d6_7'
 
     input:
     tuple val(meta), path(msa)
