@@ -2,7 +2,8 @@ process CLEAN_TREE {
     tag "${meta.species}_${meta.cluster_id}"
     label 'process_single'
 
-    container "quay.io/mdhhs_bioinformatics/quarto-wgs-reporting:1.0.0"
+    container 'quay.io/mdhhs_bioinformatics/quarto-wgs-reporting@sha256:2a3c9d9a87796ff612cce94e7638d906a04aec850ca0358446a3d5415526b326'
+    // 'quay.io/mdhhs_bioinformatics/quarto-wgs-reporting:1.0.0'
 
     input:
     tuple val(meta), path(tree)
@@ -21,12 +22,7 @@ process CLEAN_TREE {
     species = task.ext.prefix ?: "${meta.species}"
 
     """
-    Rscript -e "library(phytools); \
-    tree <- read.tree('${tree}'); \
-    midpoint_tree <- midpoint.root(tree); \
-    midpoint_tree <- drop.tip(midpoint_tree, 'Reference'); \
-    midpoint_tree <- ladderize(midpoint_tree, right = F); \
-    write.tree(midpoint_tree, file='${prefix}${args_extension}.tre')"
+    clean_tree.R '${tree}' '${prefix}${args_extension}.tre' 50
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
