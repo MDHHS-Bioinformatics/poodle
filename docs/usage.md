@@ -180,6 +180,15 @@ nextflow run MDHHS-Bioinformatics/poodle \
   --max_time 8.h
 ```
 
+Gubbins may fail when organisms are highly similar and no recombination is identified. Therefore, Gubbins errors are ignored. In these cases, you may see the following message:
+
+```bash
+-[MDHHS-Bioinformatics/poodle] Pipeline completed successfully, but with errored process(es)-
+[xxxx/yyyyy] NOTE: Process `POODLE:GUBBINS (<species>_<cluster>)` terminated with an error exit status (1) -- Error is ignored
+```
+
+If this occurs, we recommend rerunning PoODLE without `--gubbins` and using `-resume` to generate the report.
+
 ---
 
 # 📂 Pipeline Outputs
