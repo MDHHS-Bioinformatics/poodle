@@ -98,6 +98,14 @@ Contributors should:
 * Ensure containers build and run correctly
 * Confirm `-resume` works when applicable
 
+For local test `cd` in the repository directory and run:
+
+```bash
+nextflow run . -profile singularity,test
+
+nextflow run . -profile singularity,test_full -resume
+```
+
 If introducing new parameters:
 
 * Provide defaults

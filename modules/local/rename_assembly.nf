@@ -3,13 +3,14 @@ process RENAME_ASSEMBLY {
     label 'process_single'
 
     conda "conda-forge::pandas=2.2.3"
-    container 'quay.io/biocontainers/pandas:2.2.1'
+    container 'quay.io/biocontainers/pandas@sha256:509adc4983db6c608fa516bea822c29bf34d5b3f039d331fc705fc27492a0987'
+    //'quay.io/biocontainers/pandas:2.2.1'
 
     input:
-    tuple val(meta), path(reads), path(assemblies), path(annotation), path(reference)
+    tuple val(meta), path(reads), path(assembly), path(annotation), path(reference)
 
     output:
-    tuple val(meta), path(reads), path("renamed_files/*"), path(annotation), path(reference), emit: renamed_files
+    tuple val(meta), path(reads), path("renamed_files/${meta.id}.fna"), path(annotation), path(reference), emit: renamed_files
 
     when:
     task.ext.when == null || task.ext.when
@@ -19,7 +20,7 @@ process RENAME_ASSEMBLY {
     //determine if we need to rename an assembly or not
     def assembly_input
     if (meta.has_assembly){
-        assembly_input = "--assembly ${assemblies}"
+        assembly_input = "--assembly ${assembly}"
     } else{
         assembly_input = ""
     }

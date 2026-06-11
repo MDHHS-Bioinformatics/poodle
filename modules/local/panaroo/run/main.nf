@@ -3,7 +3,8 @@ process PANAROO_RUN {
     label 'process_medium'
 
     conda "${moduleDir}/environment.yml"
-    container 'quay.io/biocontainers/panaroo:1.6.0--pyhdfd78af_0'
+    container 'quay.io/biocontainers/panaroo@sha256:575f3443970a0d882e8e253ae954cd43cbac799f9a941c7ebe324ab9b11060f9'
+    // 'quay.io/biocontainers/panaroo:1.6.0--pyhdfd78af_0'
 
     input:
     tuple val(meta), path(annotation_files), val(input_lines)

@@ -104,6 +104,13 @@ This file classifies isolate pairs based on SNP distance thresholds commonly use
 | `intermediate_linkages` | 11–40 SNPs                             |
 | `lineage_level`         | 41–150 SNPs                            |
 
+```csv
+sample,species,cluster_id,ref_genome_fraction,ref_alignment_qc,min_dist,strong_linkages,intermediate_linkages,lineage_level
+sample_1,Escherichia_coli,cluster_1,0.9918869199461934,PASS,8,sample_2 (8),sample_3 (11),None
+sample_2,Escherichia_coli,cluster_1,0.9872359975132442,PASS,8,sample_1 (8),sample_3 (11),None
+sample_3,Escherichia_coli,cluster_1,0.9636578173863068,PASS,11,None,"sample_1 (11), sample_2 (11)",None
+```
+
 Alignment QC thresholds:
 
 | Status | Reference coverage |
@@ -112,15 +119,34 @@ Alignment QC thresholds:
 | WARN   | 90–94.9%           |
 | FAIL   | < 90%              |
 
-> ⚠ Low reference coverage may indicate:
+> [!WARNING]
+> Low reference coverage may indicate:
 >
-> * incorrect reference genome
+> * an incorrect or poorly matched reference genome
 > * mis-clustered samples
-> * distant lineage relationships
-> * low sequencing depth of coverage
+> * distantly related isolates
+> * low sequencing depth or poor assembly quality
 
->[!TIP]
->If many samples show WARN or FAIL alignment QC, consider: changing the reference or splitting the cluster into sub-clusters. Using a **reference from within the cluster** is strongly recommended to avoid core genome shrinkage.
+> [!IMPORTANT]
+> Samples with `FAIL` alignment QC should be removed from the cluster before rerunning the analysis. To do this:
+>
+> 1. Remove the sample from the input sample sheet (e.g. `manifest.csv`)
+> 2. Remove the sample snippy-results directory:
+>
+>    ```bash
+>    rm -rf <outdir>/<species>/<cluster_id>/snippy_run/<failed_sample>
+>    ```
+>
+> 3. Re-run PoODLE
+
+
+> [!TIP]
+> If many samples show `WARN` or `FAIL` alignment QC, consider:
+>
+> * selecting a different reference genome
+> * splitting the cluster into smaller sub-clusters
+>
+> Using a reference genome from within the cluster is strongly recommended, as it helps maximize core genome size and improves SNP comparability.
 
 ---
 

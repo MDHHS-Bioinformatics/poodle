@@ -3,8 +3,9 @@ process SNPDISTS {
     label 'process_low'
 
     conda "${moduleDir}/environment.yml"
-    container 'quay.io/biocontainers/snp-dists:0.8.2--h5bf99c6_0'
-
+    container 'quay.io/biocontainers/snp-dists@sha256:d6204b4fba8508d9531a69ee705c36756c79d1f8dc85e129e0908c1eaf19d3ac'
+    // 'quay.io/biocontainers/snp-dists:1.2.0--h577a1d6_0'
+     
     input:
     tuple val(meta), path(alignment)
 

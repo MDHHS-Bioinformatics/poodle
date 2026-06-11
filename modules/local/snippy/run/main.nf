@@ -3,20 +3,21 @@ process SNIPPY_RUN {
     label 'process_low'
 
     conda "${moduleDir}/environment.yml"
-    container 'quay.io/staphb/snippy:4.6.0-SC2'
-
+    container 'quay.io/staphb/snippy@sha256:011bb8ece52183719d2a188ff18f056a2e43367abf32a99f334da10736e0b79c'
+    // 'quay.io/staphb/snippy:4.6.0-SC2'
+    
     input:
-    tuple val(meta), path(reads), path(assemblies), path(annotation), path(reference)
+    tuple val(meta), path(reads), path(assembly), path(annotation), path(reference)
 
     output:
-    tuple val(meta), path("${prefix}/${prefix}.tab")              , emit: tab
-    tuple val(meta), path("${prefix}/${prefix}.csv")              , emit: csv
-    tuple val(meta), path("${prefix}/${prefix}.vcf")              , emit: vcf
-    tuple val(meta), path("${prefix}/${prefix}.log")              , emit: log
-    tuple val(meta), path("${prefix}/${prefix}.aligned.fa")       , emit: aligned_fa
-    tuple val(meta), path("${prefix}/${prefix}.consensus.fa")     , emit: consensus_fa
-    tuple val(meta), path("${prefix}/${prefix}.consensus.subs.fa"), emit: consensus_subs_fa
-    tuple val(meta), path("${prefix}/${prefix}.txt")              , emit: txt
+    tuple val(meta), path("${meta.id}/${meta.id}.tab")              , emit: tab
+    tuple val(meta), path("${meta.id}/${meta.id}.csv")              , emit: csv
+    tuple val(meta), path("${meta.id}/${meta.id}.vcf")              , emit: vcf
+    tuple val(meta), path("${meta.id}/${meta.id}.log")              , emit: log
+    tuple val(meta), path("${meta.id}/${meta.id}.aligned.fa")       , emit: aligned_fa
+    tuple val(meta), path("${meta.id}/${meta.id}.consensus.fa")     , emit: consensus_fa
+    tuple val(meta), path("${meta.id}/${meta.id}.consensus.subs.fa"), emit: consensus_subs_fa
+    tuple val(meta), path("${meta.id}/${meta.id}.txt")              , emit: txt
     path "versions.yml"                                           , emit: versions
 
     when:
@@ -38,7 +39,7 @@ process SNIPPY_RUN {
         }
     } else if (meta.has_assembly) {
         // If no reads, fallback to the assembly
-        input_command = "--contigs ${assemblies[0]}"  // Assembly (contigs)
+        input_command = "--contigs ${assembly}"  // Assembly (contigs)
     } else {
         exit 1, "ERROR: Sample ${meta.id} does not have valid reads or assembly!"
     }

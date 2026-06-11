@@ -7,7 +7,7 @@ Detailed descriptions of pipeline parameters can be found in
 
 ## Table of contents
 - [Recommended upstream step](#-recommended-upstream-step-defining-clusters-with-corge)
-- [Quick start](#-quick-start)
+- [PoODLE Usage](#poodle-usage)
   1. [Requirements](#1%EF%B8%8F%E2%83%A3-requirements)
   2. [Prepare the samplesheet](#2%EF%B8%8F%E2%83%A3-prepare-the-samplesheet)
   3. [Running the Pipeline](#-running-the-pipeline)
@@ -89,11 +89,11 @@ The samplesheet must contain **8 columns** with the following headers.
 | `sample`  | Unique sample identifier. Spaces in sample names are automatically converted to underscores (`_`). |
 | `fastq_1` | Full path to FastQ file for Illumina QC trimmed short reads 1. File has to be gzipped and have the extension `.fastq.gz` or `.fq.gz`.                                                  |
 | `fastq_2` | Full path to FastQ file for Illumina QC trimmed short reads 2. File has to be gzipped and have the extension `.fastq.gz` or `.fq.gz`.                                                  |
-| `annotation`     | Full path to file with annotated genomes. File should have the extension `.gff`, `.gff3`,`.gbk`, `.gb`, `.gbff`.                                                                                        |
-| `assembly` | Full path to assembled genome file. File can be gzipped and have the extension `.fasta`, `.fa`, `.fna`, `.fasta.gz`, `.fa.gz` or .`fna.gz`|
+| `annotation`     | Full path to file with annotated genomes. File can be gzipped and have the extension `.gff`, `.gff3`,`.gbk`, `.gb`, `.gbff`.                                                                                        |
+| `assembly` | Full path to assembled genome file. File can be gzipped and have the extension `.fasta`, `.fa`, `.fna`, `.fas` |
 | `cluster_id` | Custom cluster id. This entry will be identical for multiple samples from the same cluster. Spaces in cluter ids are automatically converted to underscores (`_`).                  |
 | `species`  | Custom bacterial species name. This entry will be identical for multiple samples from the same species. Spaces in sample names are automatically converted to underscores (`_`).      |
-| `reference` | Full path to assembled reference genome file. This must be identical for multiple samples from the same cluster. File can be gzipped and have the extension `.fasta`, `.fa`, `.fna`, `.fasta.gz`, `.fa.gz` or .`fna.gz`                                |
+| `reference` | Full path to assembled reference genome file. This must be identical for multiple samples from the same cluster. File can be gzipped and have the extension `.fasta`, `.fa`, `.fna`, `.fas`                          |
 
 ---
 
@@ -115,6 +115,7 @@ If FASTQ files are not available, leave the columns blank.
 > All columns must still be present in the CSV file.
 
 _Supported annotation types for pangenome profiling_
+
 Different annotation formats are supported by `Panaroo` for pangenome analysis.
 If your annotations are not standard GFF3 files with embedded FASTA sequences, use the `--annotation_format` parameter to specify the correct format.
 
@@ -179,6 +180,15 @@ nextflow run MDHHS-Bioinformatics/poodle \
   --max_time 8.h
 ```
 
+Gubbins may fail when organisms are highly similar and no recombination is identified. Therefore, Gubbins errors are ignored. In these cases, you may see the following message:
+
+```bash
+-[MDHHS-Bioinformatics/poodle] Pipeline completed successfully, but with errored process(es)-
+[xxxx/yyyyy] NOTE: Process `POODLE:GUBBINS (<species>_<cluster>)` terminated with an error exit status (1) -- Error is ignored
+```
+
+If this occurs, we recommend rerunning PoODLE without `--gubbins` and using `-resume` to generate the report.
+
 ---
 
 # 📂 Pipeline Outputs
@@ -205,7 +215,7 @@ For more details about the output files and reports, please refer to the [`Outpu
 * **Disk cleanup:** After the pipeline completes, you may safely remove the Nextflow `work/` directory to reclaim space.
 
 * Prefer **reads over assemblies** for SNP analysis
-* Use **internal references** whenever possible
+* Using a **reference from within the cluster** is strongly recommended to avoid core genome shrinkage
 * Run with `--gubbins` for highly recombinant species
 * Interpret SNP thresholds **in epidemiological context**, not in isolation
 * A genomic cluster should contain > 4 closely related samples. We strongly recommend using PoODLE after [`CorGe+`](https://github.com/MDHHS-Bioinformatics/corge), since CorGe+ identifies genomic context groups at different thresholds.
