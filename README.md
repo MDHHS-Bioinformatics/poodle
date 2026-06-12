@@ -15,7 +15,7 @@
 
 ### Suggested workflow
 
-Genomes analyzed with sequencing pipelines (e.g., PHoeNIx, Bactopia, TheiaProk, or custom workflows) or obtained from public repositories (e.g., AllTheBacteria, NCBI) can be analyzed with [`CorGe+`](https://github.com/MDHHS-Bioinformatics/corge) to identify preliminary genetic groupings and prioritize related samples.
+Genomes analyzed with sequencing pipelines (e.g., PHoeNIx, Bactopia, TheiaProk, or custom workflows) or obtained from public repositories (e.g., AllTheBacteria, NCBI) can be analyzed with [`CorGe+`](https://github.com/MDHHS-Bioinformatics/corge) or with other clustering pipelines to identify preliminary genetic groupings and prioritize related samples.
 
 These grouped isolates can then be analyzed with **PoODLE** which enables detailed within-group investigation through SNP-based approaches and pangenome analysis, supporting fine-scale discrimination of closely related isolates. This workflow enables downstream interpretation, providing the resolution needed for routine surveillance, cluster validation, and outbreak investigation.
 
@@ -90,7 +90,7 @@ _Supported input types for variant calling_
 > [!IMPORTANT]
 > - Even if FASTQs are missing, **all columns must be present** in the CSV.
 > - Use QC-trimmed FASTQ files, not raw reads.
-> - All samples from the same cluster should share the same species, cluster_id and reference file.
+> - All samples from the **same cluster should share** the same `species`, `cluster_id` and `reference` file.
 
 
 > [!WARNING]

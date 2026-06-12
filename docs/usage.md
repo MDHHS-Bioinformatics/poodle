@@ -50,19 +50,52 @@ Install the following software:
 * A container runtime:
 
   * [`Docker`](https://docs.docker.com/engine/installation/) (recommended for local runs)
-  * [`Singularity`](https://www.sylabs.io/guides/3.0/user-guide/)
   * [`Apptainer`](https://apptainer.org/docs/user/latest/) (recommended for HPC)
+  * [`Singularity`](https://www.sylabs.io/guides/3.0/user-guide/)
 
-> [!NOTE]  
-> If using **Singularity** set `NXF_SINGULARITY_CACHEDIR` (or `singularity.cacheDir`) to reuse images later. For example: 
-> ```bash
-> export NXF_SINGULARITY_CACHEDIR="/path/to/singularity_cache"
-> ``````
->
-> If using **Apptainer** set `NXF_APPTAINER_CACHEDIR` (or `apptainer.cacheDir`) to reuse images later. For example: 
-> ```bash
-> export NXF_APPTAINER_CACHEDIR="/path/to/apptainer_cache"
-> ``````
+### Container cache setup
+
+For Apptainer or Singularity, use a persistent shared cache directory so container images can be reused across runs and accessed by all compute nodes.
+
+For Apptainer:
+
+```bash
+export NXF_APPTAINER_CACHEDIR=/path/to/shared/nextflow/apptainer/cache
+```
+
+For Singularity:
+
+```bash
+export NXF_SINGULARITY_CACHEDIR=/path/to/shared/nextflow/singularity/cache
+```
+
+You can also set these paths in your Nextflow configuration using `apptainer.cacheDir` or `singularity.cacheDir`.
+
+### Optional: prefetch containers
+
+For Apptainer and Singularity users, we recommend pre-pulling all required PoODLE container images before launching the workflow. This helps avoid issues caused by multiple Nextflow tasks pulling images concurrently, such as race conditions or incomplete cache files.
+
+Helper scripts are provided:
+
+* [`bin/prefetch_poodle_containers_apptainer.sh`](./../bin/prefetch_poodle_containers_apptainer.sh)
+* [`bin/prefetch_poodle_containers_singularity.sh`](./../bin/prefetch_poodle_containers_singularity.sh)
+
+For Apptainer:
+
+```bash
+export NXF_APPTAINER_CACHEDIR=/path/to/shared/nextflow/apptainer/cache
+bash prefetch_poodle_containers_apptainer.sh
+```
+
+For Singularity:
+
+```bash
+export NXF_SINGULARITY_CACHEDIR=/path/to/shared/nextflow/singularity/cache
+bash prefetch_poodle_containers_singularity.sh
+```
+
+> [!NOTE]
+> `NXF_APPTAINER_CACHEDIR` and `NXF_SINGULARITY_CACHEDIR` control where Nextflow stores SIF images. Apptainer and Singularity also have their own OCI/layer caches, such as `APPTAINER_CACHEDIR` and `SINGULARITY_CACHEDIR`, which are mainly used while pulling or converting OCI images.
 
 ---
 
