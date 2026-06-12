@@ -126,6 +126,7 @@ Alignment QC thresholds:
 > * mis-clustered samples
 > * distantly related isolates
 > * low sequencing depth or poor assembly quality
+> * reference-specific accessory sequence, such as MGEs, prophages, plasmid-derived regions, or genomic islands, that is absent from most samples and may artificially reduce reference coverage; check the pangenome profile, reference annotation, and expected genome size for the species
 
 > [!IMPORTANT]
 > Samples with `FAIL` alignment QC should be removed from the cluster before rerunning the analysis. To do this:
