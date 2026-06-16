@@ -14,23 +14,23 @@
 
 - [snp-dists](https://github.com/tseemann/snp-dists)
 
-- [SNP-sites](https://sanger-pathogens.github.io/snp-sites/)
+- [SNP-sites](https://doi.org/10.1099/mgen.0.000056)
   > Andrew J. Page, Ben Taylor, Aidan J. Delaney, Jorge Soares, Torsten Seemann, Jacqueline A. Keane, Simon R. Harris. "SNP-sites: rapid efficient extraction of SNPs from multi-FASTA alignments", Microbial Genomics 2(4), (2016)
 
-- [IQ-TREE](https://www.iqtree.org/)
+- [IQ-TREE](https://doi.org/10.1093/molbev/msaa015)
   > Minh, Bui Quang, Heiko A. Schmidt, Olga Chernomor, Dominik Schrempf, Michael D. Woodhams, Arndt Von Haeseler, and Robert Lanfear. "IQ-TREE 2: new models and efficient methods for phylogenetic inference in the genomic era." Molecular biology and evolution 37, no. 5 (2020): 1530-1534.
 
-- [Gubbins](https://github.com/nickjcroucher/gubbins)
+- [Gubbins](https://doi.org/10.1093/nar/gku1196)
   > Croucher, Nicholas J., Andrew J. Page, Thomas R. Connor, Aidan J. Delaney, Jacqueline A. Keane, Stephen D. Bentley, Julian Parkhill, and Simon R. Harris. "Rapid phylogenetic analysis of large samples of recombinant bacterial whole genome sequences using Gubbins." Nucleic acids research 43, no. 3 (2015): e15-e15.
 
-- [Panaroo](https://github.com/gtonkinhill/panaroo)
+- [Panaroo](https://doi.org/10.1186/s13059-020-02090-4)
   > Tonkin-Hill, Gerry, Neil MacAlasdair, Christopher Ruis, Aaron Weimann, Gal Horesh, John A. Lees, Rebecca A. Gladstone et al. "Producing polished prokaryotic pangenomes with the Panaroo pipeline." Genome biology 21 (2020): 1-21.
 
-- [MashTree](https://github.com/lskatz/mashtree)
-  > Katz, L. S., Griswold, T., Morrison, S., Caravas, J., Zhang, S., den Bakker, H.C., Deng, X., and Carleton, H. A., (2019). Mashtree: a rapid comparison of whole genome sequence files. Journal of Open Source Software, 4(44), 1762, https://doi.org/10.21105/joss.01762
+- [Mashtree](https://doi.org/10.21105/joss.01762)
+  > Katz, Lee S., Taylor Griswold, Shatavia S. Morrison, Jason A. Caravas, Shaokang Zhang, Henk C. den Bakker, Xiangyu Deng, and Heather A. Carleton. "Mashtree: a rapid comparison of whole genome sequence files." Journal of open source software 4, no. 44 (2019): 10-21105.
   
-- [MultiQC](https://pubmed.ncbi.nlm.nih.gov/27312411/)
-  > Ewels P, Magnusson M, Lundin S, Käller M. MultiQC: summarize analysis results for multiple tools and samples in a single report. Bioinformatics. 2016 Oct 1;32(19):3047-8. doi: 10.1093/bioinformatics/btw354. Epub 2016 Jun 16. PubMed PMID: 27312411; PubMed Central PMCID: PMC5039924.
+- [MultiQC](https://doi.org/10.1093/bioinformatics/btw354)
+  > Ewels, Philip, Måns Magnusson, Sverker Lundin, and Max Käller. "MultiQC: summarize analysis results for multiple tools and samples in a single report." Bioinformatics 32, no. 19 (2016): 3047-3048.
 
 
 ## Software packaging/containerisation tools

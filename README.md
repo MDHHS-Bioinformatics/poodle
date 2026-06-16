@@ -50,11 +50,11 @@ For full workflow details check [`Workflow documentation`](docs/workflow.md)
 
 ### 1️⃣ Requirements
 
-* [`Nextflow`](https://www.nextflow.io/docs/latest/getstarted.html#installation) (`>=22.10.1`)
+* [`Nextflow`](https://docs.seqera.io/nextflow/install) (`>=22.10.1`)
 * One container runtime:
   * [`Docker`](https://docs.docker.com/engine/installation/) (recommended for local runs)
-  * [`Singularity`](https://www.sylabs.io/guides/3.0/user-guide/)
   * [`Apptainer`](https://apptainer.org/docs/user/latest/) (recommended for HPC)
+  * [`Singularity`](https://www.sylabs.io/guides/3.0/user-guide/)
 
 ### 2️⃣ Prepare samplesheet
 Prepare a samplesheet (CSV) to define sample files, clusters, and references:
