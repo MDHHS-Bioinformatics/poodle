@@ -1,0 +1,37 @@
+cff-version: 1.2.0
+title: "PoODLE: Phylogenomic Overview for Detection of Linkages for Epidemiologists"
+message: "If you use this pipeline, please cite it as below."
+type: pipeline
+
+authors:
+  - family-names: Vasco
+    given-names: Karla
+  - family-names: Maldonado-Torres
+    given-names: Douglas
+  - family-names: Blankenship
+    given-names: Heather
+  - family-names: Miles-Jay
+    given-names: Arianna
+
+version: "1.0.0"
+date-released: 2026-05-01
+
+doi: 10.XXXX/zenodo.XXXXXX
+
+repository-code: "https://github.com/MDHHS-Bioinformatics/poodle"
+url: "https://github.com/MDHHS-Bioinformatics/poodle"
+
+keywords:
+  - bioinformatics
+  - surveillance
+  - phylogenetics
+  - reporting
+  - public-health
+  - pangenome
+  - outbreak
+  - genomic-epidemiology
+  - bacteria
+  - epidemiology
+  - linkage
+
+license: MIT
