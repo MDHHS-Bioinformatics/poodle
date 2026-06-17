@@ -25,7 +25,7 @@ The workflow consists of several stages that transform sequencing data into inte
 
 2. **Core genome alignment & SNP distances**
    * [`Snippy`](https://github.com/tseemann/snippy) builds the core genome alignment
-   * [`IQ-TREE`](https://www.iqtree.org/) builds a phylogeny with the GTR+G4 model
+   * [`IQ-TREE`](https://github.com/iqtree/iqtree2) builds a phylogeny with the GTR+G4 model
    * [`snp-dists`](https://github.com/tseemann/snp-dists) calculates pairwise SNP distances
 
 ---

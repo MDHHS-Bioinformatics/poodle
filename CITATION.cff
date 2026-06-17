@@ -14,9 +14,9 @@ authors:
     given-names: Arianna
 
 version: "1.0.0"
-date-released: 2026-05-01
+date-released: 2026-06-22
 
-doi: 10.XXXX/zenodo.XXXXXX
+#doi: 10.XXXX/zenodo.XXXXXX
 
 repository-code: "https://github.com/MDHHS-Bioinformatics/poodle"
 url: "https://github.com/MDHHS-Bioinformatics/poodle"

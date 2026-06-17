@@ -11,11 +11,11 @@
 ![Last Commit](https://img.shields.io/github/last-commit/MDHHS-Bioinformatics/poodle)
 [![DOI](https://zenodo.org/badge/DOI/xxxxx.svg)](...)
 
-**PoODLE** (Phylogenomic Overview for Detection of Linkages for Epidemiologists) is a bioinformatics pipeline that can be used to analyze DNA sequencing data obtained from bacteria for cluster analyses. It takes a samplesheet with reads (FASTQ), annotation (GFF/GBK), and assembly (FASTA) files of multiple isolates from the same cluster as input; performs variant calling, pangenome analysis, recombination filtering, mash analysis, and phylogeny and produces linkage tables and a comprehensive report per cluster. 
+**PoODLE** (Phylogenomic Overview for Detection of Linkages for Epidemiologists) is a bioinformatics pipeline for identifying genomic linkages between bacterial isolates. Starting from a samplesheet containing sequencing reads (**FASTQ**), genome assemblies (**FASTA**), and annotation files (**GFF/GBK**), PoODLE performs SNP-based variant calling, pangenome analysis, recombination filtering, Mash distance estimation, and phylogenetic reconstruction. These analyses are used to assess genomic relatedness between isolates within clusters. The pipeline produces linkage tables and an interactive HTML report for each cluster. Reports include phylogenetic trees, pangenome profiles, and distance matrices to support clear interpretation of bacterial genomic relationships.
 
 ### Suggested workflow
 
-Genomes analyzed with sequencing pipelines (e.g., PHoeNIx, Bactopia, TheiaProk, or custom workflows) or obtained from public repositories (e.g., AllTheBacteria, NCBI) can be analyzed with [`CorGe+`](https://github.com/MDHHS-Bioinformatics/corge) or with other clustering pipelines to identify preliminary genetic groupings and prioritize related samples.
+Genomes analyzed with sequencing pipelines (e.g.,[`PHoeNIx`](https://github.com/CDCgov/phoenix), [`Bactopia`](https://github.com/bactopia/bactopia), [`TheiaProk`](https://public-health-bacterial-genomics-theiagen.readthedocs.io/en/latest/theiaprok.html), or custom workflows) or obtained from public repositories (e.g., [`AllTheBacteria`](https://github.com/AllTheBacteria/AllTheBacteria), [`NCBI`](https://www.ncbi.nlm.nih.gov/datasets/genome/)) can be analyzed with [`CorGe+`](https://github.com/MDHHS-Bioinformatics/corge) or with other clustering pipelines to identify preliminary genetic groupings and prioritize related samples.
 
 These grouped isolates can then be analyzed with **PoODLE** which enables detailed within-group investigation through SNP-based approaches and pangenome analysis, supporting fine-scale discrimination of closely related isolates. This workflow enables downstream interpretation, providing the resolution needed for routine surveillance, cluster validation, and outbreak investigation.
 
@@ -36,7 +36,7 @@ High-level steps:
 1. Reference-based SNP calling with [`Snippy`](https://github.com/tseemann/snippy)
 2. Recombination filtering with [`Gubbins`](https://github.com/nickjcroucher/gubbins) (optional)
 3. Constant site calculation from genome alignment with [`snp-sites`](https://sanger-pathogens.github.io/snp-sites/)
-4. Phylogeny with [`IQ-TREE`](https://www.iqtree.org/)
+4. Phylogeny with [`IQ-TREE`](https://github.com/iqtree/iqtree2)
 5. Pairwise SNP distance calculation with [`snp-dists`](https://github.com/tseemann/snp-dists) 
 6. Pangenome analysis with [`Panaroo`](https://github.com/gtonkinhill/panaroo)
 7. Whole-genome distance tree with [`MashTree`](https://github.com/lskatz/mashtree) (optional) 
@@ -153,8 +153,9 @@ For more details about the output files and reports, please refer to the [`Outpu
 
 ## 👥 Credits
 
-PoODLE was built and is maintained by the Genomics Analysis Unit at the Michigan Department of Health & Human Services (MDHHS) Bureau of Laboratories. This pipeline was developed by [Douglas Maldonado-Torres](https://github.com/MTDouglas) and [Karla Vasco](https://github.com/vascokarla) using the nf-core template.
+PoODLE was built and is maintained by the Genomic Analysis Unit at the Michigan Department of Health & Human Services (MDHHS) Bureau of Laboratories. This pipeline was developed by [Karla Vasco](https://github.com/vascokarla) and [Douglas Maldonado-Torres](https://github.com/MTDouglas) using the nf-core template.
 
+Additional conceptual guidance and scientific input were provided by [Arianna Miles-Jay](https://github.com/amilesj) and [Heather Blankenship](https://github.com/HeatherBlankenship).
 
 ## 🤝 Contributions
 Contributions, issues, and pull requests are welcome! If you would like to contribute to this pipeline, please see the [`Contribution guidelines`](CONTRIBUTING.md). 
@@ -163,7 +164,7 @@ Contributions, issues, and pull requests are welcome! If you would like to contr
 
 If you use PoODLE for your analysis, please cite the following doi:
 
-Maldonado-Torres D. & Vasco K. (2026). 
+Vasco K, Maldonado-Torres D, Blankenship H & Miles-Jay A (2026). 
 MDHHS-Bioinformatics/poodle: v1.0.0 (v1.0.0). 
 Zenodo. https://doi.org/XX.XXX/zenodo.XXXX
 

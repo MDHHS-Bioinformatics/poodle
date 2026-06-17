@@ -46,7 +46,7 @@ Together, they form a **two-stage surveillance workflow**:
 
 Install the following software:
 
-* [`Nextflow`](https://www.nextflow.io/docs/latest/getstarted.html#installation) (≥ 22.10.1)
+* [`Nextflow`](https://docs.seqera.io/nextflow/install) (≥ 22.10.1)
 * A container runtime:
 
   * [`Docker`](https://docs.docker.com/engine/installation/) (recommended for local runs)

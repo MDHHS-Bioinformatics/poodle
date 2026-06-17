@@ -2,7 +2,7 @@
 
 Thank you for your interest in contributing to this project.
 
-This pipeline is maintained by the Genomics Analysis Unit at the Michigan Department of Health & Human Services (MDHHS) Bureau of Laboratories. We welcome contributions that improve reproducibility, clarity, performance, and public health utility.
+This pipeline is maintained by the Genomic Analysis Unit at the Michigan Department of Health & Human Services (MDHHS) Bureau of Laboratories. We welcome contributions that improve reproducibility, clarity, performance, and public health utility.
 
 ---
 
