@@ -11,16 +11,16 @@
 ![Last Commit](https://img.shields.io/github/last-commit/MDHHS-Bioinformatics/poodle)
 [![DOI](https://zenodo.org/badge/DOI/xxxxx.svg)](...)
 
-**PoODLE** (Phylogenomic Overview for Detection of Linkages for Epidemiologists) is a bioinformatics pipeline for identifying genomic linkages between bacterial isolates. Starting from a samplesheet containing sequencing reads (**FASTQ**), genome assemblies (**FASTA**), and annotation files (**GFF/GBK**), PoODLE performs SNP-based variant calling, pangenome analysis, recombination filtering, Mash distance estimation, and phylogenetic reconstruction. These analyses are used to assess genomic relatedness between isolates within clusters. The pipeline produces linkage tables and an interactive HTML report for each cluster. Reports include phylogenetic trees, pangenome profiles, and distance matrices to support clear interpretation of bacterial genomic relationships.
+**PoODLE** (Phylogenomic Overview for Detection of Linkages for Epidemiologists) is a bioinformatics pipeline for identifying genomic relatedness between bacterial isolates. Starting from a samplesheet containing sequencing reads (FASTQ), genome assemblies (FASTA), and annotation files (GFF/GBK), PoODLE performs variant calling, recombination filtering, phylogenetic reconstruction, pangenome analysis and Mash distance estimation. The pipeline produces linkage tables and an interactive HTML report for each cluster with trees, pangenome profiles, and distance matrices.
 
 ### Suggested workflow
 
-Genomes analyzed with sequencing pipelines (e.g.,[`PHoeNIx`](https://github.com/CDCgov/phoenix), [`Bactopia`](https://github.com/bactopia/bactopia), [`TheiaProk`](https://public-health-bacterial-genomics-theiagen.readthedocs.io/en/latest/theiaprok.html), or custom workflows) or obtained from public repositories (e.g., [`AllTheBacteria`](https://github.com/AllTheBacteria/AllTheBacteria), [`NCBI`](https://www.ncbi.nlm.nih.gov/datasets/genome/)) can be analyzed with [`CorGe+`](https://github.com/MDHHS-Bioinformatics/corge) or with other clustering pipelines to identify preliminary genetic groupings and prioritize related samples.
+Genomes analyzed with sequencing pipelines (e.g.,[`PHoeNIx`](https://github.com/CDCgov/phoenix), [`Bactopia`](https://github.com/bactopia/bactopia), [`TheiaProk`](https://public-health-bacterial-genomics-theiagen.readthedocs.io/en/latest/theiaprok.html), custom workflows) or obtained from public repositories (e.g., [`AllTheBacteria`](https://github.com/AllTheBacteria/AllTheBacteria), [`NCBI`](https://www.ncbi.nlm.nih.gov/datasets/genome/)) can be analyzed with [`CorGe+`](https://github.com/MDHHS-Bioinformatics/corge) or with other clustering pipelines to identify preliminary genetic groupings and prioritize related samples.
 
-These grouped isolates can then be analyzed with **PoODLE** which enables detailed within-group investigation through SNP-based approaches and pangenome analysis, supporting fine-scale discrimination of closely related isolates. This workflow enables downstream interpretation, providing the resolution needed for routine surveillance, cluster validation, and outbreak investigation.
+These grouped isolates can then be analyzed with **PoODLE** which enables detailed within-group investigation through SNP-based approaches and pangenome analysis, supporting fine-scale discrimination of closely related isolates. This workflow provides the resolution needed for routine surveillance, cluster validation, and outbreak investigation.
 
 <p align="center">
-<img src="docs/images/poodle_suggested_workflow.png" width="500">
+<img src="docs/images/suggested_workflow.png" width="500">
 </p>
 
 
@@ -33,14 +33,15 @@ These grouped isolates can then be analyzed with **PoODLE** which enables detail
 ![Pipeline Workflow](./docs/images/poodle_workflow.png)
 
 High-level steps:
-1. Reference-based SNP calling with [`Snippy`](https://github.com/tseemann/snippy)
+1. Reference-based variant calling with [`Snippy`](https://github.com/tseemann/snippy)
 2. Recombination filtering with [`Gubbins`](https://github.com/nickjcroucher/gubbins) (optional)
 3. Constant site calculation from genome alignment with [`snp-sites`](https://sanger-pathogens.github.io/snp-sites/)
 4. Phylogeny with [`IQ-TREE`](https://github.com/iqtree/iqtree2)
 5. Pairwise SNP distance calculation with [`snp-dists`](https://github.com/tseemann/snp-dists) 
-6. Pangenome analysis with [`Panaroo`](https://github.com/gtonkinhill/panaroo)
-7. Whole-genome distance tree with [`MashTree`](https://github.com/lskatz/mashtree) (optional) 
-8. Report generation including trees, distance matrices, and pangenome plots
+6. Linkage analysis based on pairwise SNP distances
+7. Pangenome analysis with [`Panaroo`](https://github.com/gtonkinhill/panaroo)
+8. Whole-genome distance tree with [`MashTree`](https://github.com/lskatz/mashtree) (optional) 
+9. Report generation including trees, distance matrices, and pangenome plots
 
 For full workflow details check [`Workflow documentation`](docs/workflow.md)
 

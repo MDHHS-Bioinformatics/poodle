@@ -230,7 +230,7 @@ The pipeline produces the following directories:
 
 ```
 work/          # Nextflow working directory
-results/       # Final pipeline outputs
+<outdir>/      # Final pipeline outputs
 .nextflow.log  # Execution log
 ```
 

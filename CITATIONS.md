@@ -11,8 +11,10 @@
 ## Pipeline tools
 
 - [Snippy](https://github.com/tseemann/snippy)
+  > Seemann T (2015). snippy: fast bacterial variant calling from NGS reads. https://github.com/tseemann/snippy
 
 - [snp-dists](https://github.com/tseemann/snp-dists)
+  > Torsten Seemann,  Fabian Klötzl, Andrew J. Page (2017). snp-dists: convert a FASTA alignment to SNP distance matrix. https://github.com/tseemann/snp-dists
 
 - [SNP-sites](https://doi.org/10.1099/mgen.0.000056)
   > Andrew J. Page, Ben Taylor, Aidan J. Delaney, Jorge Soares, Torsten Seemann, Jacqueline A. Keane, Simon R. Harris. "SNP-sites: rapid efficient extraction of SNPs from multi-FASTA alignments", Microbial Genomics 2(4), (2016)

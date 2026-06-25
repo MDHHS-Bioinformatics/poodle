@@ -37,7 +37,6 @@ These parameters enable optional analysis steps.
 | `--mashtree`         | boolean | `false` | Generate an genomic composition tree using MashTree.               |
 | `--previous_results` | string  | –       | Path to previous pipeline results used to reuse existing analyses. By default, the pipeline looks for prior Snippy results for the same cluster in the outdir. |
 | `--save_snippy_run`  | boolean | `true`  | Save Snippy run outputs for each sample.                           |
-| `--logo_report`      | string  | `assets/DNA_logo.png`  | Logo in PNG format to include in the report header  |
 
 
 ---
