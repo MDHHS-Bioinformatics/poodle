@@ -41,7 +41,8 @@ process QUARTO_GUB_ONLY {
   export XDG_RUNTIME_DIR="\$PWD/tmp"
   export DENO_DIR="\$PWD/.deno-cache"
   export QUARTO_PRINT_STACK=true
-
+  export QUARTO_DENO_V8_OPTIONS="--max-old-space-size=8192"
+  
   cp -n ${linkages} ${snptree} ${snpmatrix} ${pan_summary} ${pan_roary} ${pan_rtab} ${pan_genedists} \\
         ${gubtree} ${gubmatrix} ${logo} .
   quarto render $qmd --execute-params $yaml --output "${prefix}.html"
