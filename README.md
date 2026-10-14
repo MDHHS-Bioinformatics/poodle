@@ -166,7 +166,7 @@ Contributions, issues, and pull requests are welcome! If you would like to contr
 If you use PoODLE for your analysis, please cite the following doi:
 
 Vasco K, Maldonado-Torres D, Blankenship H & Miles-Jay A (2026). 
-MDHHS-Bioinformatics/poodle: v1.0.0 (v1.0.0). 
+MDHHS-Bioinformatics/poodle: v1.0.1 (v1.0.1). 
 Zenodo. https://doi.org/10.5281/zenodo.20857592
 
 An extensive list of references for the tools used by the pipeline can be found in [`CITATIONS.md`](CITATIONS.md).
