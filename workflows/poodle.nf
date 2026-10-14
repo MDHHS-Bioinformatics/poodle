@@ -213,6 +213,7 @@ workflow POODLE {
 
     // For cases when cluster has zero SNPs generate a tree with 0 branches
     ZERO_SNP_TREE(ch_zero_snippy_txt)
+    ch_versions = ch_versions.mix(ZERO_SNP_TREE.out.versions)
 
     // Combine the trees to use as input for report
     ch_all_snippy_trees = SNIPPY_TREE.out.tre
