@@ -108,7 +108,7 @@ Specify the **pipeline version or Git revision** to run.
 Example:
 
 ```bash
-nextflow run MDHHS-Bioinformatics/poodle -r v1.0.0
+nextflow run MDHHS-Bioinformatics/poodle -r v1.0.1
 ```
 
 This ensures that the **exact same pipeline version** is used for analysis.
@@ -117,7 +117,7 @@ You can also run:
 
 | Example       | Description                        |
 | ------------- | ---------------------------------- |
-| `-r v1.0.0`   | Run a tagged release               |
+| `-r v1.0.1`   | Run a tagged release               |
 | `-r main`     | Run the latest development version |
 | `-r <commit>` | Run a specific Git commit          |
 

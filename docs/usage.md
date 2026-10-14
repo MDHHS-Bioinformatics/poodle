@@ -260,7 +260,7 @@ For reproducible analyses, run a specific pipeline release:
 
 ```bash
 nextflow run MDHHS-Bioinformatics/poodle \
-  -r v1.0.0 \
+  -r v1.0.1 \
   -profile singularity \
   --input samplesheet.csv \
   --outdir results
