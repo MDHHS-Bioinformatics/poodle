@@ -55,6 +55,8 @@ include { GUBBINS                      } from '../modules/local/gubbins/main'
 include { SNPSITES                     } from '../modules/local/snpsites/main'
 include { PANAROO_RUN                  } from '../modules/local/panaroo/run/main'
 include { MASHTREE                     } from '../modules/local/mashtree/main'
+include { ZERO_SNP_MATRIX              } from '../modules/local/zero_snp_matrix'
+include { ZERO_SNP_TREE                } from '../modules/local/zero_snp_tree'
 
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
@@ -101,6 +103,50 @@ workflow POODLE {
     )
     ch_versions = SNIPPY_CLUSTERS.out.versions
 
+    // Read Snippy-core status for each cluster
+    ch_snippy_status = SNIPPY_CLUSTERS.out.status
+        .map { meta, status_file ->
+            def rows = status_file
+                .text
+                .readLines()
+                .drop(1)
+
+            def status = rows[0].split('\t')[1]
+
+            tuple(meta, status)
+        }
+
+    // Clusters with valid SNP alignments
+    ch_snippy_success = ch_snippy_status
+        .filter { meta, status ->
+            status == 'SUCCESS'
+        }
+
+    // Clusters with no qualifying core SNPs
+    ch_snippy_zero = ch_snippy_status
+        .filter { meta, status ->
+            status == 'ZERO_CORE_SNPS'
+        }
+
+    // Channel to make SNP matrix when cluster has zero core SNPs
+    ch_zero_snippy_txt = SNIPPY_CLUSTERS.out.snippy_txt
+        .join(ch_snippy_status, by: 0)
+        .filter { meta, snippy_txt, status ->
+            status == 'ZERO_CORE_SNPS'
+        }
+        .map { meta, snippy_txt, status ->
+            tuple(meta, snippy_txt)
+        }
+
+    // Channel for clusters with valid core SNP alignments
+    ch_regular_snippy_txt = SNIPPY_CLUSTERS.out.snippy_txt
+        .join(ch_snippy_status, by: 0)
+        .filter { meta, snippy_txt, status ->
+            status == 'SUCCESS'
+        }
+        .map { meta, snippy_txt, status ->
+            tuple(meta, snippy_txt)
+        }
     //
     // MODULE: Core SNP Distances
     //
@@ -109,23 +155,41 @@ workflow POODLE {
     )
     ch_versions = ch_versions.mix(SNPDISTS_SNIPPY.out.versions.first())
 
+    // For cases when zero SNPs were identified
+    ZERO_SNP_MATRIX(
+        ch_zero_snippy_txt
+    )
+    ch_versions = ch_versions.mix(ZERO_SNP_MATRIX.out.versions.first())
+
+    // Combine the core SNP distance matrices to make the report
+    ch_all_snp_dists = SNPDISTS_SNIPPY.out.tsv
+        .mix(ZERO_SNP_MATRIX.out.tsv)
     //
     // MODULE: Core SNP Linkages
     //
-    ch_snp_report_dists = SNPDISTS_SNIPPY.out.tsv
-    .join(SNIPPY_CLUSTERS.out.snippy_txt)
+    ch_regular_linkage_input = SNPDISTS_SNIPPY.out.tsv
+        .join(ch_regular_snippy_txt)
 
-    LINKAGES_SNIPPY(
-        ch_snp_report_dists
-    )
+    ch_zero_linkage_input = ZERO_SNP_MATRIX.out.tsv
+        .join(ch_zero_snippy_txt)
+
+    ch_all_linkage_input = ch_regular_linkage_input
+        .mix(ch_zero_linkage_input)
+
+    LINKAGES_SNIPPY(ch_all_linkage_input)
     ch_versions = ch_versions.mix(LINKAGES_SNIPPY.out.versions.first())
 
     //
     // MODULE: Output count of constant sites (suitable for IQ-TREE -fconst)
     //
-    CONSTANTSITES(
-        SNIPPY_CLUSTERS.out.clean_full_aln
-    )
+    // Run CONSTANTSITES only for clusters with valid core SNPs not for zero SNPs
+    ch_regular_clean_full_aln = SNIPPY_CLUSTERS.out.clean_full_aln
+        .join(ch_snippy_success, by: 0)
+        .map { meta, full_aln, status ->
+            tuple(meta, full_aln)
+        }
+
+    CONSTANTSITES(ch_regular_clean_full_aln)
     ch_versions = ch_versions.mix(CONSTANTSITES.out.versions.first())
 
     // Convert constant sites file to value
@@ -146,6 +210,13 @@ workflow POODLE {
     //
     SNIPPY_TREE(IQTREE_SNIPPY.out.phylogeny)
     ch_versions = ch_versions.mix(SNIPPY_TREE.out.versions)
+
+    // For cases when cluster has zero SNPs generate a tree with 0 branches
+    ZERO_SNP_TREE(ch_zero_snippy_txt)
+
+    // Combine the trees to use as input for report
+    ch_all_snippy_trees = SNIPPY_TREE.out.tre
+        .mix(ZERO_SNP_TREE.out.tre)
 
     //
     // MODULE: Gubbins
@@ -186,6 +257,9 @@ workflow POODLE {
         // Midpoint rooting and removing reference
         GUBBINS_TREE(IQTREE_GUBBINS.out.phylogeny)
         ch_versions = ch_versions.mix(GUBBINS_TREE.out.versions)
+    
+    ch_gubbins_results = GUBBINS_TREE.out.tre
+        .join(SNPDISTS_GUBBINS.out.tsv, by: 0)
     }
 
     //
@@ -278,58 +352,158 @@ workflow POODLE {
     Channel.value(file(params.qmd_neither )).set { ch_qmd_neither  }
     Channel.value(file(params.logo_report )).set { ch_logo         }
 
-    // BOTH
+    // BOTH: Gubbins + MashTree
     if (params.gubbins && params.mashtree) {
-        ch_clusters_both = LINKAGES_SNIPPY.out.linkages
-        .join(SNIPPY_TREE.out.tre,         by: 0)
-        .join(SNPDISTS_SNIPPY.out.tsv,     by: 0)
-        .join(PANAROO_RUN.out.summary,     by: 0)
-        .join(PANAROO_RUN.out.csv,         by: 0)
-        .join(PANAROO_RUN.out.rtab,        by: 0)
-        .join(GENEDISTS.out.tsv,           by: 0)
-        .join(GUBBINS_TREE.out.tre,        by: 0)
-        .join(SNPDISTS_GUBBINS.out.tsv,    by: 0)
-        .join(MASHTREE.out.tree,           by: 0)
-        .join(MASHTREE.out.matrix,         by: 0)
-        .map { meta, ref_eval, snptree, snpmatrix, pan_summary, pan_roary, pan_rtab, pan_genedists, gubtree, gubmatrix, mashtree, mashmatrix ->
-            tuple(meta, ref_eval, snptree, snpmatrix, pan_summary, pan_roary, pan_rtab, pan_genedists, gubtree, gubmatrix, mashtree, mashmatrix)
-        }
-        
-        YAML_BOTH(ch_clusters_both )
+
+        // Base results, independent of Gubbins
+        ch_clusters_base = LINKAGES_SNIPPY.out.linkages
+            .join(ch_all_snippy_trees,       by: 0)
+            .join(ch_all_snp_dists,          by: 0)
+            .join(PANAROO_RUN.out.summary,   by: 0)
+            .join(PANAROO_RUN.out.csv,       by: 0)
+            .join(PANAROO_RUN.out.rtab,      by: 0)
+            .join(GENEDISTS.out.tsv,         by: 0)
+            .join(MASHTREE.out.tree,         by: 0)
+            .join(MASHTREE.out.matrix,       by: 0)
+
+        // Left-join with available Gubbins results.
+        // remainder:true retains clusters missing Gubbins outputs.
+        ch_clusters_with_gubbins = ch_clusters_base
+            .join(ch_gubbins_results, by: 0, remainder: true)
+            .filter { row -> row[1] != null }
+
+        // Successful Gubbins -> BOTH report
+        ch_clusters_both = ch_clusters_with_gubbins
+            .filter { row ->
+                row[10] != null && row[11] != null
+            }
+            .map { row ->
+                tuple(
+                    row[0],  // meta
+                    row[1],  // ref_eval
+                    row[2],  // snptree
+                    row[3],  // snpmatrix
+                    row[4],  // pan_summary
+                    row[5],  // pan_roary
+                    row[6],  // pan_rtab
+                    row[7],  // pan_genedists
+                    row[10], // gubtree
+                    row[11], // gubmatrix
+                    row[8],  // mashtree
+                    row[9]   // mashmatrix
+                )
+            }
+
+        // Missing Gubbins -> MASH ONLY report
+        ch_clusters_mash_fallback = ch_clusters_with_gubbins
+            .filter { row ->
+                row[10] == null || row[11] == null
+            }
+            .map { row ->
+                tuple(*row.take(10))
+            }
+
+        // Report with Gubbins and MashTree
+        YAML_BOTH(ch_clusters_both)
+
         QUARTO_BOTH(
-        YAML_BOTH.out.files, YAML_BOTH.out.yaml,
-        ch_qmd_both, ch_logo
+            YAML_BOTH.out.files,
+            YAML_BOTH.out.yaml,
+            ch_qmd_both,
+            ch_logo
         )
-        ch_versions = ch_versions.mix(QUARTO_BOTH.out.versions)
+
+        // Fallback report with MashTree only
+        YAML_MASH_ONLY(ch_clusters_mash_fallback)
+
+        QUARTO_MASH_ONLY(
+            YAML_MASH_ONLY.out.files,
+            YAML_MASH_ONLY.out.yaml,
+            ch_qmd_mashonly,
+            ch_logo
+        )
+
+        ch_versions = ch_versions
+            .mix(QUARTO_BOTH.out.versions)
+            .mix(QUARTO_MASH_ONLY.out.versions)
     }
 
-    // GUBBINS ONLY
+    // GUBBINS ONLY: with fallback to NEITHER
     if (params.gubbins && !params.mashtree) {
-        ch_clusters_gub = LINKAGES_SNIPPY.out.linkages
-        .join(SNIPPY_TREE.out.tre,          by: 0)
-        .join(SNPDISTS_SNIPPY.out.tsv,     by: 0)
-        .join(PANAROO_RUN.out.summary,     by: 0)
-        .join(PANAROO_RUN.out.csv,         by: 0)
-        .join(PANAROO_RUN.out.rtab,        by: 0)
-        .join(GENEDISTS.out.tsv,           by: 0)
-        .join(GUBBINS_TREE.out.tre,        by: 0)
-        .join(SNPDISTS_GUBBINS.out.tsv,      by: 0)
-        .map { meta, ref_eval, snptree, snpmatrix, pan_summary, pan_roary, pan_rtab, pan_genedists, gubtree, gubmatrix ->
-            tuple(meta, ref_eval, snptree, snpmatrix, pan_summary, pan_roary, pan_rtab, pan_genedists, gubtree, gubmatrix)
-        }
-        YAML_GUB_ONLY( ch_clusters_gub )
+
+        // Base results, independent of Gubbins
+        ch_clusters_base = LINKAGES_SNIPPY.out.linkages
+            .join(ch_all_snippy_trees,       by: 0)
+            .join(ch_all_snp_dists,          by: 0)
+            .join(PANAROO_RUN.out.summary,   by: 0)
+            .join(PANAROO_RUN.out.csv,       by: 0)
+            .join(PANAROO_RUN.out.rtab,      by: 0)
+            .join(GENEDISTS.out.tsv,         by: 0)
+
+        // Keep clusters without Gubbins results
+        ch_clusters_with_gubbins = ch_clusters_base
+            .join(ch_gubbins_results, by: 0, remainder: true)
+            .filter { row -> row[1] != null }
+
+        // Successful Gubbins -> GUBBINS ONLY
+        ch_clusters_gub = ch_clusters_with_gubbins
+            .filter { row ->
+                row[8] != null && row[9] != null
+            }
+            .map { row ->
+                tuple(
+                    row[0], // meta
+                    row[1], // ref_eval
+                    row[2], // snptree
+                    row[3], // snpmatrix
+                    row[4], // pan_summary
+                    row[5], // pan_roary
+                    row[6], // pan_rtab
+                    row[7], // pan_genedists
+                    row[8], // gubtree
+                    row[9]  // gubmatrix
+                )
+            }
+
+        // Missing Gubbins -> NEITHER
+        ch_clusters_neither_fallback = ch_clusters_with_gubbins
+            .filter { row ->
+                row[8] == null || row[9] == null
+            }
+            .map { row ->
+                tuple(*row.take(8))
+            }
+
+        // Report with Gubbins only
+        YAML_GUB_ONLY(ch_clusters_gub)
+
         QUARTO_GUB_ONLY(
-        YAML_GUB_ONLY.out.files, YAML_GUB_ONLY.out.yaml,
-        ch_qmd_gubonly, ch_logo
+            YAML_GUB_ONLY.out.files,
+            YAML_GUB_ONLY.out.yaml,
+            ch_qmd_gubonly,
+            ch_logo
         )
-       ch_versions = ch_versions.mix(QUARTO_GUB_ONLY.out.versions)
+
+        // Fallback without Gubbins or MashTree
+        YAML_NEITHER(ch_clusters_neither_fallback)
+
+        QUARTO_NEITHER(
+            YAML_NEITHER.out.files,
+            YAML_NEITHER.out.yaml,
+            ch_qmd_neither,
+            ch_logo
+        )
+
+        ch_versions = ch_versions
+            .mix(QUARTO_GUB_ONLY.out.versions)
+            .mix(QUARTO_NEITHER.out.versions)
     }
 
     // MASH ONLY
     if (!params.gubbins && params.mashtree) {
         ch_clusters_mash = LINKAGES_SNIPPY.out.linkages
-        .join(SNIPPY_TREE.out.tre,          by: 0)
-        .join(SNPDISTS_SNIPPY.out.tsv,     by: 0)
+        .join(ch_all_snippy_trees,         by: 0)
+        .join(ch_all_snp_dists,            by: 0)
         .join(PANAROO_RUN.out.summary,     by: 0)
         .join(PANAROO_RUN.out.csv,         by: 0)
         .join(PANAROO_RUN.out.rtab,        by: 0)
@@ -350,10 +524,10 @@ workflow POODLE {
     }
 
     // NEITHER
-    if (!params.gubbins && !params.gubbins) {
+    if (!params.gubbins && !params.mashtree) {
         ch_clusters_core = LINKAGES_SNIPPY.out.linkages
-        .join(SNIPPY_TREE.out.tre,          by: 0)
-        .join(SNPDISTS_SNIPPY.out.tsv,     by: 0)
+        .join(ch_all_snippy_trees,         by: 0)
+        .join(ch_all_snp_dists,            by: 0)
         .join(PANAROO_RUN.out.summary,     by: 0)
         .join(PANAROO_RUN.out.csv,         by: 0)
         .join(PANAROO_RUN.out.rtab,        by: 0)
@@ -369,7 +543,6 @@ workflow POODLE {
         ch_versions = ch_versions.mix(QUARTO_NEITHER.out.versions)
     }
 
-    //
     //MODULE: Get software versions
     //
     CUSTOM_DUMPSOFTWAREVERSIONS(
