@@ -11,6 +11,7 @@ process ZERO_SNP_TREE {
 
     output:
     tuple val(meta), path("${meta.species}_${meta.cluster_id}.tre"), emit: tre
+    path "versions.yml"                                            , emit: versions
 
     script:
     prefix = task.ext.prefix ?: "${meta.species}_${meta.cluster_id}"
