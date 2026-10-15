@@ -205,6 +205,14 @@ custom_plot_function <- function(plot, max_interactive = 150) {
   }
 }
 
+n_samples <- nrow(snp_matrix)
+
+label_size <- dplyr::case_when(
+  n_samples <= 150 ~ 8,
+  n_samples <= 250 ~ 4,
+  n_samples <= 400 ~ 3,
+  TRUE ~ 0
+)
 ```
 
 ## Disclaimer
@@ -223,6 +231,12 @@ Cluster analysis was performed on `r length(unique(samples$sample_id))` samples 
 ```{r snp-tree-plot}
 knitr::opts_chunk$set(cache.vars = TRUE)
 
+# Check if snp-tree has valid branch lengths
+use_lengths <- !is.null(snp_tree$edge.length) &&
+  length(snp_tree$edge.length) > 0 &&
+  all(is.finite(snp_tree$edge.length)) &&
+  any(snp_tree$edge.length > 0)
+
 zero_branches <- !is.null(snp_tree$edge.length) &&
   all(is.finite(snp_tree$edge.length)) &&
   all(snp_tree$edge.length == 0)
@@ -236,6 +250,14 @@ if (ape::Ntip(snp_tree) <= 2 || zero_branches) {
     show.tip.label = TRUE,
     no.margin = TRUE
   )
+
+  # Add scale bar only when branch lengths are meaningful
+  if (use_lengths) {
+    ape::add.scale.bar(
+      lwd = 2,
+      cex = 0.8
+    )
+  }
 
 } else {
 
@@ -254,6 +276,13 @@ if (ape::Ntip(snp_tree) <= 2 || zero_branches) {
 ```{r gubbins-tree-plot}
 knitr::opts_chunk$set(cache.vars = TRUE)
 
+# Check if gub-tree has valid branch lengths
+use_lengths <- !is.null(gub_tree$edge.length) &&
+  length(gub_tree$edge.length) > 0 &&
+  all(is.finite(gub_tree$edge.length)) &&
+  any(gub_tree$edge.length > 0)
+
+
 zero_branches <- !is.null(gub_tree$edge.length) &&
   all(is.finite(gub_tree$edge.length)) &&
   all(gub_tree$edge.length == 0)
@@ -267,6 +296,14 @@ if (ape::Ntip(gub_tree) <= 2 || zero_branches) {
     show.tip.label = TRUE,
     no.margin = TRUE
   )
+  
+  # Add scale bar only when branch lengths are meaningful
+  if (use_lengths) {
+    ape::add.scale.bar(
+      lwd = 2,
+      cex = 0.8
+    )
+  }
 
 } else {
   phylocanvas(
@@ -290,6 +327,10 @@ cat(panaroo_stats_text, sep="\n")
 ```
 
 ```{r pangenome-plot}
+#| fig-width: 14
+#| fig-height: 14
+#| fig-dpi: 200
+#| lightbox: true
 knitr::opts_chunk$set(cache.vars = TRUE)
 
 #----- PANGENOME HEATMAP ------#
@@ -298,7 +339,7 @@ pangenome_plot <- ggplot(pangenome, aes(y = sample_id, x = Gene, fill = Value, t
   scale_color_identity() +
   theme_minimal() +
   theme(axis.text.x = element_blank(),axis.title.x = element_blank(),
-        axis.text.y = element_text(size = 8), 
+        axis.text.y = element_text(size = label_size), 
         axis.title.y = element_blank(),
         axis.ticks = element_blank(),
         legend.position = "none"
@@ -308,11 +349,15 @@ pangenome_plot <- ggplot(pangenome, aes(y = sample_id, x = Gene, fill = Value, t
 custom_plot_function(pangenome_plot)
 ```
 
-***Figure 3.** Gene presence–absence heatmap generated from a pangenome analysis performed with Panaroo. Blue indicates gene presence, white indicates gene absence, and gray tiles indicate identical gene presence/absence profiles. Columns represent genes and rows represent isolates, ordered according to the core SNP phylogeny. Gene names and annotations can be interactively displayed by hovering over individual tiles. Visualization was generated using ggplot2 and plotly.*
+***Figure 3.** Gene presence–absence heatmap generated from a pangenome analysis performed with Panaroo. Blue indicates gene presence, white indicates gene absence, and gray tiles indicate identical gene presence/absence profiles. Columns represent genes and rows represent isolates, ordered according to the core SNP phylogeny. For clusters with ≤150 samples, gene names and annotations can be explored interactively by hovering over individual tiles. For larger clusters, static heatmaps are displayed and can be enlarged by clicking on the image. Visualization was generated using ggplot2 and Plotly, where applicable.*
 
 ### Core SNP distance matrix
 
 ```{r snp-matrix}
+#| fig-width: 14
+#| fig-height: 14
+#| fig-dpi: 200
+#| lightbox: true
 
 ##---CORE SNP MATRIX---###
 
@@ -344,14 +389,17 @@ snps_heatmap_plot <- ggplot(
     text = hovertext
   )
 ) +
-  geom_tile(color = "white", linewidth = 0.2) +
+  geom_tile(
+    color = if (n_samples > max_interactive) NA else "white",
+    linewidth = if (n_samples > max_interactive) 0 else 0.2
+  ) +  
   scale_fill_gradient(low = "#4E79A7", high = "white") +
   theme_minimal() +
   theme(
     axis.text.x = element_text(
-      angle = 90, hjust = 1, vjust = 0.5, size = 8
+      angle = 90, hjust = 1, vjust = 0.5, size = label_size
     ),
-    axis.text.y = element_text(size = 8),
+    axis.text.y = element_text(size = label_size),
     axis.title = element_blank()
   ) +
   labs(fill = "SNPs")
@@ -382,6 +430,11 @@ custom_plot_function(snps_heatmap_plot)
 ### Recombination filtered SNP distance matrix
 
 ```{r gub-snp-matrix}
+#| fig-width: 14
+#| fig-height: 14
+#| fig-dpi: 200
+#| lightbox: true
+
 
 ##---RECOMBINATION FILTERED SNP MATRIX---###
 # Convert matrix to data frame
@@ -419,21 +472,8 @@ gub_snps_heatmap_plot <- ggplot(
   scale_fill_gradient(low = "#6C3BAA", high = "white") +
   theme_minimal() +
   theme(
-    axis.text.x = if (n_samples > max_interactive) {
-      element_blank()
-    } else {
-      element_text(angle = 90, hjust = 1, vjust = 0.5, size = 8)
-    },
-    axis.text.y = if (n_samples > max_interactive) {
-      element_blank()
-    } else {
-      element_text(size = 8)
-    },
-    axis.ticks = if (n_samples > max_interactive) {
-      element_blank()
-    } else {
-      element_line()
-    },
+    axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = label_size),
+    axis.text.y = element_text(size = label_size),
     axis.title = element_blank()
   ) +
   labs(fill = "SNPs")
@@ -463,6 +503,10 @@ custom_plot_function(gub_snps_heatmap_plot)
 
 ### Gene presence-absence distance matrix
 ```{r gene-matrix}
+#| fig-width: 14
+#| fig-height: 14
+#| fig-dpi: 200
+#| lightbox: true
 ##---CORE GENE MATRIX---###
 
 # Convert matrix to data frame
@@ -500,21 +544,8 @@ genes_heatmap_plot <- ggplot(
   scale_fill_gradient(low = "#AA4A44", high = "white") +
   theme_minimal() +
   theme(
-    axis.text.x = if (n_samples > max_interactive) {
-      element_blank()
-    } else {
-      element_text(angle = 90, hjust = 1, vjust = 0.5, size = 8)
-    },
-    axis.text.y = if (n_samples > max_interactive) {
-      element_blank()
-    } else {
-      element_text(size = 8)
-    },
-    axis.ticks = if (n_samples > max_interactive) {
-      element_blank()
-    } else {
-      element_line()
-    },
+    axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = label_size),
+    axis.text.y = element_text(size = label_size),
     axis.title = element_blank()
   ) +
   labs(fill = "Genes")

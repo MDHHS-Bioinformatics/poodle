@@ -228,7 +228,14 @@ custom_plot_function <- function(plot, max_interactive = 150) {
   }
 }
 
+n_samples <- nrow(snp_matrix)
 
+label_size <- dplyr::case_when(
+  n_samples <= 150 ~ 8,
+  n_samples <= 250 ~ 4,
+  n_samples <= 400 ~ 3,
+  TRUE ~ 0
+)
 ```
 
 ## Disclaimer
@@ -245,7 +252,18 @@ Cluster analysis was performed on `r length(unique(samples$sample_id))` samples 
 ### Core-SNP Tree
 
 ```{r snp-tree-plot}
+#| fig-width: 10
+#| fig-height: 3
+#| lightbox: true
+
 knitr::opts_chunk$set(cache.vars = TRUE)
+
+# Check if snp-tree has valid branch lengths
+use_lengths <- !is.null(snp_tree$edge.length) &&
+  length(snp_tree$edge.length) > 0 &&
+  all(is.finite(snp_tree$edge.length)) &&
+  any(snp_tree$edge.length > 0)
+
 
 zero_branches <- !is.null(snp_tree$edge.length) &&
   all(is.finite(snp_tree$edge.length)) &&
@@ -261,6 +279,14 @@ if (ape::Ntip(snp_tree) <= 2 || zero_branches) {
     no.margin = TRUE
   )
 
+  # Add scale bar only when branch lengths are meaningful
+  if (use_lengths) {
+    ape::add.scale.bar(
+      lwd = 2,
+      cex = 0.8
+    )
+  }
+  
 } else {
 
   phylocanvas(
@@ -271,13 +297,22 @@ if (ape::Ntip(snp_tree) <= 2 || zero_branches) {
 }
 ```
 
-***Figure 1.** Maximum-likelihood phylogeny inferred from core SNPs identified with Snippy-core. The tree was reconstructed in IQ-TREE using the GTR+G4 substitution model with constant sites included. Branch lengths represent substitutions per site across the core genome alignment. Nodes with <50% bootstrap support were collapsed into polytomies. Very short or near-zero branches indicate unresolved relationships among highly similar isolates. Because recombination and horizontal gene transfer may obscure vertical inheritance, branch lengths and fine-scale relationships should be interpreted cautiously. The reference genome was excluded, the tree was midpoint-rooted, and visualization was performed using Phylocanvas.*
+***Figure 1.** Maximum-likelihood phylogeny inferred from core SNPs identified with Snippy-core. The tree was reconstructed in IQ-TREE using the GTR+G4 substitution model with constant sites included. Branch lengths represent substitutions per site across the core genome alignment. Nodes with <50% bootstrap support were collapsed into polytomies. Very short or near-zero branches indicate unresolved relationships among highly similar isolates. Because recombination and horizontal gene transfer may obscure vertical inheritance, branch lengths and fine-scale relationships should be interpreted cautiously. The reference genome was excluded, the tree was midpoint-rooted, and visualization was performed using Phylocanvas. For clusters with zero core SNPs, an unresolved tree with zero-length branches was generated and displayed as a static plot with equal branch spacing for visualization only. No phylogenetic inference was performed.*
 
 
 ### Mash Tree
 
 ```{r mash-tree-plot}
+#| fig-width: 10
+#| fig-height: 3
+#| lightbox: true
 knitr::opts_chunk$set(cache.vars = TRUE)
+
+# Check if MashTree has valid branch lengths
+use_lengths <- !is.null(mash_tree$edge.length) &&
+  length(mash_tree$edge.length) > 0 &&
+  all(is.finite(mash_tree$edge.length)) &&
+  any(mash_tree$edge.length > 0)
 
 zero_branches_mash <- !is.null(mash_tree$edge.length) &&
   all(is.finite(mash_tree$edge.length)) &&
@@ -311,7 +346,7 @@ if (ape::Ntip(mash_tree) <= 2 || zero_branches_mash) {
 }
 ```
 
-***Figure 2.** Distance-based dendrogram constructed with MashTree from pairwise genomic distances estimated using the MinHash algorithm (Mash). Clustering was performed using the neighbor-joining algorithm implemented in QuickTree. This tree reflects overall genomic similarity rather than inferred evolutionary relationships. Only samples with available genome assemblies were included in the analysis. The reference genome was excluded, the tree was midpoint-rooted, and visualization was performed using Phylocanvas.*
+***Figure 2.** Distance-based dendrogram constructed with MashTree from pairwise genomic distances estimated using the MinHash algorithm (Mash). Clustering was performed using the neighbor-joining algorithm implemented in QuickTree. This tree reflects overall genomic similarity rather than inferred evolutionary relationships. Only samples with available genome assemblies were included in the analysis. The reference genome was excluded, the tree was midpoint-rooted, and visualization was performed using Phylocanvas. For clusters with zero-branch distance, a static plot with equal branch spacing was generated for visualization only.*
 
 ### Pangenome profile
 
@@ -323,6 +358,10 @@ cat(panaroo_stats_text, sep="\n")
 ```
 
 ```{r pangenome-plot}
+#| fig-width: 14
+#| fig-height: 14
+#| fig-dpi: 200
+#| lightbox: true
 knitr::opts_chunk$set(cache.vars = TRUE)
 
 #----- PANGENOME HEATMAP ------#
@@ -331,7 +370,7 @@ pangenome_plot <- ggplot(pangenome, aes(y = sample_id, x = Gene, fill = Value, t
   scale_color_identity() +
   theme_minimal() +
   theme(axis.text.x = element_blank(),axis.title.x = element_blank(),
-        axis.text.y = element_text(size = 8), 
+        axis.text.y = element_text(size = label_size), 
         axis.title.y = element_blank(),
         axis.ticks = element_blank(),
         legend.position = "none"
@@ -341,11 +380,15 @@ pangenome_plot <- ggplot(pangenome, aes(y = sample_id, x = Gene, fill = Value, t
 custom_plot_function(pangenome_plot)
 ```
 
-***Figure 3.** Gene presence–absence heatmap generated from a pangenome analysis performed with Panaroo. Blue indicates gene presence, white indicates gene absence, and gray tiles indicate identical gene presence/absence profiles. Columns represent genes and rows represent isolates, ordered according to the core SNP phylogeny. Gene names and annotations can be interactively displayed by hovering over individual tiles. Visualization was generated using ggplot2 and plotly.*
+***Figure 3.** Gene presence–absence heatmap generated from a pangenome analysis performed with Panaroo. Blue indicates gene presence, white indicates gene absence, and gray tiles indicate identical gene presence/absence profiles. Columns represent genes and rows represent isolates, ordered according to the core SNP phylogeny. For clusters with ≤150 samples, gene names and annotations can be explored interactively by hovering over individual tiles. For larger clusters, static heatmaps are displayed and can be enlarged by clicking on the image. Visualization was generated using ggplot2 and Plotly, where applicable.*
 
 ### Core SNP distance matrix
 
 ```{r snp-matrix}
+#| fig-width: 14
+#| fig-height: 14
+#| fig-dpi: 200
+#| lightbox: true
 
 ##---CORE SNP MATRIX---###
 
@@ -377,14 +420,17 @@ snps_heatmap_plot <- ggplot(
     text = hovertext
   )
 ) +
-  geom_tile(color = "white", linewidth = 0.2) +
+  geom_tile(
+    color = if (n_samples > max_interactive) NA else "white",
+    linewidth = if (n_samples > max_interactive) 0 else 0.2
+  ) +  
   scale_fill_gradient(low = "#4E79A7", high = "white") +
   theme_minimal() +
   theme(
     axis.text.x = element_text(
-      angle = 90, hjust = 1, vjust = 0.5, size = 8
+      angle = 90, hjust = 1, vjust = 0.5, size = label_size
     ),
-    axis.text.y = element_text(size = 8),
+    axis.text.y = element_text(size = label_size),
     axis.title = element_blank()
   ) +
   labs(fill = "SNPs")
@@ -415,7 +461,10 @@ custom_plot_function(snps_heatmap_plot)
 ### Mash distance matrix
 
 ```{r mash-matrix}
-
+#| fig-width: 14
+#| fig-height: 14
+#| fig-dpi: 200
+#| lightbox: true
 ##---MASH distance MATRIX---###
 
 # Convert matrix to data frame
@@ -431,12 +480,14 @@ mash_df <- mash_df %>%
     
 # Create the heatmap
 mash_heatmap_plot <- ggplot(mash_df, aes(x = sample_id_col, y = sample_id_row, fill = value, text = hovertext)) +
-  geom_tile(color = "white", size = 0.2) +
-  #geom_text(aes(label = value), color = "black", size = 1, vjust = 0.5, hjust = 0.5) +
+  geom_tile(
+    color = if (n_samples > max_interactive) NA else "white",
+    linewidth = if (n_samples > max_interactive) 0 else 0.2
+  ) +    
   scale_fill_gradient(low = "orange3", high = "white") +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 8),
-        axis.text.y = element_text(size = 8),
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = label_size),
+        axis.text.y = element_text(size = label_size),
         axis.title = element_blank()) +
   labs(fill = "Mash")
   
@@ -444,10 +495,14 @@ mash_heatmap_plot <- ggplot(mash_df, aes(x = sample_id_col, y = sample_id_row, f
 custom_plot_function(mash_heatmap_plot)
 ```
 
-***Figure 5.** Heatmap of pairwise Mash distances calculated with MashTree. Distances reflect genome-wide similarity estimated from MinHash sketches. Rows and columns are ordered according to the core SNP phylogeny. Exact pairwise distances can be interactively displayed by hovering over individual cells. Visualization was generated using ggplot2 and plotly.*
+***Figure 5.** Heatmap of pairwise Mash distances calculated with MashTree. Distances reflect genome-wide similarity estimated from MinHash sketches. Rows and columns are ordered according to the core SNP phylogeny. For clusters with ≤150 samples, values can be explored interactively by hovering over individual cells. For larger clusters, static heatmaps are presented and can be enlarged by clicking on the image. Exact distances are available in the corresponding distance matrix.*
 
 ### Gene presence-absence distance matrix
 ```{r gene-matrix}
+#| fig-width: 14
+#| fig-height: 14
+#| fig-dpi: 200
+#| lightbox: true
 ##---CORE GENE MATRIX---###
 
 # Convert matrix to data frame
@@ -485,21 +540,8 @@ genes_heatmap_plot <- ggplot(
   scale_fill_gradient(low = "#AA4A44", high = "white") +
   theme_minimal() +
   theme(
-    axis.text.x = if (n_samples > max_interactive) {
-      element_blank()
-    } else {
-      element_text(angle = 90, hjust = 1, vjust = 0.5, size = 8)
-    },
-    axis.text.y = if (n_samples > max_interactive) {
-      element_blank()
-    } else {
-      element_text(size = 8)
-    },
-    axis.ticks = if (n_samples > max_interactive) {
-      element_blank()
-    } else {
-      element_line()
-    },
+    axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = label_size),
+    axis.text.y = element_text(size = label_size),
     axis.title = element_blank()
   ) +
   labs(fill = "Genes")
