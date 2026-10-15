@@ -9,7 +9,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![GitHub release](https://img.shields.io/github/v/release/MDHHS-Bioinformatics/poodle)](https://github.com/MDHHS-Bioinformatics/poodle/releases)
 ![Last Commit](https://img.shields.io/github/last-commit/MDHHS-Bioinformatics/poodle)
-[![DOI](https://zenodo.org/badge/885043245.svg)](https://doi.org/10.5281/zenodo.20857592)
+[![DOI](https://zenodo.org/badge/885043245.svg)](https://doi.org/10.5281/zenodo.23403980)
 
 **PoODLE** (Phylogenomic Overview for Detection of Linkages for Epidemiologists) is a bioinformatics pipeline for identifying genomic relatedness between bacterial isolates. Starting from a samplesheet containing sequencing reads (FASTQ), genome assemblies (FASTA), and annotation files (GFF/GBK), PoODLE performs variant calling, recombination filtering, phylogenetic reconstruction, pangenome analysis and Mash distance estimation. The pipeline produces linkage tables and an interactive HTML report for each cluster with trees, pangenome profiles, and distance matrices.
 
@@ -167,7 +167,7 @@ If you use PoODLE for your analysis, please cite the following doi:
 
 Vasco K, Maldonado-Torres D, Blankenship H & Miles-Jay A (2026). 
 MDHHS-Bioinformatics/poodle: v1.0.1 (v1.0.1). 
-Zenodo. https://doi.org/10.5281/zenodo.20857592
+Zenodo. https://doi.org/10.5281/zenodo.23403980
 
 An extensive list of references for the tools used by the pipeline can be found in [`CITATIONS.md`](CITATIONS.md).
 
