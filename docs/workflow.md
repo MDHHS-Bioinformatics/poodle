@@ -59,3 +59,11 @@ Outputs include:
 * linkage classification tables
 
 These reports are designed for **epidemiological interpretation and outbreak investigation**.
+
+### Handling clusters with zero core SNPs
+
+PoODLE supports clusters in which Snippy-core identifies no qualifying SNPs in the complete-site core-genome alignment. For these clusters, the pipeline generates a zero-SNP distance matrix and an unresolved tree with zero-length branches to maintain compatibility with downstream linkage analyses and HTML reporting.
+
+SNP-based phylogenetic inference and recombination filtering are skipped for these clusters. The unresolved tree is provided for visualization only and should not be interpreted as an inferred phylogeny.
+
+**Important:** Zero qualifying core SNPs do not necessarily indicate complete genomic identity. Results should be interpreted alongside alignment completeness, sequence quality, and other available genomic evidence.

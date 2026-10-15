@@ -166,6 +166,11 @@ The interactive report contains:
 * pangenome heatmaps
 * methods
 
+Improvements include:
+- **Interactive visualizations:** Phylogenetic trees and distance matrices are displayed interactively, allowing users to explore genomic relationships and pairwise distances and export visualizations as PNG files.
+- **Large-cluster visualization:** For clusters with more than 150 samples, heatmaps are displayed as static, expandable images to improve rendering performance and reduce memory usage.
+- **Zero-core-SNP handling:** For clusters with no qualifying core SNPs, PoODLE generates zero-SNP distance matrices and unresolved trees with zero-length branches, allowing linkage analysis and report generation to continue. These trees are displayed as static figures for visualization purposes only.
+
 ![report 1](./images/poodle_report_1.png)
 ![report 2](./images/poodle_report_2.png)
 ![report 3](./images/poodle_report_3.png)
@@ -231,6 +236,7 @@ snippy_core/
 | `<Species>_<cluster_id>.tre`      | Midpoint rooted tree in Newick format (reference tip dropped)    |
 | `<Species>_<cluster_id>.txt`      | Summary of core genome aligntment     |
 | `<Species>_<cluster_id>.vcf`      | Core genome variants     |
+
 
 </details>
 
@@ -314,6 +320,27 @@ mashtree/
 | `<Species>_<cluster_id>.dnd` | Mash-based distance tree |
 | `<Species>_<cluster_id>.tsv` | Mash distance matrix         |
 
+</details>
+
+---
+
+# Zero-core-SNP results
+
+For clusters with no qualifying SNPs in the complete-site core-genome alignment, PoODLE generates alternative outputs to allow downstream analyses and report generation to continue.
+
+<details>
+<summary>Files</summary>
+
+| Output | Description |
+|---|---|
+| Zero-SNP distance matrix (`.tsv`) | A pairwise distance matrix containing zero values for all isolates in the cluster. These values represent the absence of qualifying core SNP differences, rather than independently calculated pairwise distances. |
+| Unresolved tree (`.tre`) | A Newick tree containing the cluster isolates with zero-length branches. It is generated for visualization and report compatibility, not through maximum-likelihood phylogenetic inference. |
+| Linkage table (`.csv`) | Pairwise linkage classifications derived from the zero-SNP matrix using the existing linkage thresholds, subject to alignment-quality checks. |
+| HTML report (`.html`) | A report containing the available analyses, including core SNP summaries, linkage results, pangenome analysis, and MashTree results when enabled. |
+
+**Interpretation:** Zero qualifying SNPs do not necessarily imply that isolates are genomically identical. Differences may occur at positions excluded because of missing or ambiguous sequence data. Linkage classifications should therefore be interpreted alongside alignment completeness, sequencing quality, and additional genomic or epidemiological evidence.
+
+SNP-based maximum-likelihood phylogenetic inference and recombination filtering are not performed for these clusters.
 </details>
 
 ---

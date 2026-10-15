@@ -224,6 +224,28 @@ If this occurs, we recommend rerunning PoODLE without `--gubbins` and using `-re
 
 ---
 
+## Handling incomplete or unavailable analyses
+
+PoODLE is designed to continue processing clusters when certain analyses cannot be completed.
+
+**Clusters with zero core SNPs**
+
+When no qualifying core SNPs are identified by Snippy-core, PoODLE generates a zero-SNP distance matrix and an unresolved zero-length tree. These outputs support downstream linkage analysis and reporting without attempting SNP-based phylogenetic inference.
+
+Constant-site calculations and recombination filtering are skipped for these clusters. Other analyses, including Panaroo and MashTree (when enabled), continue independently.
+
+**Gubbins analysis fallback**
+
+When `--gubbins` is enabled but complete recombination-filtered results are unavailable for a cluster, PoODLE automatically generates the corresponding report without Gubbins results.
+
+If `--mashtree` is also enabled, the report includes MashTree results. Otherwise, the report contains the available core SNP and pangenome analyses.
+
+This fallback is applied independently to each cluster, allowing successful Gubbins results to be retained for other clusters within the same run.
+
+Users do not need to rerun PoODLE without `--gubbins` solely to generate reports for affected clusters.
+
+---
+
 # 📂 Pipeline Outputs
 
 The pipeline produces the following directories:
@@ -249,7 +271,6 @@ For more details about the output files and reports, please refer to the [`Outpu
 
 * Prefer **reads over assemblies** for SNP analysis
 * Using a **reference from within the cluster** is strongly recommended to avoid core genome shrinkage
-* Run with `--gubbins` for highly recombinant species
 * Interpret SNP thresholds **in epidemiological context**, not in isolation
 * A genomic cluster should contain > 4 closely related samples. We strongly recommend using PoODLE after [`CorGe+`](https://github.com/MDHHS-Bioinformatics/corge), since CorGe+ identifies genomic context groups at different thresholds.
 
